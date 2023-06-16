@@ -392,9 +392,15 @@ class MaspsxProcessor:
                                 f"#nop # DEBUG: next op WRITES to {r_dest}"
                             )
                     else:
+                        label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+
                         res.append(
                             "nop # DEBUG: is_addend (not uses_at and reg_in_line)"
                         )
+
 
                     self.verbose and res.append(f"# {r_dest} in {next_instruction}")
                 else:
@@ -411,6 +417,10 @@ class MaspsxProcessor:
                 if not uses_at(next_instruction) and reg_in_line(
                     r_dest, next_instruction
                 ):
+                    label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                    if is_label(label):
+                        res.append(label)
+                        self.skip_instructions = 1
                     res.append(
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
@@ -428,10 +438,8 @@ class MaspsxProcessor:
                     label = self.get_next_instruction(skip=0)
                     if is_label(label):
                         res.append(label)
-                        res.append(f"nop # DEBUG: {label} is label")
                         self.skip_instructions = 1
-                    else:
-                        res.append(f"nop # DEBUG: {label} is not a label")
+                    res.append(f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at")
             else:
                 res.append(line)
 
