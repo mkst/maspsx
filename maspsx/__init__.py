@@ -41,6 +41,9 @@ def reg_in_line(reg, line):
     if re.match(rf"[a-z]+\s+{reg},.*", line):
         # "lhu	$2,0($3)"
         return True
+    if re.match(rf"mtc2\s+{reg},.*", line):
+        # "mtc2	$2, $8"
+        return True
     if re.match(rf".*,{reg},.*", line):
         return True
     if re.match(rf".*,{reg}$", line):
@@ -113,6 +116,8 @@ def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=F
     if line == ".set\tmacro" or line == ".set\tnomacro":
         return False
     if line == "#.set\tvolatile" or line == "#.set\tnovolatile":
+        return False
+    if line == "#APP" or line == "#NO_APP":
         return False
 
     return True
