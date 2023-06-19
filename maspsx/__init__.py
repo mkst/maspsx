@@ -319,6 +319,11 @@ class MaspsxProcessor:
             res.append(".set\tat")
             res.append("# EXPAND_DIV END")
 
+            next_instruction = self.get_next_instruction(skip=0)
+            if reg_in_line(r_dest, next_instruction):
+                res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
+
+
         elif op == "divu":
             # FIXME: handle mult within next 3 instructions!
             r_dest, r_source, r_operand = rest[0].split(",")
@@ -330,6 +335,10 @@ class MaspsxProcessor:
             res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
             res.append(f"mflo\t{r_dest}")
             res.append(".set\tat")
+
+            next_instruction = self.get_next_instruction(skip=0)
+            if reg_in_line(r_dest, next_instruction):
+                res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
 
         elif op in branch_mnemonics + jump_mnemonics:
             res.append(line)
@@ -385,6 +394,12 @@ class MaspsxProcessor:
                         )
                     elif next_op in load_mnemonics:
                         if f"({r_dest})" in next_instruction:
+
+                            label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                            if is_label(label):
+                                res.append(label)
+                                self.skip_instructions = 1
+
                             res.append(f"nop # DEBUG: next op READS from {r_dest}")
                         else:
                             # we dont need a nop
