@@ -348,6 +348,18 @@ class MaspsxProcessor:
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
 
+        elif op == "sltu":
+            r_dest, r_source, r_operand = rest[0].split(",")
+            if re.match(r"^-?\d+$", r_operand) or re.match(r"^-?0x[A-Fa-f0-9]+$", r_operand):
+                value = int(r_operand)
+                if value < 0:
+                    res.append(f"li\t$at,{r_operand}")
+                    res.append(f"{op}\t{r_dest},{r_source},$at")
+                else:
+                    res.append(line)
+            else:
+                res.append(line)
+
         elif op in branch_mnemonics + jump_mnemonics:
             res.append(line)
             if self.is_reorder:
