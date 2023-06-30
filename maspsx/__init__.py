@@ -273,14 +273,17 @@ class MaspsxProcessor:
             res.append(line)
 
             nop = self.get_next_instruction(skip=0)
-
             assert nop == "#nop", f"#nop is expected after mfhi. Got {nop}"
 
-            next_next_line = self.get_next_instruction(skip=1)
-            mult = self.get_next_instruction(skip=2)
+            next_next_line = self.get_next_instruction(skip=1, ignore_set=True)
+            mult = self.get_next_instruction(skip=2, ignore_set=True)
 
             if mult.startswith("mult\t"):
-                if next_next_line != "#nop":
+                set_line = self.get_next_instruction(skip=1)
+                if set_line.startswith(".set\t"):
+                    res.append("nop  # DEBUG: mult + noreorder")
+                    self.skip_instructions = 1
+                elif next_next_line != "#nop":
                     res.extend([next_next_line, "nop  # DEBUG: mult"])
                     self.skip_instructions = 2
                 else:
