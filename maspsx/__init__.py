@@ -465,6 +465,25 @@ class MaspsxProcessor:
                     res.append(
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
+            
+            elif not is_addend and r_source == "$2" and r_source == r_dest and int(operand) > 32767:
+                # e.g. lhu	$2,49344($2)
+                res.append(".set\tnoat")
+                res.append(f"lui\t$at,%hi({operand})")
+                res.append(f"addu\t$at,{r_source},$at")
+                res.append(f"{op}\t{r_dest},%lo({operand})($at)")
+                res.append(".set\tat")
+
+                if not uses_at(next_instruction) and reg_in_line(
+                    r_dest, next_instruction
+                ):
+                    label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                    if is_label(label):
+                        res.append(label)
+                        self.skip_instructions = 1
+                    res.append(
+                        f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
+                    )
 
             elif not is_addend and r_source and reg_in_line(r_dest, next_instruction):
                 # e.g. lw	$v0,364($a3)
