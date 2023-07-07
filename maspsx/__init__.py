@@ -272,9 +272,6 @@ class MaspsxProcessor:
             # cannot use a mult within 2 instructions of mflo/mfhi
             res.append(line)
 
-            nop = self.get_next_instruction(skip=0)
-            assert nop == "#nop", f"#nop is expected after mfhi. Got {nop}"
-
             next_next_line = self.get_next_instruction(skip=1, ignore_set=True)
             mult = self.get_next_instruction(skip=2, ignore_set=True)
 
