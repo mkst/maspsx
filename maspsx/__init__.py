@@ -466,7 +466,7 @@ class MaspsxProcessor:
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
             
-            elif not is_addend and r_source == "$2" and r_source == r_dest and int(operand) > 32767:
+            elif not is_addend and r_source in ("$2", "$v0") and r_source == r_dest and int(operand) > 32767:
                 # e.g. lhu	$2,49344($2)
                 res.append(".set\tnoat")
                 res.append(f"lui\t$at,%hi({operand})")
