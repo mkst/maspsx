@@ -271,28 +271,63 @@ class MaspsxProcessor:
         elif op in ("mflo", "mfhi"):
             # cannot use a mult within 2 instructions of mflo/mfhi
             res.append(line)
+            next_instruction = self.get_next_instruction(
+                skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
+            )
+            next_next_instruction = self.get_next_instruction(
+                skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
+            )
+            if next_instruction.startswith("mult\t") or next_instruction.startswith(
+                "div\t"
+            ):
+                # #nop
+                # #nop
+                # mult...
+                skip = 0
+                while True:
+                    inst = self.get_next_instruction(skip=skip)
+                    skip += 1
+                    if inst == next_instruction:
+                        res.append("nop")
+                        res.append("nop")
+                        res.append(inst)
+                        break
+                    if not inst.startswith("#"):
+                        res.append(inst)
+                self.skip_instructions = skip
 
-            next_next_line = self.get_next_instruction(skip=1, ignore_set=True)
-            mult = self.get_next_instruction(skip=2, ignore_set=True)
+            elif next_next_instruction.startswith(
+                "mult\t"
+            ) or next_next_instruction.startswith("div\t"):
+                # #nop
+                # #nop
+                # addu or lh ...
+                # mult ...
+                skip = 0
+                while True:
+                    inst = self.get_next_instruction(skip=skip)
+                    skip += 1
+                    if inst == next_instruction:
+                        op, *_ = inst.strip().split()
+                        if op in load_mnemonics:
+                            # allow for $at handling later in the script
+                            skip = 0
+                            break
+                        else:
+                            res.append(inst)
+                            res.append(
+                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
+                            )
+                    elif inst == next_next_instruction:
+                        res.append(inst)
+                        break
+                    elif not inst.startswith("#"):
+                        res.append(inst)
+                self.skip_instructions = skip
 
-            if mult.startswith("mult\t"):
-                set_line = self.get_next_instruction(skip=1)
-                if set_line.startswith(".set\t"):
-                    res.append("nop  # DEBUG: mult + noreorder")
-                    self.skip_instructions = 1
-                elif next_next_line != "#nop":
-                    res.extend([next_next_line, "nop  # DEBUG: mult"])
-                    self.skip_instructions = 2
-                else:
-                    res.extend(
-                        [
-                            "nop  # DEBUG: mult 1",
-                            "nop  # DEBUG: mult 2",
-                        ]
-                    )
             else:
-                # ignore the next nop (or two)
-                self.skip_instructions = 2 if next_next_line == "#nop" else 1
+                # do nothing
+                pass
 
         elif op == "break":
             # turn 'break 7' into 'break 0x0,0x7'
@@ -328,8 +363,7 @@ class MaspsxProcessor:
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
 
-
-        elif op == "divu":
+        elif self.expand_div and op == "divu":
             # FIXME: handle mult within next 3 instructions!
             r_dest, r_source, r_operand = rest[0].split(",")
             res.append(".set\tnoat")
@@ -347,7 +381,9 @@ class MaspsxProcessor:
 
         elif op == "sltu":
             r_dest, r_source, r_operand = rest[0].split(",")
-            if re.match(r"^-?\d+$", r_operand) or re.match(r"^-?0x[A-Fa-f0-9]+$", r_operand):
+            if re.match(r"^-?\d+$", r_operand) or re.match(
+                r"^-?0x[A-Fa-f0-9]+$", r_operand
+            ):
                 value = int(r_operand)
                 if value < 0:
                     res.append(f"li\t$at,{r_operand}")
@@ -417,8 +453,9 @@ class MaspsxProcessor:
                         )
                     elif next_op in load_mnemonics:
                         if f"({r_dest})" in next_instruction:
-
-                            label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                            label = self.get_next_instruction(
+                                skip=0, ignore_nop=True, ignore_set=True
+                            )
                             if is_label(label):
                                 res.append(label)
                                 self.skip_instructions = 1
@@ -430,7 +467,9 @@ class MaspsxProcessor:
                                 f"#nop # DEBUG: next op WRITES to {r_dest}"
                             )
                     else:
-                        label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
                         if is_label(label):
                             res.append(label)
                             self.skip_instructions = 1
@@ -438,7 +477,6 @@ class MaspsxProcessor:
                         res.append(
                             "nop # DEBUG: is_addend (not uses_at and reg_in_line)"
                         )
-
 
                     self.verbose and res.append(f"# {r_dest} in {next_instruction}")
                 else:
@@ -455,15 +493,22 @@ class MaspsxProcessor:
                 if not uses_at(next_instruction) and reg_in_line(
                     r_dest, next_instruction
                 ):
-                    label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                    label = self.get_next_instruction(
+                        skip=0, ignore_nop=True, ignore_set=True
+                    )
                     if is_label(label):
                         res.append(label)
                         self.skip_instructions = 1
                     res.append(
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
-            
-            elif not is_addend and r_source in ("$2", "$v0") and r_source == r_dest and int(operand) > 32767:
+
+            elif (
+                not is_addend
+                and r_source in ("$2", "$v0")
+                and r_source == r_dest
+                and int(operand) > 32767
+            ):
                 # e.g. lhu	$2,49344($2)
                 res.append(".set\tnoat")
                 res.append(f"lui\t$at,%hi({operand})")
@@ -474,7 +519,9 @@ class MaspsxProcessor:
                 if not uses_at(next_instruction) and reg_in_line(
                     r_dest, next_instruction
                 ):
-                    label = self.get_next_instruction(skip=0, ignore_nop=True, ignore_set=True)
+                    label = self.get_next_instruction(
+                        skip=0, ignore_nop=True, ignore_set=True
+                    )
                     if is_label(label):
                         res.append(label)
                         self.skip_instructions = 1
@@ -496,7 +543,9 @@ class MaspsxProcessor:
                     if is_label(label):
                         res.append(label)
                         self.skip_instructions = 1
-                    res.append(f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at")
+                    res.append(
+                        f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at"
+                    )
             else:
                 res.append(line)
 
