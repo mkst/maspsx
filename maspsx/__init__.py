@@ -109,8 +109,6 @@ def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=F
         return False
     if line.startswith(".loc"):
         return False
-    if line.startswith("$L") and line[2] not in "0123456789":
-        return False
     if line.startswith("L") and line[1] not in "0123456789" and line.endswith(":"):
         return False
     if line == ".set\tmacro" or line == ".set\tnomacro":
@@ -359,7 +357,7 @@ class MaspsxProcessor:
             res.append(".set\tat")
             res.append("# EXPAND_DIV END")
 
-            next_instruction = self.get_next_instruction(skip=0)
+            next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
 
@@ -375,7 +373,7 @@ class MaspsxProcessor:
             res.append(f"mflo\t{r_dest}")
             res.append(".set\tat")
 
-            next_instruction = self.get_next_instruction(skip=0)
+            next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
 
