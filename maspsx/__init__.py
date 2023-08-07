@@ -275,9 +275,8 @@ class MaspsxProcessor:
             next_next_instruction = self.get_next_instruction(
                 skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
             )
-            if next_instruction.startswith("mult\t") or next_instruction.startswith(
-                "div\t"
-            ):
+            if any(next_instruction.startswith(x) for x in
+                   ["mult\t","multu\t","div\t","divu\t","mthi\t"]):
                 # #nop
                 # #nop
                 # mult...
@@ -294,9 +293,8 @@ class MaspsxProcessor:
                         res.append(inst)
                 self.skip_instructions = skip
 
-            elif next_next_instruction.startswith(
-                "mult\t"
-            ) or next_next_instruction.startswith("div\t"):
+            elif any(next_next_instruction.startswith(x) for x in
+                     ["mult\t","multu\t","div\t","divu\t","mthi\t"]):
                 # #nop
                 # #nop
                 # addu or lh ...
