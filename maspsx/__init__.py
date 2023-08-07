@@ -276,7 +276,7 @@ class MaspsxProcessor:
                 skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
             )
             if any(next_instruction.startswith(x) for x in
-                   ["mult\t","multu\t","div\t","divu\t","mthi\t"]):
+                   ["mult\t","multu\t","div\t","divu\t"]):
                 # #nop
                 # #nop
                 # mult...
@@ -294,7 +294,7 @@ class MaspsxProcessor:
                 self.skip_instructions = skip
 
             elif any(next_next_instruction.startswith(x) for x in
-                     ["mult\t","multu\t","div\t","divu\t","mthi\t"]):
+                     ["mult\t","multu\t","div\t","divu\t"]):
                 # #nop
                 # #nop
                 # addu or lh ...
