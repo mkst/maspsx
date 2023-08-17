@@ -21,6 +21,7 @@ load_mnemonics = [
     "lh",
     "lhu",
     "lw",
+    "lwl",
     "lwr",
 ]
 
@@ -530,9 +531,15 @@ class MaspsxProcessor:
                 #      beq	$a3,$a0,$L14
                 res.append(line)
 
+                next_op, *_ = next_instruction.split()
+
                 if uses_at(next_instruction):
                     res.append(
                         f"#nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' uses $at"
+                    )
+                elif op == "lwl" and next_op == "lwr":
+                    res.append(
+                        f"#nop # DEBUG: {op} followed by {next_op}"
                     )
                 else:
                     label = self.get_next_instruction(skip=0)
