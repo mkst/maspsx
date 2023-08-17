@@ -21,6 +21,7 @@ load_mnemonics = [
     "lh",
     "lhu",
     "lw",
+    "lwl",
     "lwr",
 ]
 
@@ -287,7 +288,11 @@ class MaspsxProcessor:
                     if inst == next_instruction:
                         res.append("nop")
                         res.append("nop")
-                        res.append(inst)
+                        if inst.startswith("div") and self.expand_div:
+                            res.append("# DEBUG: expand_div is True")
+                            skip -= 1
+                        else:
+                            res.append(inst)
                         break
                     if not inst.startswith("#"):
                         res.append(inst)
@@ -433,6 +438,10 @@ class MaspsxProcessor:
                     if op in branch_mnemonics:
                         res.append("nop  # DEBUG: next instruction is branch")
                         self.skip_instructions = 1
+                    elif op == "lwl" and reg_in_line(r_dest, next_instruction):
+                        # TODO: can this be simplified to is_load(next_instruction) ?
+                        res.append(f"nop  # DEBUG: next instruction uses {r_dest} and is lwl")
+                        self.skip_instructions = 1
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
@@ -530,9 +539,15 @@ class MaspsxProcessor:
                 #      beq	$a3,$a0,$L14
                 res.append(line)
 
+                next_op, *_ = next_instruction.split()
+
                 if uses_at(next_instruction):
                     res.append(
                         f"#nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' uses $at"
+                    )
+                elif op == "lwl" and next_op == "lwr":
+                    res.append(
+                        f"#nop # DEBUG: {op} followed by {next_op}"
                     )
                 else:
                     label = self.get_next_instruction(skip=0)
@@ -544,6 +559,15 @@ class MaspsxProcessor:
                     )
             else:
                 res.append(line)
+
+        elif op == "li":
+            res.append(line)
+            rest = " ".join(rest)
+            r_dest, *_ = rest.split(",")
+            # TODO: make this more generic
+            next_instruction = self.get_next_instruction(skip=0)
+            if next_instruction.startswith("div") and next_instruction.endswith(f",{r_dest}"):
+                res.append(f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}")
 
         else:
             if line == ".rdata":
