@@ -288,7 +288,11 @@ class MaspsxProcessor:
                     if inst == next_instruction:
                         res.append("nop")
                         res.append("nop")
-                        res.append(inst)
+                        if inst.startswith("div") and self.expand_div:
+                            res.append("# DEBUG: expand_div is True")
+                            skip -= 1
+                        else:
+                            res.append(inst)
                         break
                     if not inst.startswith("#"):
                         res.append(inst)
@@ -555,6 +559,13 @@ class MaspsxProcessor:
                     )
             else:
                 res.append(line)
+
+        elif op == "li":
+            res.append(line)
+            next_instruction = self.get_next_instruction(skip=0)
+            if any(next_instruction.startswith(x) for x in
+                   ["mult\t","multu\t","div\t","divu\t"]):
+                res.append("nop  # DEBUG: li followed by div/divu")
 
         else:
             if line == ".rdata":
