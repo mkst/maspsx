@@ -562,10 +562,12 @@ class MaspsxProcessor:
 
         elif op == "li":
             res.append(line)
+            rest = " ".join(rest)
+            r_dest, *_ = rest.split(",")
+            # TODO: make this more generic
             next_instruction = self.get_next_instruction(skip=0)
-            if any(next_instruction.startswith(x) for x in
-                   ["mult\t","multu\t","div\t","divu\t"]):
-                res.append("nop  # DEBUG: li followed by div/divu")
+            if next_instruction.startswith("div") and next_instruction.endswith(f",{r_dest}"):
+                res.append(f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}")
 
         else:
             if line == ".rdata":
