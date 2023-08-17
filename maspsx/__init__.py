@@ -434,6 +434,10 @@ class MaspsxProcessor:
                     if op in branch_mnemonics:
                         res.append("nop  # DEBUG: next instruction is branch")
                         self.skip_instructions = 1
+                    elif op == "lwl" and reg_in_line(r_dest, next_instruction):
+                        # TODO: can this be simplified to is_load(next_instruction) ?
+                        res.append(f"nop  # DEBUG: next instruction uses {r_dest} and is lwl")
+                        self.skip_instructions = 1
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
