@@ -219,6 +219,80 @@ class MaspsxProcessor:
 
         return ""  # warn user?
 
+    def _handle_mflo_mfhi(self):
+        # we cannot use a div/mult within 2 instructions of mflo/mfhi
+        res = []
+
+        next_instruction = self.get_next_instruction(
+            skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
+        )
+        next_next_instruction = self.get_next_instruction(
+            skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
+        )
+        if any(
+            next_instruction.startswith(x)
+            for x in ["mult\t", "multu\t", "div\t", "divu\t"]
+        ):
+            # #nop
+            # #nop
+            # mult...
+            skip = 0
+            while True:
+                inst = self.get_next_instruction(skip=skip)
+                skip += 1
+                if inst == next_instruction:
+                    res.append("nop")
+                    res.append("nop")
+                    if inst.startswith("div") and self.expand_div:
+                        res.append("# DEBUG: expand_div is True")
+                        skip -= 1
+                    else:
+                        res.append(inst)
+                    break
+                if not inst.startswith("#"):
+                    res.append(inst)
+            self.skip_instructions = skip
+
+        elif any(
+            next_next_instruction.startswith(x)
+            for x in ["mult\t", "multu\t", "div\t", "divu\t"]
+        ):
+            # #nop
+            # #nop
+            # addu or lh ...
+            # mult ...
+            skip = 0
+            while True:
+                inst = self.get_next_instruction(skip=skip)
+                skip += 1
+                if inst == next_instruction:
+                    op, *_ = inst.strip().split()
+                    if op in load_mnemonics:
+                        # allow for $at handling later in the script
+                        skip = 0
+                        break
+                    else:
+                        res.append(inst)
+                        res.append(
+                            "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
+                        )
+                elif inst == next_next_instruction:
+                    if self.expand_div:
+                        res.append("# DEBUG: expand_div is True")
+                        skip -= 1
+                    else:
+                        res.append(inst)
+                    break
+                elif not inst.startswith("#"):
+                    res.append(inst)
+            self.skip_instructions = skip
+
+        else:
+            # do nothing
+            pass
+
+        return res
+
     def process_line(self, line):
         res = []
 
@@ -268,67 +342,8 @@ class MaspsxProcessor:
             res += load_immediate_double(line)
 
         elif op in ("mflo", "mfhi"):
-            # cannot use a mult within 2 instructions of mflo/mfhi
             res.append(line)
-            next_instruction = self.get_next_instruction(
-                skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
-            )
-            next_next_instruction = self.get_next_instruction(
-                skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
-            )
-            if any(next_instruction.startswith(x) for x in
-                   ["mult\t","multu\t","div\t","divu\t"]):
-                # #nop
-                # #nop
-                # mult...
-                skip = 0
-                while True:
-                    inst = self.get_next_instruction(skip=skip)
-                    skip += 1
-                    if inst == next_instruction:
-                        res.append("nop")
-                        res.append("nop")
-                        if inst.startswith("div") and self.expand_div:
-                            res.append("# DEBUG: expand_div is True")
-                            skip -= 1
-                        else:
-                            res.append(inst)
-                        break
-                    if not inst.startswith("#"):
-                        res.append(inst)
-                self.skip_instructions = skip
-
-            elif any(next_next_instruction.startswith(x) for x in
-                     ["mult\t","multu\t","div\t","divu\t"]):
-                # #nop
-                # #nop
-                # addu or lh ...
-                # mult ...
-                skip = 0
-                while True:
-                    inst = self.get_next_instruction(skip=skip)
-                    skip += 1
-                    if inst == next_instruction:
-                        op, *_ = inst.strip().split()
-                        if op in load_mnemonics:
-                            # allow for $at handling later in the script
-                            skip = 0
-                            break
-                        else:
-                            res.append(inst)
-                            res.append(
-                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
-                            )
-                    elif inst == next_next_instruction:
-                        res.append(inst)
-                        break
-                    elif not inst.startswith("#"):
-                        res.append(inst)
-                self.skip_instructions = skip
-
-            else:
-                # do nothing
-                pass
+            res += self._handle_mflo_mfhi()
 
         elif op == "break":
             # turn 'break 7' into 'break 0x0,0x7'
@@ -363,6 +378,8 @@ class MaspsxProcessor:
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
+            else:
+                res += self._handle_mflo_mfhi()
 
         elif self.expand_div and op == "divu":
             # FIXME: handle mult within next 3 instructions!
@@ -379,6 +396,8 @@ class MaspsxProcessor:
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if reg_in_line(r_dest, next_instruction):
                 res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
+            else:
+                res += self._handle_mflo_mfhi()
 
         elif op == "sltu":
             r_dest, r_source, r_operand = rest[0].split(",")
@@ -440,7 +459,9 @@ class MaspsxProcessor:
                         self.skip_instructions = 1
                     elif op == "lwl" and reg_in_line(r_dest, next_instruction):
                         # TODO: can this be simplified to is_load(next_instruction) ?
-                        res.append(f"nop  # DEBUG: next instruction uses {r_dest} and is lwl")
+                        res.append(
+                            f"nop  # DEBUG: next instruction uses {r_dest} and is lwl"
+                        )
                         self.skip_instructions = 1
 
             elif is_addend and r_source is None:
@@ -546,9 +567,7 @@ class MaspsxProcessor:
                         f"#nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' uses $at"
                     )
                 elif op == "lwl" and next_op == "lwr":
-                    res.append(
-                        f"#nop # DEBUG: {op} followed by {next_op}"
-                    )
+                    res.append(f"#nop # DEBUG: {op} followed by {next_op}")
                 else:
                     label = self.get_next_instruction(skip=0)
                     if is_label(label):
@@ -566,8 +585,12 @@ class MaspsxProcessor:
             r_dest, *_ = rest.split(",")
             # TODO: make this more generic
             next_instruction = self.get_next_instruction(skip=0)
-            if next_instruction.startswith("div") and next_instruction.endswith(f",{r_dest}"):
-                res.append(f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}")
+            if next_instruction.startswith("div") and next_instruction.endswith(
+                f",{r_dest}"
+            ):
+                res.append(
+                    f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
+                )
 
         else:
             if line == ".rdata":
