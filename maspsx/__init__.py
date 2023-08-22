@@ -24,40 +24,99 @@ load_mnemonics = [
     "lwl",
     "lwr",
 ]
+store_mnemonics = [
+    "sb",
+    "sh",
+    "sw",
+    "swl",
+    "swr",
+]
+
+single_reg_loads = [
+    "mult",
+    "multu",
+    "div",
+    "divu",
+    "rem",
+    "move",
+    "negu",
+]
+double_reg_loads = [
+    "and",
+    "andi",
+    "or",
+    "ori",
+    "xor",
+    "xori",
+    "addu",
+    "subu",
+    "sll",
+    "slr",
+    "srl",
+    "sra",
+    "slt",
+    "slti",
+    "sltu",
+]
 
 
-def reg_in_line(reg, line):
-    if len(line) == 0:
-        return False
-
+def line_loads_from_reg(line, r_src) -> bool:
     line = line.split("#")[0]  # strip comments
     line = line.strip()
 
     # escape dollar
-    reg = reg.replace("$", r"\$")
+    r_src = r_src.replace("$", r"\$")
 
-    if re.match(rf"[a-z]+\s+{reg}$", line):
-        # "j	$2"
-        return True
-    if re.match(rf"[a-z]+\s+{reg},.*", line):
-        # "lhu	$2,0($3)"
-        return True
-    if re.match(rf"mtc2\s+{reg},.*", line):
-        # "mtc2	$2, $8"
-        return True
-    if re.match(rf".*,{reg},.*", line):
-        return True
-    if re.match(rf".*,{reg}$", line):
-        # subu	$3,$3,$2
-        return True
-    if re.match(rf".*\({reg}\).*", line):
-        # "lh	$4,0($2)"
-        return True
+    if line.count("\t") != 1:
+        # print warning?
+        return False
+
+    op, rest = line.split("\t")
+
+    if op == "jal":
+        if re.match(rf"^.*,\s*{r_src}$", rest):
+            return True
+
+    elif op == "j":
+        if re.match(rf"^{r_src}$", rest):
+            return True
+
+    elif op in branch_mnemonics:
+        if re.match(rf"^{r_src},.*$", rest):
+            return True
+        elif re.match(rf"^.*,\s*{r_src},.*$", rest):
+            return True
+
+    elif op in load_mnemonics:
+        # lwl	$9,7($2)
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\({r_src}\)$", rest):
+            return True
+
+    elif op in store_mnemonics:
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\({r_src}\)$", rest):
+            return True
+        # "line_loads_from_reg" is a bit of a lie
+        if re.match(rf"^{r_src},.*$", rest):
+            return True
+
+    elif op in single_reg_loads:
+        if re.match(rf"^.*,\s*{r_src}$", rest):
+            return True
+        if op.startswith("mult"):
+            # TODO: do we need to check for div too?
+            if re.match(rf"^{r_src},.*$", rest):
+                return True
+
+    elif op in double_reg_loads:
+        if re.match(rf"^.*,\s*{r_src},.*$", rest):
+            return True
+        elif re.match(rf"^.*,.*,\s*{r_src}$", rest):
+            return True
 
     return False
 
 
-def uses_at(line: str):
+def uses_at(line: str) -> bool:
     # take everything before the comment
     line = line.split("#")[0]
     line = line.strip()
@@ -380,13 +439,14 @@ class MaspsxProcessor:
             res.append("# EXPAND_DIV END")
 
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-            if reg_in_line(r_dest, next_instruction):
-                res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
+            if line_loads_from_reg(next_instruction, r_dest):
+                res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
             else:
                 res += self._handle_mflo_mfhi()
 
         elif self.expand_div and op == "divu":
             r_dest, r_source, r_operand = rest[0].split(",")
+            res.append("# EXPAND_DIV START")
             res.append(".set\tnoat")
             res.append(f"divu\t$zero,{r_source},{r_operand}")
             res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
@@ -395,10 +455,11 @@ class MaspsxProcessor:
             res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
             res.append(f"mflo\t{r_dest}")
             res.append(".set\tat")
+            res.append("# EXPAND_DIV START")
 
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-            if reg_in_line(r_dest, next_instruction):
-                res.append(f"nop # DEBUG: {op} and {r_dest} in {next_instruction}")
+            if line_loads_from_reg(next_instruction, r_dest):
+                res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
             else:
                 res += self._handle_mflo_mfhi()
 
@@ -453,74 +514,49 @@ class MaspsxProcessor:
             )
 
             if not needs_expanding:
-                res.append(f"{line} # DEBUG: for assembler to expand")
+                res.append(f"{line} # DEBUG: leaving for assembler to expand")
                 nop = self.get_next_instruction(skip=0)
                 if nop == "#nop":
                     op, *_ = next_instruction.split()
                     if op in branch_mnemonics:
                         res.append("nop  # DEBUG: next instruction is branch")
                         self.skip_instructions = 1
-                    elif op == "lwl" and reg_in_line(r_dest, next_instruction):
-                        # TODO: can this be simplified to is_load(next_instruction) ?
-                        res.append(
-                            f"nop  # DEBUG: next instruction uses {r_dest} and is lwl"
-                        )
+                    elif line_loads_from_reg(next_instruction, r_dest):
+                        res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
                         self.skip_instructions = 1
+                    else:
+                        res.append(
+                            f"#nop  # DEBUG: next op ({op}) does not load from {r_dest}"
+                        )
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
                 res.append(line)
 
-                if not uses_at(next_instruction) and reg_in_line(
-                    r_dest, next_instruction
+                if not uses_at(next_instruction) and line_loads_from_reg(
+                    next_instruction, r_dest
                 ):
-                    next_op, *_ = next_instruction.split()
-                    if next_op in ("li", "la"):
-                        # ignore load address / load immediate
-                        self.verbose and res.append(
-                            "#nop # DEBUG: load address/immediate into r_dest"
-                        )
-                    elif next_op in load_mnemonics:
-                        if f"({r_dest})" in next_instruction:
-                            label = self.get_next_instruction(
-                                skip=0, ignore_nop=True, ignore_set=True
-                            )
-                            if is_label(label):
-                                res.append(label)
-                                self.skip_instructions = 1
+                    label = self.get_next_instruction(
+                        skip=0, ignore_nop=True, ignore_set=True
+                    )
+                    if is_label(label):
+                        res.append(label)
+                        self.skip_instructions = 1
 
-                            res.append(f"nop # DEBUG: next op READS from {r_dest}")
-                        else:
-                            # we dont need a nop
-                            self.verbose and res.append(
-                                f"#nop # DEBUG: next op WRITES to {r_dest}"
-                            )
-                    else:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-
-                        res.append(
-                            "nop # DEBUG: is_addend (not uses_at and reg_in_line)"
-                        )
-
-                    self.verbose and res.append(f"# {r_dest} in {next_instruction}")
-                else:
-                    self.verbose and res.append(f"# not {r_dest} in {next_instruction}")
+                    res.append(f"nop # DEBUG: next op loads from {r_dest}")
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
+                res.append("# EXPAND_AT START")
                 res.append(".set\tnoat")
                 res.append(f"lui\t$at,%hi({operand})")
                 res.append(f"addu\t$at,$at,{r_source}")
                 res.append(f"{op}\t{r_dest},%lo({operand})($at)")
                 res.append(".set\tat")
+                res.append("# EXPAND_AT START")
 
-                if not uses_at(next_instruction) and reg_in_line(
-                    r_dest, next_instruction
+                if not uses_at(next_instruction) and line_loads_from_reg(
+                    next_instruction, r_dest
                 ):
                     label = self.get_next_instruction(
                         skip=0, ignore_nop=True, ignore_set=True
@@ -539,14 +575,16 @@ class MaspsxProcessor:
                 and int(operand) > 32767
             ):
                 # e.g. lhu	$2,49344($2)
+                res.append("# EXPAND_AT START")
                 res.append(".set\tnoat")
                 res.append(f"lui\t$at,%hi({operand})")
                 res.append(f"addu\t$at,{r_source},$at")
                 res.append(f"{op}\t{r_dest},%lo({operand})($at)")
                 res.append(".set\tat")
+                res.append("# EXPAND_AT START")
 
-                if not uses_at(next_instruction) and reg_in_line(
-                    r_dest, next_instruction
+                if not uses_at(next_instruction) and line_loads_from_reg(
+                    next_instruction, r_dest
                 ):
                     label = self.get_next_instruction(
                         skip=0, ignore_nop=True, ignore_set=True
@@ -558,20 +596,16 @@ class MaspsxProcessor:
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
 
-            elif not is_addend and r_source and reg_in_line(r_dest, next_instruction):
+            elif (
+                not is_addend
+                and r_source
+                and line_loads_from_reg(next_instruction, r_dest)
+            ):
                 # e.g. lw	$v0,364($a3)
                 #      beq	$a3,$a0,$L14
                 res.append(line)
 
-                next_op, *_ = next_instruction.split()
-
-                if uses_at(next_instruction):
-                    res.append(
-                        f"#nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' uses $at"
-                    )
-                elif op == "lwl" and next_op == "lwr":
-                    res.append(f"#nop # DEBUG: {op} followed by {next_op}")
-                else:
+                if not uses_at(next_instruction):
                     label = self.get_next_instruction(skip=0)
                     if is_label(label):
                         res.append(label)
