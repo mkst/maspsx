@@ -99,7 +99,7 @@ def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=F
 
     if ignore_nop and line == "#nop":
         return False
-    if ignore_set and (line == ".set\treorder" or line == ".set\tnoreorder"):
+    if ignore_set and line in (".set\treorder", ".set\tnoreorder"):
         return False
     if ignore_label and is_label(line):
         return False
@@ -110,13 +110,14 @@ def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=F
         return False
     if line.startswith(".loc"):
         return False
+
     if line.startswith("L") and line[1] not in "0123456789" and line.endswith(":"):
         return False
-    if line == ".set\tmacro" or line == ".set\tnomacro":
+    if line in (".set\tmacro", ".set\tnomacro"):
         return False
-    if line == "#.set\tvolatile" or line == "#.set\tnovolatile":
+    if line in ("#.set\tvolatile", "#.set\tnovolatile"):
         return False
-    if line == "#APP" or line == "#NO_APP":
+    if line in ("#APP", "#NO_APP"):
         return False
 
     return True
@@ -178,6 +179,11 @@ def load_immediate_double(line: str):
 
 
 class MaspsxProcessor:
+    is_reorder = True
+    skip_instructions = 0
+    file_num = 1
+    line_index = 0
+
     def __init__(self, lines: List[str], expand_div=False, verbose=False):
         self.lines = [x.strip() for x in lines]
         self.expand_div = expand_div
@@ -271,11 +277,10 @@ class MaspsxProcessor:
                         # allow for $at handling later in the script
                         skip = 0
                         break
-                    else:
-                        res.append(inst)
-                        res.append(
-                            "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
-                        )
+                    res.append(inst)
+                    res.append(
+                        "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
+                    )
                 elif inst == next_next_instruction:
                     if self.expand_div:
                         res.append("# DEBUG: expand_div is True")
@@ -352,7 +357,6 @@ class MaspsxProcessor:
             res.append(line)
 
         elif self.expand_div and op in ("div", "rem"):
-            # FIXME: handle mult within next 3 instructions!
             move_from = "mfhi" if op == "rem" else "mflo"
             r_dest, r_source, r_operand = rest[0].split(",")
             res.append("# EXPAND_DIV START")
@@ -382,7 +386,6 @@ class MaspsxProcessor:
                 res += self._handle_mflo_mfhi()
 
         elif self.expand_div and op == "divu":
-            # FIXME: handle mult within next 3 instructions!
             r_dest, r_source, r_operand = rest[0].split(",")
             res.append(".set\tnoat")
             res.append(f"divu\t$zero,{r_source},{r_operand}")
