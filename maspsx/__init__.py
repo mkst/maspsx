@@ -143,6 +143,22 @@ def uses_at(line: str) -> bool:
     return True
 
 
+def uses_gp(line: str, sdata_limit: int) -> bool:
+    line = line.split("#")[0]
+    line = line.strip()
+
+    if uses_at(line):
+        op, *_ = line.split("\t")
+        if op in ["lw", "sw"] and sdata_limit >= 4:
+            return True
+        if op in ["lh", "lhu", "sh"] and sdata_limit >= 2:
+            return True
+        if op in ["lb", "lbu", "sb"] and sdata_limit >= 1:
+            return True
+
+    return False
+
+
 def is_load(line: str):
     op, *_ = line.split()
     return op in load_mnemonics
@@ -243,10 +259,13 @@ class MaspsxProcessor:
     file_num = 1
     line_index = 0
 
-    def __init__(self, lines: List[str], expand_div=False, verbose=False):
+    def __init__(
+        self, lines: List[str], expand_div=False, verbose=False, sdata_limit=0
+    ):
         self.lines = [x.strip() for x in lines]
         self.expand_div = expand_div
         self.verbose = verbose
+        self.sdata_limit = sdata_limit
 
     def process_lines(self):
         self.is_reorder = True
@@ -533,17 +552,21 @@ class MaspsxProcessor:
                 # e.g. lb	$s0,D_800E52E0
                 res.append(line)
 
-                if not uses_at(next_instruction) and line_loads_from_reg(
-                    next_instruction, r_dest
-                ):
-                    label = self.get_next_instruction(
-                        skip=0, ignore_nop=True, ignore_set=True
+                if line_loads_from_reg(next_instruction, r_dest):
+                    if not uses_at(next_instruction) or uses_gp(
+                        next_instruction, self.sdata_limit
+                    ):
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(f"nop # DEBUG: next op loads from {r_dest}")
+                else:
+                    res.append(
+                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
                     )
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
-
-                    res.append(f"nop # DEBUG: next op loads from {r_dest}")
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)

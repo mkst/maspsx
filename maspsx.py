@@ -47,8 +47,16 @@ def main():
         "" if args.no_macro_inc else '.include "macro.inc"',
     ]
 
+    sdata_limit = 0
+    for arg in as_args:
+        if arg.startswith("-G") and len(arg) > 2:
+            sdata_limit = int(arg[2:])
+
     maspsx_processor = MaspsxProcessor(
-        in_lines, expand_div=args.expand_div, verbose=args.verbose
+        in_lines,
+        expand_div=args.expand_div,
+        verbose=args.verbose,
+        sdata_limit=sdata_limit,
     )
     try:
         out_lines = maspsx_processor.process_lines()
