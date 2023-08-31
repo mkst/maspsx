@@ -621,7 +621,7 @@ class MaspsxProcessor:
 
             elif (
                 not is_addend
-                and r_source
+                and (r_source or int(operand) > 32767)
                 and line_loads_from_reg(next_instruction, r_dest)
             ):
                 # e.g. lw	$v0,364($a3)
