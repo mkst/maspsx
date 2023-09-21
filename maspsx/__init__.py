@@ -271,6 +271,7 @@ class MaspsxProcessor:
         self.is_reorder = True
         self.skip_instructions = 0
         self.file_num = 1
+        self.bss_entries = []
 
         res = []
         for i, line in enumerate(self.lines):
@@ -281,6 +282,15 @@ class MaspsxProcessor:
                 res += [f"# {line}  # DEBUG: skipped"]
             else:
                 res += self.process_line(line)
+
+        if len(self.bss_entries) > 0:
+            res.append(".section .bss")
+            for symbol, size in self.bss_entries:
+                res.extend([
+                    f"\t.globl {symbol}",
+                    f"{symbol}:",
+                    f"\t.space {size}",
+                ])
 
         return res
 
@@ -410,6 +420,12 @@ class MaspsxProcessor:
                 # enforce noreorder for each function
                 res.append(line)
                 res.append(".set\tnoreorder")
+
+            elif line.startswith(".comm\t"):
+                # 	.comm	MENU_RadarScale_800AB480,4
+                _, var = line.split()
+                symbol, size = var.split(",")
+                self.bss_entries.append((symbol, int(size)))
 
             else:
                 res.append(line)
