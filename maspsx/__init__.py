@@ -89,11 +89,11 @@ def line_loads_from_reg(line, r_src) -> bool:
 
     elif op in load_mnemonics:
         # lwl	$9,7($2)
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\({r_src}\)$", rest):
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
             return True
 
     elif op in store_mnemonics:
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\({r_src}\)$", rest):
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
             return True
         # "line_loads_from_reg" is a bit of a lie
         if re.match(rf"^{r_src},.*$", rest):
@@ -286,11 +286,13 @@ class MaspsxProcessor:
         if len(self.bss_entries) > 0:
             res.append(".section .bss")
             for symbol, size in self.bss_entries:
-                res.extend([
-                    f"\t.globl {symbol}",
-                    f"{symbol}:",
-                    f"\t.space {size}",
-                ])
+                res.extend(
+                    [
+                        f"\t.globl {symbol}",
+                        f"{symbol}:",
+                        f"\t.space {size}",
+                    ]
+                )
 
         return res
 
@@ -607,20 +609,22 @@ class MaspsxProcessor:
                         f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
                     )
 
-            elif (
-                not is_addend
-                and r_source in ("$2", "$v0")
-                and r_source == r_dest
-                and int(operand) > 32767
-            ):
-                # e.g. lhu	$2,49344($2)
-                res.append("# EXPAND_AT START")
-                res.append(".set\tnoat")
-                res.append(f"lui\t$at,%hi({operand})")
-                res.append(f"addu\t$at,{r_source},$at")
-                res.append(f"{op}\t{r_dest},%lo({operand})($at)")
-                res.append(".set\tat")
-                res.append("# EXPAND_AT START")
+            else:
+                if int(operand) > 32767:
+                    # e.g. lhu	$2,49344($2)
+                    res.append("# EXPAND_AT START")
+                    res.append(".set\tnoat")
+                    res.append(f"lui\t$at,%hi({operand})")
+                    res.append(f"addu\t$at,{r_source},$at")
+                    res.append(f"{op}\t{r_dest},%lo({operand})($at)")
+                    res.append(".set\tat")
+                    res.append("# EXPAND_AT START")
+                else:
+                    res.append(line)
+
+                # TODO: properly handle multi-line macros
+                if ";" in next_instruction:
+                    next_instruction = next_instruction.split(";")[0]
 
                 if not uses_at(next_instruction) and line_loads_from_reg(
                     next_instruction, r_dest
@@ -632,28 +636,8 @@ class MaspsxProcessor:
                         res.append(label)
                         self.skip_instructions = 1
                     res.append(
-                        f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
-                    )
-
-            elif (
-                not is_addend
-                and (r_source or int(operand) > 32767)
-                and line_loads_from_reg(next_instruction, r_dest)
-            ):
-                # e.g. lw	$v0,364($a3)
-                #      beq	$a3,$a0,$L14
-                res.append(line)
-
-                if not uses_at(next_instruction):
-                    label = self.get_next_instruction(skip=0)
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
-                    res.append(
                         f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at"
                     )
-            else:
-                res.append(line)
 
         elif op == "li":
             res.append(line)
