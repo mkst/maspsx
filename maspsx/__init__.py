@@ -610,7 +610,7 @@ class MaspsxProcessor:
                     )
 
             else:
-                if int(operand) > 32767:
+                if r_source and int(operand) > 32767:
                     # e.g. lhu	$2,49344($2)
                     res.append("# EXPAND_AT START")
                     res.append(".set\tnoat")
@@ -620,6 +620,7 @@ class MaspsxProcessor:
                     res.append(".set\tat")
                     res.append("# EXPAND_AT START")
                 else:
+                    # e.g. lhu	$2,528482304
                     res.append(line)
 
                 # TODO: properly handle multi-line macros
