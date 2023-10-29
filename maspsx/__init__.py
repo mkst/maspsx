@@ -452,28 +452,38 @@ class MaspsxProcessor:
             line = f"break\t0x0,0x{num:X}"
             res.append(line)
 
-        elif self.expand_div and op in ("div", "rem"):
+        elif op in ("div", "rem"):
             move_from = "mfhi" if op == "rem" else "mflo"
             r_dest, r_source, r_operand = rest[0].split(",")
-            res.append("# EXPAND_DIV START")
-            res.append(".set\tnoat")
-            res.append(f"div\t$zero,{r_source},{r_operand}")
-            res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
-            res.append("nop")
-            res.append("break\t0x7")
-            res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
-            res.append("addiu\t$at,$zero,-1")
-            res.append(
-                f"bne\t{r_operand},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
-            )
-            res.append("lui\t$at,0x8000")
-            res.append(f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}")
-            res.append("nop")
-            res.append("break\t0x6")
-            res.append(f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:")
-            res.append(f"{move_from}\t{r_dest}")
-            res.append(".set\tat")
-            res.append("# EXPAND_DIV END")
+
+            if r_dest in ("$zero", "$0"):
+                # already expanded
+                res.append(line)
+            elif self.expand_div:
+                res.append("# EXPAND_DIV START")
+                res.append(".set\tnoat")
+                res.append(f"div\t$zero,{r_source},{r_operand}")
+                res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
+                res.append("nop")
+                res.append("break\t0x7")
+                res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
+                res.append("addiu\t$at,$zero,-1")
+                res.append(
+                    f"bne\t{r_operand},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
+                )
+                res.append("lui\t$at,0x8000")
+                res.append(f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}")
+                res.append("nop")
+                res.append("break\t0x6")
+                res.append(f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:")
+                res.append(f"{move_from}\t{r_dest}")
+                res.append(".set\tat")
+                res.append("# EXPAND_DIV END")
+            else:
+                res.append("# EXPAND_ZERO_DIV START")
+                res.append(f"div\t$zero,{r_source},{r_operand}")
+                res.append(f"{move_from}\t{r_dest}")
+                res.append("# EXPAND_ZERO_DIV END")
 
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if line_loads_from_reg(next_instruction, r_dest):
@@ -481,18 +491,27 @@ class MaspsxProcessor:
             else:
                 res += self._handle_mflo_mfhi()
 
-        elif self.expand_div and op == "divu":
+        elif op == "divu":
             r_dest, r_source, r_operand = rest[0].split(",")
-            res.append("# EXPAND_DIV START")
-            res.append(".set\tnoat")
-            res.append(f"divu\t$zero,{r_source},{r_operand}")
-            res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
-            res.append("nop")
-            res.append("break\t0x7")
-            res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
-            res.append(f"mflo\t{r_dest}")
-            res.append(".set\tat")
-            res.append("# EXPAND_DIV START")
+            if r_dest in ("$zero", "$0"):
+                # already expanded
+                res.append(line)
+            elif self.expand_div:
+                res.append("# EXPAND_DIV START")
+                res.append(".set\tnoat")
+                res.append(f"divu\t$zero,{r_source},{r_operand}")
+                res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
+                res.append("nop")
+                res.append("break\t0x7")
+                res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
+                res.append(f"mflo\t{r_dest}")
+                res.append(".set\tat")
+                res.append("# EXPAND_DIV START")
+            else:
+                res.append("# EXPAND_ZERO_DIV START")
+                res.append(f"divu\t$zero,{r_source},{r_operand}")
+                res.append(f"mflo\t{r_dest}")
+                res.append("# EXPAND_ZERO_DIV END")
 
             next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
             if line_loads_from_reg(next_instruction, r_dest):
