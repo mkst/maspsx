@@ -103,8 +103,11 @@ def line_loads_from_reg(line, r_src) -> bool:
         if re.match(rf"^.*,\s*{r_src}$", rest):
             return True
         if op.startswith("mult"):
-            # TODO: do we need to check for div too?
             if re.match(rf"^{r_src},.*$", rest):
+                return True
+        if op.startswith("div"):
+            # e.g. div	$3,$3,$7
+            if re.match(rf"^.*,{r_src}.*$", rest):
                 return True
 
     elif op in double_reg_loads:
@@ -157,6 +160,15 @@ def uses_gp(line: str, sdata_limit: int) -> bool:
             return True
 
     return False
+
+
+def div_needs_expanding(line: str) -> bool:
+    inst, *rest = line.split()
+    if not (inst.startswith("div") or inst.startswith("rem")):
+        return False
+
+    r_dest, r_source, r_operand = rest[0].split(",")
+    return r_dest not in ("$zero", "$0")
 
 
 def is_load(line: str):
@@ -339,8 +351,8 @@ class MaspsxProcessor:
                 if inst == next_instruction:
                     res.append("nop")
                     res.append("nop")
-                    if inst.startswith("div") and self.expand_div:
-                        res.append("# DEBUG: expand_div is True")
+                    if div_needs_expanding(inst):
+                        res.append("# DEBUG: div needs expanding")
                         skip -= 1
                     else:
                         res.append(inst)
@@ -372,8 +384,8 @@ class MaspsxProcessor:
                         "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
                     )
                 elif inst == next_next_instruction:
-                    if self.expand_div:
-                        res.append("# DEBUG: expand_div is True")
+                    if div_needs_expanding(inst):
+                        res.append("# DEBUG: div needs expanding")
                         skip -= 1
                     else:
                         res.append(inst)
@@ -456,7 +468,7 @@ class MaspsxProcessor:
             move_from = "mfhi" if op == "rem" else "mflo"
             r_dest, r_source, r_operand = rest[0].split(",")
 
-            if r_dest in ("$zero", "$0"):
+            if not div_needs_expanding(line):
                 # already expanded
                 res.append(line)
             elif self.expand_div:
@@ -479,16 +491,17 @@ class MaspsxProcessor:
                 res.append(f"{move_from}\t{r_dest}")
                 res.append(".set\tat")
                 res.append("# EXPAND_DIV END")
+
+                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                if line_loads_from_reg(next_instruction, r_dest):
+                    res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
+                else:
+                    res += self._handle_mflo_mfhi()
             else:
                 res.append("# EXPAND_ZERO_DIV START")
                 res.append(f"div\t$zero,{r_source},{r_operand}")
                 res.append(f"{move_from}\t{r_dest}")
                 res.append("# EXPAND_ZERO_DIV END")
-
-            next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-            if line_loads_from_reg(next_instruction, r_dest):
-                res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
-            else:
                 res += self._handle_mflo_mfhi()
 
         elif op == "divu":
@@ -507,16 +520,17 @@ class MaspsxProcessor:
                 res.append(f"mflo\t{r_dest}")
                 res.append(".set\tat")
                 res.append("# EXPAND_DIV START")
+
+                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                if line_loads_from_reg(next_instruction, r_dest):
+                    res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
+                else:
+                    res += self._handle_mflo_mfhi()
             else:
                 res.append("# EXPAND_ZERO_DIV START")
                 res.append(f"divu\t$zero,{r_source},{r_operand}")
                 res.append(f"mflo\t{r_dest}")
                 res.append("# EXPAND_ZERO_DIV END")
-
-            next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-            if line_loads_from_reg(next_instruction, r_dest):
-                res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
-            else:
                 res += self._handle_mflo_mfhi()
 
         elif op == "sltu":
