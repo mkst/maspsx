@@ -484,7 +484,9 @@ class MaspsxProcessor:
                     f"bne\t{r_operand},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
                 )
                 res.append("lui\t$at,0x8000")
-                res.append(f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}")
+                res.append(
+                    f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
+                )
                 res.append("nop")
                 res.append("break\t0x6")
                 res.append(f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:")
@@ -627,7 +629,11 @@ class MaspsxProcessor:
                 res.append(f"addu\t$at,$at,{r_source}")
                 res.append(f"{op}\t{r_dest},%lo({operand})($at)")
                 res.append(".set\tat")
-                res.append("# EXPAND_AT START")
+                res.append("# EXPAND_AT END")
+
+                # TODO: properly handle multi-line macros
+                if ";" in next_instruction:
+                    next_instruction = next_instruction.split(";")[0]
 
                 if not uses_at(next_instruction) and line_loads_from_reg(
                     next_instruction, r_dest
@@ -651,7 +657,7 @@ class MaspsxProcessor:
                     res.append(f"addu\t$at,{r_source},$at")
                     res.append(f"{op}\t{r_dest},%lo({operand})($at)")
                     res.append(".set\tat")
-                    res.append("# EXPAND_AT START")
+                    res.append("# EXPAND_AT END")
                 else:
                     # e.g. lhu	$2,528482304
                     res.append(line)
