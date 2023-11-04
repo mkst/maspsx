@@ -264,3 +264,44 @@ class TestNop(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_nop_lh_sw_pair_uses_gp(self):
+        """
+        We need a nop betwen lh/sw pair when the sw uses $gp
+        Bug: https://github.com/mkst/maspsx/issues/36
+        """
+        lines = [
+            "	lh	$2,2($2)",
+            "	#nop",
+            "	sw	$2,Map_water_height",
+        ]
+        expected_lines = [
+            "lh\t$2,2($2)",
+            "nop",
+            "sw\t$2,Map_water_height",
+        ]
+        mp = MaspsxProcessor(lines, sdata_limit=4)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_nop_lh_sw_pair_no_gp(self):
+        """
+        We do not want a nop betwen lh/sw pair when the sw does not use $gp
+        Bug: https://github.com/mkst/maspsx/issues/36
+        """
+        lines = [
+            "	lh	$2,2($2)",
+            "	#nop",
+            "	sw	$2,Map_water_height",
+        ]
+        expected_lines = [
+            "lh\t$2,2($2)",
+            "sw\t$2,Map_water_height",
+        ]
+        mp = MaspsxProcessor(lines, sdata_limit=0)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

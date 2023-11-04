@@ -41,8 +41,6 @@ def main():
         with open(input_file, "r") as f:
             in_lines = f.readlines()
 
-    in_lines.append("")  # Warning: end of file not at end of a line; newline inserted
-
     preamble = [
         "" if args.no_macro_inc else '.include "macro.inc"',
     ]
@@ -66,6 +64,9 @@ def main():
 
     out_text = "\n".join(preamble + out_lines)
 
+    # avoid "Warning: end of file not at end of a line; newline inserted"
+    out_text += "\n"
+
     # FIXME: can we stop gcc from passing us this flag?
     if "-KPIC" in as_args:
         # sys.stderr.write("WARNING: Removed -KPIC flag!\n")
@@ -77,15 +78,15 @@ def main():
             *as_args,
             "-",  # read from stdin
         ]
-        process = subprocess.Popen(
+        with subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        out_bytes = out_text.encode("utf")
-        stdout, stderr = process.communicate(input=out_bytes)
-        if len(stdout):
-            sys.stdout.write(stdout.decode("utf"))
-        if len(stderr):
-            sys.stderr.write(stderr.decode("utf"))
+        ) as process:
+            out_bytes = out_text.encode("utf")
+            stdout, stderr = process.communicate(input=out_bytes)
+            if len(stdout):
+                sys.stdout.write(stdout.decode("utf"))
+            if len(stderr):
+                sys.stderr.write(stderr.decode("utf"))
     else:
         sys.stdout.write(out_text)
 

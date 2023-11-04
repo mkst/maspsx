@@ -602,6 +602,10 @@ class MaspsxProcessor:
             else:
                 is_addend = True
 
+            # res.append(
+            #     f"#op: {op}, r_dest: {r_dest}, operand: {operand}, r_source: {r_source}, needs_expanding: {needs_expanding}, is_addend: {is_addend}"
+            # )
+
             next_instruction = self.get_next_instruction(
                 skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
             )
@@ -656,18 +660,19 @@ class MaspsxProcessor:
                 if ";" in next_instruction:
                     next_instruction = next_instruction.split(";")[0]
 
-                if not uses_at(next_instruction) and line_loads_from_reg(
-                    next_instruction, r_dest
-                ):
-                    label = self.get_next_instruction(
-                        skip=0, ignore_nop=True, ignore_set=True
-                    )
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
-                    res.append(
-                        f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
-                    )
+                if line_loads_from_reg(next_instruction, r_dest):
+                    if not uses_at(next_instruction) or uses_gp(
+                        next_instruction, self.sdata_limit
+                    ):
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(
+                            f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
+                        )
 
             else:
                 if r_source and int(operand) > 32767:
@@ -687,18 +692,19 @@ class MaspsxProcessor:
                 if ";" in next_instruction:
                     next_instruction = next_instruction.split(";")[0]
 
-                if not uses_at(next_instruction) and line_loads_from_reg(
-                    next_instruction, r_dest
-                ):
-                    label = self.get_next_instruction(
-                        skip=0, ignore_nop=True, ignore_set=True
-                    )
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
-                    res.append(
-                        f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at"
-                    )
+                if line_loads_from_reg(next_instruction, r_dest):
+                    if not uses_at(next_instruction) or uses_gp(
+                        next_instruction, self.sdata_limit
+                    ):
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(
+                            f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at"
+                        )
 
         elif op == "li":
             # TODO: handle non-soft floats?
