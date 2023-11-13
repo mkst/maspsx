@@ -630,6 +630,10 @@ class MaspsxProcessor:
                 # e.g. lb	$s0,D_800E52E0
                 res.append(line)
 
+                # TODO: properly handle multi-line macros
+                if ";" in next_instruction:
+                    next_instruction = next_instruction.split(";")[0]
+
                 if line_loads_from_reg(next_instruction, r_dest):
                     if not uses_at(next_instruction) or uses_gp(
                         next_instruction, self.sdata_limit
