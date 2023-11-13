@@ -195,6 +195,22 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_nop_with_macro_with_addend_no_r_source(self):
+        lines = [
+            "	lw	$15,MRViewtrans_ptr",
+            "	#APP",
+            "	lw	$12, 0( $15 );lw	$13, 4( $15 );ctc2	$12, $0;ctc2	$13, $1;lw	$12, 8( $15 );lw	$13, 12( $15 );lw	$14, 16( $15 );ctc2	$12, $2;ctc2	$13, $3;ctc2	$14, $4",
+            "	#NO_APP",
+        ]
+        expected_lines = [
+            "lw	$15,MRViewtrans_ptr",
+            "nop",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
     def test_nop_lw_addu(self):
         """
         Ensure we place a nop betwen an lw/addu pair that uses the same register
