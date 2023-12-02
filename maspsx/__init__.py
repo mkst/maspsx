@@ -308,16 +308,30 @@ class MaspsxProcessor:
             else:
                 res += self.process_line(line)
 
-        if len(self.bss_entries) > 0:
-            res.append(".section .bss")
-            for symbol, size in self.bss_entries:
-                res.extend(
-                    [
-                        f"\t.globl {symbol}",
-                        f"{symbol}:",
-                        f"\t.space {size}",
-                    ]
-                )
+        for i, (symbol, size) in enumerate(
+            (x, y) for (x, y) in self.bss_entries if y <= self.sdata_limit
+        ):
+            if i == 0:
+                res.append(".section .sbss")
+            res.extend(
+                [
+                    f"\t.globl {symbol}",
+                    f"{symbol}:",
+                    f"\t.space {size}",
+                ]
+            )
+        for i, (symbol, size) in enumerate(
+            (x, y) for (x, y) in self.bss_entries if y > self.sdata_limit
+        ):
+            if i == 0:
+                res.append(".section .bss")
+            res.extend(
+                [
+                    f"\t.globl {symbol}",
+                    f"{symbol}:",
+                    f"\t.space {size}",
+                ]
+            )
 
         return res
 
@@ -453,6 +467,13 @@ class MaspsxProcessor:
                 _, var = line.split()
                 symbol, size = var.split(",")
                 self.bss_entries.append((symbol, int(size)))
+
+            elif line.startswith(".data"):
+                res.append(".section .data")
+            elif line.startswith(".sdata"):
+                res.append(".section .sdata")
+            elif line.startswith(".rdata"):
+                res.append(".section .rodata")
 
             else:
                 res.append(line)
@@ -725,9 +746,6 @@ class MaspsxProcessor:
                 )
 
         else:
-            if line == ".rdata":
-                line = ".section .rodata"
-
             res.append(line)
 
         return res
