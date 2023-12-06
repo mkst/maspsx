@@ -198,11 +198,6 @@ def div_needs_expanding(line: str) -> bool:
     return r_dest not in ("$zero", "$0")
 
 
-def is_load(line: str):
-    op, *_ = line.split()
-    return op in load_mnemonics
-
-
 def is_label(line: str):
     return re.match(r"\$L\d+:$", line)
 
@@ -341,32 +336,23 @@ class MaspsxProcessor:
                 in_sdata = False
                 continue
 
+            if line.startswith("#"):
+                continue
+
             if line.startswith(".sdata"):
                 in_sdata = True
                 continue
 
             if in_sdata:
-                if line.endswith(":"):
-                    current_symbol = line.replace(":", "")
-                    self.sdata_entries[current_symbol] = 0
-                else:
-                    if line.startswith(".word"):
-                        size = 4
-                    elif line.startswith(".half") or line.startswith(".short"):
-                        size = 2
-                    elif line.startswith(".byte"):
-                        size = 1
-                    elif line.startswith(".ascii"):
-                        # e.g. .ascii	"Map poly groups\000"
-                        # NOTE: len('.ascii\t""') == 9
-                        size = len(line) - 9
-                    else:
-                        raise Exception(f"Unable to parse .sdata instruction: {line}")
-                    self.sdata_entries[current_symbol] += size
+                # TODO: do all compilers emit .size directive for sdata?
+                if match := re.match(r"\.size\s+([^,]+),([0-9]+)", line):
+                    current_symbol = match.group(1)
+                    size = int(match.group(2))
+                    self.sdata_entries[current_symbol] = size
 
                 continue
 
-            if line.startswith(".comm"):
+            if line.startswith(".comm") or line.startswith(".lcomm"):
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
                 _, var = line.split()
                 symbol, size = var.split(",")
@@ -716,25 +702,28 @@ class MaspsxProcessor:
                 else:
                     res.append(line)
 
-                # TODO: properly handle multi-line macros
-                if ";" in next_instruction:
-                    next_instruction = next_instruction.split(";")[0]
+                if op != "la":
+                    # TODO: properly handle multi-line macros
+                    if ";" in next_instruction:
+                        next_instruction = next_instruction.split(";")[0]
 
-                if line_loads_from_reg(next_instruction, r_dest):
-                    if not uses_at(next_instruction) or uses_gp(
-                        next_instruction, self.sdata_limit
-                    ):
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
+                    if line_loads_from_reg(next_instruction, r_dest):
+                        if not uses_at(next_instruction) or uses_gp(
+                            next_instruction, self.sdata_limit
+                        ):
+                            label = self.get_next_instruction(
+                                skip=0, ignore_nop=True, ignore_set=True
+                            )
+                            if is_label(label):
+                                res.append(label)
+                                self.skip_instructions = 1
+                            res.append(f"nop # DEBUG: next op loads from {r_dest}")
+                    else:
+                        res.append(
+                            f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
                         )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: next op loads from {r_dest}")
                 else:
-                    res.append(
-                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
-                    )
+                    res.append("# no nop required after la?")
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
@@ -810,7 +799,7 @@ class MaspsxProcessor:
                     f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
                 )
 
-        elif op in store_mnemonics:
+        elif op == "la" or op in store_mnemonics:
             rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
 
