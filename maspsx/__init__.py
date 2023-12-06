@@ -373,7 +373,10 @@ class MaspsxProcessor:
                         current_symbol = line.replace(":", "")
                         self.sdata_entries[current_symbol] = 0
                     else:
-                        if line.startswith(".word"):
+                        if line.startswith(".space"):
+                            _, size = line.split()
+                            size = int(size)
+                        elif line.startswith(".word"):
                             size = 4
                         elif line.startswith(".half") or line.startswith(".short"):
                             size = 2
