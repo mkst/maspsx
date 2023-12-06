@@ -317,6 +317,7 @@ class MaspsxProcessor:
     def preprocess_lines(self):
         in_sdata = False
         current_symbol = None
+        uses_size = False
 
         for line in self.lines:
             if line.startswith(".align"):
@@ -336,6 +337,10 @@ class MaspsxProcessor:
                 in_sdata = False
                 continue
 
+            if line == ".section .text":
+                in_sdata = False
+                continue
+
             if line.startswith("#"):
                 continue
 
@@ -343,17 +348,9 @@ class MaspsxProcessor:
                 in_sdata = True
                 continue
 
-            if in_sdata:
-                # TODO: do all compilers emit .size directive for sdata?
-                if match := re.match(r"\.size\s+([^,]+),([0-9]+)", line):
-                    current_symbol = match.group(1)
-                    size = int(match.group(2))
-                    self.sdata_entries[current_symbol] = size
-
-                continue
-
             if line.startswith(".comm") or line.startswith(".lcomm"):
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
+                in_sdata = False
                 _, var = line.split()
                 symbol, size = var.split(",")
                 size = int(size)
@@ -361,6 +358,36 @@ class MaspsxProcessor:
                     self.sbss_entries[symbol] = size
                 else:
                     self.bss_entries[symbol] = size
+
+            if in_sdata:
+                # NOTE: newer compilers emit .size for sdata, old ones do not...
+                if match := re.match(r"\.size\s+([^,]+),([0-9]+)", line):
+                    current_symbol = match.group(1)
+                    size = int(match.group(2))
+                    self.sdata_entries[current_symbol] = size
+                    uses_size = True
+                    continue
+
+                if not uses_size:
+                    if line.endswith(":"):
+                        current_symbol = line.replace(":", "")
+                        self.sdata_entries[current_symbol] = 0
+                    else:
+                        if line.startswith(".word"):
+                            size = 4
+                        elif line.startswith(".half") or line.startswith(".short"):
+                            size = 2
+                        elif line.startswith(".byte"):
+                            size = 1
+                        elif line.startswith(".ascii"):
+                            # e.g. .ascii	"Map poly groups\000"
+                            # NOTE: len('.ascii\t""') == 9
+                            size = len(line) - 9
+                        else:
+                            raise Exception(f"Unable to parse .sdata instruction: {line}")
+                        self.sdata_entries[current_symbol] += size
+                    continue
+
 
     def process_lines(self):
         self.is_reorder = True
