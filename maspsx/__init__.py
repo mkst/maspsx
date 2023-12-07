@@ -358,6 +358,7 @@ class MaspsxProcessor:
                     self.sbss_entries[symbol] = size
                 else:
                     self.bss_entries[symbol] = size
+                continue
 
             if in_sdata:
                 # NOTE: newer compilers emit .size for sdata, old ones do not...
@@ -387,10 +388,10 @@ class MaspsxProcessor:
                             # NOTE: len('.ascii\t""') == 9
                             size = len(line) - 9
                         else:
-                            raise Exception(f"Unable to parse .sdata instruction: {line}")
+                            raise Exception(
+                                f"Unable to parse .sdata instruction: {line}"
+                            )
                         self.sdata_entries[current_symbol] += size
-                    continue
-
 
     def process_lines(self):
         self.is_reorder = True
@@ -732,28 +733,25 @@ class MaspsxProcessor:
                 else:
                     res.append(line)
 
-                if op != "la":
-                    # TODO: properly handle multi-line macros
-                    if ";" in next_instruction:
-                        next_instruction = next_instruction.split(";")[0]
+                # TODO: properly handle multi-line macros
+                if ";" in next_instruction:
+                    next_instruction = next_instruction.split(";")[0]
 
-                    if line_loads_from_reg(next_instruction, r_dest):
-                        if not uses_at(next_instruction) or uses_gp(
-                            next_instruction, self.sdata_limit
-                        ):
-                            label = self.get_next_instruction(
-                                skip=0, ignore_nop=True, ignore_set=True
-                            )
-                            if is_label(label):
-                                res.append(label)
-                                self.skip_instructions = 1
-                            res.append(f"nop # DEBUG: next op loads from {r_dest}")
-                    else:
-                        res.append(
-                            f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
+                if line_loads_from_reg(next_instruction, r_dest):
+                    if not uses_at(next_instruction) or uses_gp(
+                        next_instruction, self.sdata_limit
+                    ):
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
                         )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(f"nop # DEBUG: next op loads from {r_dest}")
                 else:
-                    res.append("# no nop required after la?")
+                    res.append(
+                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
+                    )
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
