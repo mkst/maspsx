@@ -30,6 +30,7 @@ store_mnemonics = [
     "sw",
     "swl",
     "swr",
+    "nor",
 ]
 
 single_reg_loads = [
