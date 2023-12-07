@@ -40,6 +40,7 @@ single_reg_loads = [
     "rem",
     "move",
     "negu",
+    "nor",
 ]
 double_reg_loads = [
     "and",
