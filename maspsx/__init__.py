@@ -84,7 +84,7 @@ def line_loads_from_reg(line, r_src) -> bool:
     elif op in branch_mnemonics:
         if re.match(rf"^{r_src},.*$", rest):
             return True
-        elif re.match(rf"^.*,\s*{r_src},.*$", rest):
+        if re.match(rf"^.*,\s*{r_src},.*$", rest):
             return True
 
     elif op in load_mnemonics:
@@ -113,7 +113,7 @@ def line_loads_from_reg(line, r_src) -> bool:
     elif op in double_reg_loads:
         if re.match(rf"^.*,\s*{r_src},.*$", rest):
             return True
-        elif re.match(rf"^.*,.*,\s*{r_src}$", rest):
+        if re.match(rf"^.*,.*,\s*{r_src}$", rest):
             return True
 
     return False
@@ -179,7 +179,7 @@ def parse_load_or_store(rest):
         r_source = None
         needs_expanding = True
     else:
-        raise Exception(f"Unable to parse load/store instruction: {line}")
+        raise Exception(f"Unable to parse load/store instruction: {rest}")
 
     if re.match(r"^-?\d+$", operand) or re.match(r"^-?0x[A-Fa-f0-9]+$", operand):
         is_addend = False
@@ -313,6 +313,10 @@ class MaspsxProcessor:
         self.expand_div = expand_div
         self.verbose = verbose
         self.sdata_limit = sdata_limit
+
+        self.bss_entries = {}
+        self.sbss_entries = {}
+        self.sdata_entries = {}
 
     def preprocess_lines(self):
         in_sdata = False
