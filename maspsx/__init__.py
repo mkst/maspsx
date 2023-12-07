@@ -30,7 +30,6 @@ store_mnemonics = [
     "sw",
     "swl",
     "swr",
-    "nor",
 ]
 
 single_reg_loads = [
@@ -41,6 +40,7 @@ single_reg_loads = [
     "rem",
     "move",
     "negu",
+    "nor",
 ]
 double_reg_loads = [
     "and",
