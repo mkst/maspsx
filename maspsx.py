@@ -2,30 +2,7 @@ import argparse
 import subprocess
 import sys
 
-from pkg_resources import packaging
-
 from maspsx import MaspsxProcessor
-
-
-ASPSX_VERSION_2_21 = packaging.version.parse("2.21")
-ASPSX_VERSION_2_34 = packaging.version.parse("2.34")
-ASPSX_VERSION_2_56 = packaging.version.parse("2.56")
-ASPSX_VERSION_2_67 = packaging.version.parse("2.67")
-ASPSX_VERSION_2_77 = packaging.version.parse("2.77")
-ASPSX_VERSION_2_79 = packaging.version.parse("2.79")
-ASPSX_VERSION_2_81 = packaging.version.parse("2.81")
-ASPSX_VERSION_2_86 = packaging.version.parse("2.86")
-
-VALID_ASPSX_VERSIONS = [
-    ASPSX_VERSION_2_21,
-    ASPSX_VERSION_2_34,
-    ASPSX_VERSION_2_56,
-    ASPSX_VERSION_2_67,
-    ASPSX_VERSION_2_77,
-    ASPSX_VERSION_2_79,
-    ASPSX_VERSION_2_81,
-    ASPSX_VERSION_2_86,
-]
 
 
 def main():
@@ -36,11 +13,7 @@ def main():
     parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
     parser.add_argument("--expand-div", action="store_true")
     parser.add_argument("--dont-force-G0", action="store_true")
-    parser.add_argument(
-        "--aspsx-version",
-        type=packaging.version.parse,
-        choices=VALID_ASPSX_VERSIONS,
-    )
+    parser.add_argument("--aspsx-version", type=str)
 
     args, as_args = parser.parse_known_args()
 
@@ -82,9 +55,10 @@ def main():
     la_gprel = False
 
     if args.aspsx_version:
-        if args.aspsx_version == ASPSX_VERSION_2_21:
+        aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
+        if aspsx_version == (2, 21):
             nop_v0_at = True
-        if args.aspsx_version >= ASPSX_VERSION_2_79:
+        if aspsx_version >= (2, 79):
             nop_gp = True
             la_gprel = True
 

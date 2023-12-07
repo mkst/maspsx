@@ -3,19 +3,19 @@ import re
 
 from typing import List
 
-branch_mnemonics = [
+branch_mnemonics = {
     "beq",
     "bgez",
     "bgtz",
     "blez",
     "bltz",
     "bne",
-]
-jump_mnemonics = [
+}
+jump_mnemonics = {
     "j",
     "jal",
-]
-load_mnemonics = [
+}
+load_mnemonics = {
     "lb",
     "lbu",
     "lh",
@@ -23,16 +23,16 @@ load_mnemonics = [
     "lw",
     "lwl",
     "lwr",
-]
-store_mnemonics = [
+}
+store_mnemonics = {
     "sb",
     "sh",
     "sw",
     "swl",
     "swr",
-]
+}
 
-single_reg_loads = [
+single_reg_loads = {
     "mult",
     "multu",
     "div",
@@ -41,8 +41,8 @@ single_reg_loads = [
     "move",
     "negu",
     "nor",
-]
-double_reg_loads = [
+}
+double_reg_loads = {
     "and",
     "andi",
     "or",
@@ -58,7 +58,7 @@ double_reg_loads = [
     "slt",
     "slti",
     "sltu",
-]
+}
 
 
 def line_loads_from_reg(line, r_src) -> bool:
@@ -315,7 +315,6 @@ class MaspsxProcessor:
 
     def preprocess_lines(self):
         in_sdata = False
-        current_symbol = None
         uses_size = False
 
         for line in self.lines:
@@ -712,7 +711,7 @@ class MaspsxProcessor:
             else:
                 res.append(line)
 
-        elif op in branch_mnemonics + jump_mnemonics:
+        elif op in branch_mnemonics or op in jump_mnemonics:
             res.append(line)
             if self.is_reorder:
                 res.append("nop  # DEBUG: branch/jump")
