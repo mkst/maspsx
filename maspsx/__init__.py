@@ -147,22 +147,6 @@ def uses_at(line: str) -> bool:
     return True
 
 
-def uses_gp(line: str, sdata_limit: int) -> bool:
-    line = line.split("#")[0]
-    line = line.strip()
-
-    if uses_at(line):
-        op, *_ = line.split("\t")
-        if op in ["lw", "sw"] and sdata_limit >= 4:
-            return True
-        if op in ["lh", "lhu", "sh"] and sdata_limit >= 2:
-            return True
-        if op in ["lb", "lbu", "sb"] and sdata_limit >= 1:
-            return True
-
-    return False
-
-
 def parse_load_or_store(rest):
     if match := re.match(r"(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^(]+)\)", rest):
         r_dest = match.group(1)
@@ -195,7 +179,7 @@ def div_needs_expanding(line: str) -> bool:
     if not (inst.startswith("div") or inst.startswith("rem")):
         return False
 
-    r_dest, r_source, r_operand = rest[0].split(",")
+    r_dest, *_ = rest[0].split(",")
     return r_dest not in ("$zero", "$0")
 
 
@@ -308,12 +292,22 @@ class MaspsxProcessor:
     line_index = 0
 
     def __init__(
-        self, lines: List[str], expand_div=False, verbose=False, sdata_limit=0
+        self,
+        lines: List[str],
+        sdata_limit=0,
+        expand_div=False,
+        nop_v0_at=False,
+        nop_gp=False,
+        la_gprel=False,
     ):
         self.lines = [x.strip() for x in lines]
-        self.expand_div = expand_div
-        self.verbose = verbose
+
         self.sdata_limit = sdata_limit
+
+        self.expand_div = expand_div
+        self.nop_v0_at = nop_v0_at
+        self.nop_gp = nop_gp
+        self.la_gprel = la_gprel
 
         self.bss_entries = {}
         self.sbss_entries = {}
@@ -460,6 +454,28 @@ class MaspsxProcessor:
             i += 1
 
         return ""  # warn user?
+
+    def _uses_gp(self, line: str) -> bool:
+        line = line.split("#")[0]
+        line = line.strip()
+
+        if uses_at(line):
+            op, *rest = line.split("\t")
+            if op in load_mnemonics or op in store_mnemonics:
+                rest = " ".join(rest)
+                (
+                    _,
+                    _,
+                    operand,
+                    _,
+                    _,
+                ) = parse_load_or_store(rest)
+                if operand in self.sbss_entries:
+                    return True
+                if operand in self.sdata_entries:
+                    return True
+
+        return False
 
     def _handle_mflo_mfhi(self):
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
@@ -743,16 +759,26 @@ class MaspsxProcessor:
                     next_instruction = next_instruction.split(";")[0]
 
                 if line_loads_from_reg(next_instruction, r_dest):
-                    if not uses_at(next_instruction) or uses_gp(
-                        next_instruction, self.sdata_limit
-                    ):
+                    nop_required = False
+
+                    if not uses_at(next_instruction):
+                        reason = f"'{next_instruction}' does not use $at"
+                        nop_required = True
+                    if self.nop_gp and self._uses_gp(next_instruction):
+                        reason = f"'{next_instruction}' uses $gp"
+                        nop_required = True
+                    if self.nop_v0_at:
+                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
+                        nop_required = True
+
+                    if nop_required:
                         label = self.get_next_instruction(
                             skip=0, ignore_nop=True, ignore_set=True
                         )
                         if is_label(label):
                             res.append(label)
                             self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: next op loads from {r_dest}")
+                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
                 else:
                     res.append(
                         f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
@@ -773,9 +799,16 @@ class MaspsxProcessor:
                     next_instruction = next_instruction.split(";")[0]
 
                 if line_loads_from_reg(next_instruction, r_dest):
-                    if not uses_at(next_instruction) or uses_gp(
-                        next_instruction, self.sdata_limit
-                    ):
+                    nop_required = False
+
+                    if not uses_at(next_instruction):
+                        reason = f"'{next_instruction}' does not use $at"
+                        nop_required = True
+                    if self.nop_gp and self._uses_gp(next_instruction):
+                        reason = f"nop_gp and '{next_instruction}' uses $gp"
+                        nop_required = True
+
+                    if nop_required:
                         label = self.get_next_instruction(
                             skip=0, ignore_nop=True, ignore_set=True
                         )
@@ -783,7 +816,7 @@ class MaspsxProcessor:
                             res.append(label)
                             self.skip_instructions = 1
                         res.append(
-                            f"nop # DEBUG: is_addend (r_dest: {r_dest}) '{next_instruction}' does not use $at"
+                            f"nop # DEBUG: is_addend (r_dest: {r_dest}) {reason}"
                         )
 
             else:
@@ -805,18 +838,22 @@ class MaspsxProcessor:
                     next_instruction = next_instruction.split(";")[0]
 
                 if line_loads_from_reg(next_instruction, r_dest):
-                    if not uses_at(next_instruction) or uses_gp(
-                        next_instruction, self.sdata_limit
-                    ):
+                    nop_required = False
+                    if not uses_at(next_instruction):
+                        reason = f"'{next_instruction}' does not use $at"
+                        nop_required = True
+                    if self.nop_gp and self._uses_gp(next_instruction):
+                        reason = f"'{next_instruction}' uses $gp"
+                        nop_required = True
+
+                    if nop_required:
                         label = self.get_next_instruction(
                             skip=0, ignore_nop=True, ignore_set=True
                         )
                         if is_label(label):
                             res.append(label)
                             self.skip_instructions = 1
-                        res.append(
-                            f"nop # DEBUG: {r_dest} in {next_instruction} and '{next_instruction}' does not use $at"
-                        )
+                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
 
         elif op == "li":
             # TODO: handle non-soft floats?
@@ -832,7 +869,7 @@ class MaspsxProcessor:
                     f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
                 )
 
-        elif op == "la" or op in store_mnemonics:
+        elif (self.la_gprel and op == "la") or op in store_mnemonics:
             rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
 

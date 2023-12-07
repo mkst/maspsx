@@ -1,9 +1,31 @@
-import sys
-import subprocess
 import argparse
+import subprocess
+import sys
 
+from pkg_resources import packaging
 
 from maspsx import MaspsxProcessor
+
+
+ASPSX_VERSION_2_21 = packaging.version.parse("2.21")
+ASPSX_VERSION_2_34 = packaging.version.parse("2.34")
+ASPSX_VERSION_2_56 = packaging.version.parse("2.56")
+ASPSX_VERSION_2_67 = packaging.version.parse("2.67")
+ASPSX_VERSION_2_77 = packaging.version.parse("2.77")
+ASPSX_VERSION_2_79 = packaging.version.parse("2.79")
+ASPSX_VERSION_2_81 = packaging.version.parse("2.81")
+ASPSX_VERSION_2_86 = packaging.version.parse("2.86")
+
+VALID_ASPSX_VERSIONS = [
+    ASPSX_VERSION_2_21,
+    ASPSX_VERSION_2_34,
+    ASPSX_VERSION_2_56,
+    ASPSX_VERSION_2_67,
+    ASPSX_VERSION_2_77,
+    ASPSX_VERSION_2_79,
+    ASPSX_VERSION_2_81,
+    ASPSX_VERSION_2_86,
+]
 
 
 def main():
@@ -13,8 +35,12 @@ def main():
     parser.add_argument("--force-stdin", action="store_true")
     parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
     parser.add_argument("--expand-div", action="store_true")
-    parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--dont-force-G0", action="store_true")
+    parser.add_argument(
+        "--aspsx-version",
+        type=packaging.version.parse,
+        choices=VALID_ASPSX_VERSIONS,
+    )
 
     args, as_args = parser.parse_known_args()
 
@@ -51,11 +77,24 @@ def main():
         if arg.startswith("-G") and len(arg) > 2:
             sdata_limit = int(arg[2:])
 
+    nop_v0_at = False
+    nop_gp = False
+    la_gprel = False
+
+    if args.aspsx_version:
+        if args.aspsx_version == ASPSX_VERSION_2_21:
+            nop_v0_at = True
+        if args.aspsx_version >= ASPSX_VERSION_2_79:
+            nop_gp = True
+            la_gprel = True
+
     maspsx_processor = MaspsxProcessor(
         in_lines,
-        expand_div=args.expand_div,
-        verbose=args.verbose,
         sdata_limit=sdata_limit,
+        expand_div=args.expand_div,
+        nop_v0_at=nop_v0_at,
+        nop_gp=nop_gp,
+        la_gprel=la_gprel,
     )
     try:
         out_lines = maspsx_processor.process_lines()

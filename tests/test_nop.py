@@ -258,6 +258,8 @@ class TestNop(unittest.TestCase):
         Bug: https://github.com/mkst/maspsx/issues/20
         """
         lines = [
+            "	.comm	UnkVar00,4",
+            "	.comm	UnkVar01,4",
             "	li	$2,-1			# 0xffffffff",
             "	#.set	volatile",
             "	sw	$2,UnkVar00",
@@ -271,15 +273,15 @@ class TestNop(unittest.TestCase):
         ]
         expected_lines = [
             "li\t$2,-1",
-            "sw\t$2,UnkVar00",
-            "lw\t$2,UnkVar00",
+            "sw\t$2,%gp_rel(UnkVar00)($gp)",
+            "lw\t$2,%gp_rel(UnkVar00)($gp)",
             "nop",  # DEBUG: next op loads from $2",
-            "sw\t$2,UnkVar01",
+            "sw\t$2,%gp_rel(UnkVar01)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=4)
+        mp = MaspsxProcessor(lines, sdata_limit=4, nop_gp=True)
         res = mp.process_lines()
         clean_lines = strip_comments(res)
-        self.assertEqual(expected_lines, clean_lines)
+        self.assertEqual(expected_lines, clean_lines[:5])
 
     def test_nop_lh_sw_pair_uses_gp(self):
         """
@@ -287,6 +289,7 @@ class TestNop(unittest.TestCase):
         Bug: https://github.com/mkst/maspsx/issues/36
         """
         lines = [
+            "	.comm	Map_water_height,2",
             "	lh	$2,2($2)",
             "	#nop",
             "	sw	$2,Map_water_height",
@@ -294,13 +297,13 @@ class TestNop(unittest.TestCase):
         expected_lines = [
             "lh\t$2,2($2)",
             "nop",
-            "sw\t$2,Map_water_height",
+            "sw\t$2,%gp_rel(Map_water_height)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=4)
+        mp = MaspsxProcessor(lines, sdata_limit=4, nop_gp=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
-        self.assertEqual(expected_lines, clean_lines)
+        self.assertEqual(expected_lines, clean_lines[:3])
 
     def test_nop_lh_sw_pair_no_gp(self):
         """
@@ -317,6 +320,25 @@ class TestNop(unittest.TestCase):
             "sw\t$2,Map_water_height",
         ]
         mp = MaspsxProcessor(lines, sdata_limit=0)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_nop_nor(self):
+        """
+        We want a nop between load/nor pair
+        """
+        lines = [
+            "	lbu	$2,20($16)",
+            "	nor	$2,$0,$2",
+        ]
+        expected_lines = [
+            "lbu\t$2,20($16)",
+            "nop",
+            "nor\t$2,$0,$2",
+        ]
+        mp = MaspsxProcessor(lines)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
