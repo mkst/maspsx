@@ -14,6 +14,7 @@ def main():
     parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
     parser.add_argument("--expand-div", action="store_true")
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--dont-force-G0", action="store_true")
 
     args, as_args = parser.parse_known_args()
 
@@ -78,6 +79,9 @@ def main():
             *as_args,
             "-",  # read from stdin
         ]
+        if not args.dont_force_G0:
+            cmd.insert(-1, "-G0")
+
         with subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE
         ) as process:

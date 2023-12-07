@@ -84,7 +84,7 @@ def line_loads_from_reg(line, r_src) -> bool:
     elif op in branch_mnemonics:
         if re.match(rf"^{r_src},.*$", rest):
             return True
-        elif re.match(rf"^.*,\s*{r_src},.*$", rest):
+        if re.match(rf"^.*,\s*{r_src},.*$", rest):
             return True
 
     elif op in load_mnemonics:
@@ -113,7 +113,7 @@ def line_loads_from_reg(line, r_src) -> bool:
     elif op in double_reg_loads:
         if re.match(rf"^.*,\s*{r_src},.*$", rest):
             return True
-        elif re.match(rf"^.*,.*,\s*{r_src}$", rest):
+        if re.match(rf"^.*,.*,\s*{r_src}$", rest):
             return True
 
     return False
@@ -162,6 +162,33 @@ def uses_gp(line: str, sdata_limit: int) -> bool:
     return False
 
 
+def parse_load_or_store(rest):
+    if match := re.match(r"(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^(]+)\)", rest):
+        r_dest = match.group(1)
+        operand = match.group(2)
+        r_source = match.group(3)
+        needs_expanding = False
+    elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", rest):
+        r_dest = match.group(1)
+        operand = match.group(2)
+        r_source = match.group(3)
+        needs_expanding = True
+    elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)", rest):
+        r_dest = match.group(1)
+        operand = match.group(2)
+        r_source = None
+        needs_expanding = True
+    else:
+        raise Exception(f"Unable to parse load/store instruction: {rest}")
+
+    if re.match(r"^-?\d+$", operand) or re.match(r"^-?0x[A-Fa-f0-9]+$", operand):
+        is_addend = False
+    else:
+        is_addend = True
+
+    return (r_source, r_dest, operand, is_addend, needs_expanding)
+
+
 def div_needs_expanding(line: str) -> bool:
     inst, *rest = line.split()
     if not (inst.startswith("div") or inst.startswith("rem")):
@@ -169,11 +196,6 @@ def div_needs_expanding(line: str) -> bool:
 
     r_dest, r_source, r_operand = rest[0].split(",")
     return r_dest not in ("$zero", "$0")
-
-
-def is_load(line: str):
-    op, *_ = line.split()
-    return op in load_mnemonics
 
 
 def is_label(line: str):
@@ -292,11 +314,99 @@ class MaspsxProcessor:
         self.verbose = verbose
         self.sdata_limit = sdata_limit
 
+        self.bss_entries = {}
+        self.sbss_entries = {}
+        self.sdata_entries = {}
+
+    def preprocess_lines(self):
+        in_sdata = False
+        current_symbol = None
+        uses_size = False
+
+        for line in self.lines:
+            if line.startswith(".align"):
+                # TODO: worry about alignment later
+                continue
+
+            if line.startswith(".globl"):
+                continue
+
+            if line.startswith(".text"):
+                in_sdata = False
+                continue
+            if line.startswith(".data"):
+                in_sdata = False
+                continue
+            if line.startswith(".rdata"):
+                in_sdata = False
+                continue
+
+            if line == ".section .text":
+                in_sdata = False
+                continue
+
+            if line.startswith("#"):
+                continue
+
+            if line.startswith(".sdata"):
+                in_sdata = True
+                continue
+
+            if line.startswith(".comm") or line.startswith(".lcomm"):
+                # e.g.	.comm	MENU_RadarScale_800AB480,4
+                in_sdata = False
+                _, var = line.split()
+                symbol, size = var.split(",")
+                size = int(size)
+                if size <= self.sdata_limit:
+                    self.sbss_entries[symbol] = size
+                else:
+                    self.bss_entries[symbol] = size
+                continue
+
+            if in_sdata:
+                # NOTE: newer compilers emit .size for sdata, old ones do not...
+                if match := re.match(r"\.size\s+([^,]+),([0-9]+)", line):
+                    current_symbol = match.group(1)
+                    size = int(match.group(2))
+                    self.sdata_entries[current_symbol] = size
+                    uses_size = True
+                    continue
+
+                if not uses_size:
+                    if line.endswith(":"):
+                        current_symbol = line.replace(":", "")
+                        self.sdata_entries[current_symbol] = 0
+                    else:
+                        if line.startswith(".space"):
+                            _, size = line.split()
+                            size = int(size)
+                        elif line.startswith(".word"):
+                            size = 4
+                        elif line.startswith(".half") or line.startswith(".short"):
+                            size = 2
+                        elif line.startswith(".byte"):
+                            size = 1
+                        elif line.startswith(".ascii"):
+                            # e.g. .ascii	"Map poly groups\000"
+                            # NOTE: len('.ascii\t""') == 9
+                            size = len(line) - 9
+                        else:
+                            raise Exception(
+                                f"Unable to parse .sdata instruction: {line}"
+                            )
+                        self.sdata_entries[current_symbol] += size
+
     def process_lines(self):
         self.is_reorder = True
         self.skip_instructions = 0
         self.file_num = 1
-        self.bss_entries = []
+
+        self.bss_entries = {}
+        self.sbss_entries = {}
+        self.sdata_entries = {}
+
+        self.preprocess_lines()
 
         res = []
         for i, line in enumerate(self.lines):
@@ -308,9 +418,7 @@ class MaspsxProcessor:
             else:
                 res += self.process_line(line)
 
-        for i, (symbol, size) in enumerate(
-            (x, y) for (x, y) in self.bss_entries if y <= self.sdata_limit
-        ):
+        for i, (symbol, size) in enumerate(self.sbss_entries.items()):
             if i == 0:
                 res.append(".section .sbss")
             res.extend(
@@ -320,9 +428,7 @@ class MaspsxProcessor:
                     f"\t.space {size}",
                 ]
             )
-        for i, (symbol, size) in enumerate(
-            (x, y) for (x, y) in self.bss_entries if y > self.sdata_limit
-        ):
+        for i, (symbol, size) in enumerate(self.bss_entries.items()):
             if i == 0:
                 res.append(".section .bss")
             res.extend(
@@ -462,11 +568,9 @@ class MaspsxProcessor:
                 res.append(line)
                 res.append(".set\tnoreorder")
 
-            elif line.startswith(".comm\t"):
-                # 	.comm	MENU_RadarScale_800AB480,4
-                _, var = line.split()
-                symbol, size = var.split(",")
-                self.bss_entries.append((symbol, int(size)))
+            elif line.startswith(".comm") or line.startswith(".lcomm"):
+                # already handled via preprocess_lines
+                pass
 
             elif line.startswith(".data"):
                 res.append(".section .data")
@@ -598,30 +702,9 @@ class MaspsxProcessor:
 
         elif op in load_mnemonics:
             rest = " ".join(rest)
-            if match := re.match(r"(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^(]+)\)", rest):
-                r_dest = match.group(1)
-                operand = match.group(2)
-                r_source = match.group(3)
-                needs_expanding = False
-            elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", rest):
-                r_dest = match.group(1)
-                operand = match.group(2)
-                r_source = match.group(3)
-                needs_expanding = True
-            elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)", rest):
-                r_dest = match.group(1)
-                operand = match.group(2)
-                r_source = None
-                needs_expanding = True
-            else:
-                raise Exception(f"Unable to parse load instruction: {line}")
-
-            if re.match(r"^-?\d+$", operand) or re.match(
-                r"^-?0x[A-Fa-f0-9]+$", operand
-            ):
-                is_addend = False
-            else:
-                is_addend = True
+            r_source, r_dest, operand, is_addend, needs_expanding = parse_load_or_store(
+                rest
+            )
 
             # res.append(
             #     f"#op: {op}, r_dest: {r_dest}, operand: {operand}, r_source: {r_source}, needs_expanding: {needs_expanding}, is_addend: {is_addend}"
@@ -649,7 +732,10 @@ class MaspsxProcessor:
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
-                res.append(line)
+                if operand in self.sdata_entries or operand in self.sbss_entries:
+                    res.append(f"{op}\t{r_dest},%gp_rel({operand})($gp)")
+                else:
+                    res.append(line)
 
                 # TODO: properly handle multi-line macros
                 if ";" in next_instruction:
@@ -744,6 +830,19 @@ class MaspsxProcessor:
                 res.append(
                     f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
                 )
+
+        elif op == "la" or op in store_mnemonics:
+            rest = " ".join(rest)
+            r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
+
+            if is_addend and r_source is None:
+                # e.g. sw	$v0,D_800E52E0
+                if operand in self.sdata_entries or operand in self.sbss_entries:
+                    res.append(f"{op}\t{r_dest},%gp_rel({operand})($gp)")
+                else:
+                    res.append(line)
+            else:
+                res.append(line)
 
         else:
             res.append(line)
