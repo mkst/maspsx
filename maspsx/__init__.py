@@ -568,7 +568,7 @@ class MaspsxProcessor:
                 res.append(line)
                 res.append(".set\tnoreorder")
 
-            elif line.startswith(".comm\t"):
+            elif line.startswith(".comm") or line.startswith(".lcomm"):
                 # already handled via preprocess_lines
                 pass
 
