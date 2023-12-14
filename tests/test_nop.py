@@ -211,6 +211,21 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_nop_with_macro_lwc2(self):
+        lines = [
+            "	lw	$7,48($fp)",
+            "	#APP",
+            "	lwc2	$0, 0( $7 );lwc2	$1, 4( $7 );lwc2	$2, 0( $2 );lwc2	$3, 4( $2 );lwc2	$4, 0( $3 );lwc2	$5, 4( $3 )",
+        ]
+        expected_lines = [
+            "lw\t$7,48($fp)",
+            "nop",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
     def test_nop_lw_addu(self):
         """
         Ensure we place a nop betwen an lw/addu pair that uses the same register
@@ -341,5 +356,46 @@ class TestNop(unittest.TestCase):
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
 
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_li(self):
+        """
+        li with large value will turn into two instructions (lui+ori)
+        which means no nop is required
+        """
+        lines = [
+            "	mflo	$3",
+            "	li	$5,-2004318071			# 0x88888889",
+            "	mult	$3,$5        ",
+        ]
+        expected_lines = [
+            "mflo\t$3",
+            "li\t$5,-2004318071",
+            "mult\t$3,$5",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_li_hex(self):
+        """
+        li with large value will turn into two instructions (lui+ori)
+        which means no nop is required
+        """
+        lines = [
+            "	mflo	$3",
+            "	li	$5,0x2aaaaaab		# 715827883",
+            "	mult	$3,$5        ",
+        ]
+        expected_lines = [
+            "mflo\t$3",
+            "li\t$5,0x2aaaaaab",
+            "mult\t$3,$5",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)

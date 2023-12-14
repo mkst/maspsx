@@ -23,6 +23,7 @@ load_mnemonics = {
     "lw",
     "lwl",
     "lwr",
+    "lwc2",
 }
 store_mnemonics = {
     "sb",
@@ -529,9 +530,23 @@ class MaspsxProcessor:
                         skip = 0
                         break
                     res.append(inst)
-                    res.append(
-                        "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
-                    )
+
+                    if op == "li" and (
+                        match := re.match(r"li\s+.*,-?([0-9a-fA-Fx]+).*", inst)
+                    ):
+                        value = int(match.group(1), 0)
+                        if value > 0xFFFF:
+                            res.append(
+                                f"#nop  # DEBUG: mflo/mfhi with mult/div and li with large value ({value})"
+                            )
+                        else:
+                            res.append(
+                                f"nop  # DEBUG: mflo/mfhi with mult/div and li with small value ({value})"
+                            )
+                    else:
+                        res.append(
+                            "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
+                        )
                 elif inst == next_next_instruction:
                     if div_needs_expanding(inst):
                         res.append("# DEBUG: div needs expanding")
