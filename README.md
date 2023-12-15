@@ -2,7 +2,7 @@
 
 The goal of `maspsx` is to facilitate the replacement of the combination of `ASPSX.EXE` + [psyq-obj-parser](https://github.com/grumpycoders/pcsx-redux/tree/main/tools/psyq-obj-parser) when attempting to generate byte-perfect ELF objects.
 
-`maspsx` takes the output of `gcc` and massages it such that it can be assembled via GNU `as` to the equivalent object as the original PSYQ SDK would create.
+`maspsx` takes the assembly code output of `gcc` and massages it such that it can be assembled via GNU `as` to the equivalent object as what the original PSYQ SDK would create.
 
 `ASPSX` does not appear to do very much in terms of code *optimisation*, therefore the belief is that this will be a straightforward process.
 
@@ -13,6 +13,7 @@ There are a number of reasons why using `maspsx` with GNU `as` is preferable to 
  - Support for line numbers in diff!
    - Pass `-gcoff` to gcc to get line numbers in [asm-differ](https://github.com/simonlindholm/asm-differ)
 
+
 ## Usage
 
 `maspsx` supports the following arguments:
@@ -21,7 +22,7 @@ There are a number of reasons why using `maspsx` with GNU `as` is preferable to 
 The default behaviour of `maspsx` is to write the output to stdout, by passing `--run-assembler`, `maspsx` will run `mips-linux-gnu-as` directly.
 
 ### `--gnu-as-path`
-If `mips-linux-gnu-as` isn't on your path, or you want to use a different assembler, specify the full path here.
+If `mips-linux-gnu-as` isn't on your path, or you want to use a different assembler (e.g. `mipsel-linux-gnu-as`), specify the full path here.
 
 ### `--dont-force-G0`
 Current understanding is that `-G0` needs to be passed to GNU `as` in order to get correct behaviour. If you need to pass a non-zero value for `-G` to the GNU assembler, use this flag.
@@ -36,7 +37,8 @@ By default, `maspsx` adds a `include "macro.inc"` statement to the output, pass 
 **EXPERIMENTAL** There are slight nuances in `nop` placement across `ASPSX` versions. In order to emulate the correct behaviour, pass the `ASPSX` version to `maspsx`, e.g. `--aspsx-version=2.78`.
 
 ### `-G`
-**EXPERIMENTAL** If you wish to use `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
+**EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
+
 
 ## Examples
 
@@ -45,6 +47,7 @@ Projects that use `maspsx` include:
   - [open-ribbon](https://github.com/open-ribbon/open-ribbon)
   - [Evo's Space Adventures](https://github.com/mkst/esa)
 
+
 ## Bugs
 
-This project is a work-in-progress. If you encounter scenarios where `maspsx` output differs from the original PSYQ toolchain please create a [GitHub Issue](https://github.com/mkst/maspsx/issues/new) - ideall with a link to a [decomp.me](https://decomp.me/) scratch that demonstrates the problem.
+This project is a work-in-progress. If you encounter scenarios where `maspsx` output differs from the original PSYQ toolchain please create a [GitHub Issue](https://github.com/mkst/maspsx/issues/new) - ideally with a link to a [decomp.me](https://decomp.me/) scratch that demonstrates the problem.
