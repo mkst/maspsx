@@ -1,7 +1,6 @@
-import sys
-import subprocess
 import argparse
-
+import subprocess
+import sys
 
 from maspsx import MaspsxProcessor
 
@@ -13,8 +12,8 @@ def main():
     parser.add_argument("--force-stdin", action="store_true")
     parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
     parser.add_argument("--expand-div", action="store_true")
-    parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--dont-force-G0", action="store_true")
+    parser.add_argument("--aspsx-version", type=str)
 
     args, as_args = parser.parse_known_args()
 
@@ -51,11 +50,25 @@ def main():
         if arg.startswith("-G") and len(arg) > 2:
             sdata_limit = int(arg[2:])
 
+    nop_v0_at = False
+    nop_gp = False
+    la_gprel = False
+
+    if args.aspsx_version:
+        aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
+        if aspsx_version == (2, 21):
+            nop_v0_at = True
+        if aspsx_version >= (2, 79):
+            nop_gp = True
+            la_gprel = True
+
     maspsx_processor = MaspsxProcessor(
         in_lines,
-        expand_div=args.expand_div,
-        verbose=args.verbose,
         sdata_limit=sdata_limit,
+        expand_div=args.expand_div,
+        nop_v0_at=nop_v0_at,
+        nop_gp=nop_gp,
+        la_gprel=la_gprel,
     )
     try:
         out_lines = maspsx_processor.process_lines()
