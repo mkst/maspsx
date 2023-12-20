@@ -12,6 +12,7 @@ def main():
     parser.add_argument("--force-stdin", action="store_true")
     parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
     parser.add_argument("--expand-div", action="store_true")
+    parser.add_argument("--expand-li", action="store_true")
     parser.add_argument("--dont-force-G0", action="store_true")
     parser.add_argument("--aspsx-version", type=str)
 
@@ -66,6 +67,7 @@ def main():
         in_lines,
         sdata_limit=sdata_limit,
         expand_div=args.expand_div,
+        expand_li=args.expand_li,
         nop_v0_at=nop_v0_at,
         nop_gp=nop_gp,
         la_gprel=la_gprel,
