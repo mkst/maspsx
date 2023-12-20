@@ -297,6 +297,7 @@ class MaspsxProcessor:
         lines: List[str],
         sdata_limit=0,
         expand_div=False,
+        expand_li=False,
         nop_v0_at=False,
         nop_gp=False,
         la_gprel=False,
@@ -306,6 +307,8 @@ class MaspsxProcessor:
         self.sdata_limit = sdata_limit
 
         self.expand_div = expand_div
+        self.expand_li = expand_li
+
         self.nop_v0_at = nop_v0_at
         self.nop_gp = nop_gp
         self.la_gprel = la_gprel
@@ -871,7 +874,31 @@ class MaspsxProcessor:
 
         elif op == "li":
             # TODO: handle non-soft floats?
-            res.append(line)
+            if self.expand_li:
+                match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
+                r_dest = match.group(1)
+                operand = int(match.group(2), 0)
+
+                if 0 < operand < 0x10000:
+                    res.append(f"ori\t{r_dest},$zero,{operand}")
+                elif operand >= 0x10000:
+                    res.append(f"lui\t{r_dest},%hi({operand})")
+                    if operand & 0xFFFF:
+                        res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
+                elif 0 > operand > -0x8000:
+                    res.append(f"addiu\t{r_dest},$zero,{operand}")
+                elif operand == -0x8000:
+                    res.append(f"addiu\t{r_dest},$zero,{operand} & 0xFFFF")
+                elif operand < -0x8000:
+                    res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
+                    if operand & 0xFFFF:
+                        res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
+                else:
+                    # this would be a sw rather than li, but for completeness:
+                    res.append(f"lui\t{r_dest},0")
+            else:
+                res.append(line)
+
             rest = " ".join(rest)
             r_dest, *_ = rest.split(",")
             # TODO: make this more generic

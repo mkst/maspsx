@@ -2,16 +2,7 @@ import unittest
 
 from maspsx import MaspsxProcessor
 
-
-def strip_comments(lines):
-    res = []
-    for line in lines:
-        if line.startswith("#"):
-            continue
-        if "#" in line:
-            line, *_ = line.split("#")
-        res.append(line.strip())
-    return res
+from .util import strip_comments
 
 
 class TestFloatingPoint(unittest.TestCase):
