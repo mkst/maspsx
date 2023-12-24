@@ -766,8 +766,15 @@ class MaspsxProcessor:
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
-                if operand in self.sdata_entries or operand in self.sbss_entries:
-                    res.append(f"{op}\t{r_dest},%gp_rel({operand})($gp)")
+                if operand.count("+") == 1:
+                    symbol, offset = operand.split("+")
+                    gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
+                else:
+                    symbol = operand
+                    gp_rel = f"%gp_rel({symbol})($gp)"
+
+                if symbol in self.sdata_entries or symbol in self.sbss_entries:
+                    res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
 
@@ -916,8 +923,15 @@ class MaspsxProcessor:
 
             if is_addend and r_source is None:
                 # e.g. sw	$v0,D_800E52E0
-                if operand in self.sdata_entries or operand in self.sbss_entries:
-                    res.append(f"{op}\t{r_dest},%gp_rel({operand})($gp)")
+                if operand.count("+") == 1:
+                    symbol, offset = operand.split("+")
+                    gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
+                else:
+                    symbol = operand
+                    gp_rel = f"%gp_rel({symbol})($gp)"
+
+                if symbol in self.sdata_entries or symbol in self.sbss_entries:
+                    res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
             else:

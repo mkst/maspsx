@@ -128,7 +128,7 @@ class TestLi(unittest.TestCase):
             "	li	$2,-0x00008000		# -32768",
         ]
         expected_lines = [
-            "addiu	$2,$zero,-32768",
+            "addiu	$2,$zero,-32768 & 0xFFFF",
         ]
         mp = MaspsxProcessor(lines, expand_li=True)
         res = mp.process_lines()
@@ -136,7 +136,7 @@ class TestLi(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_expand_li_neg_0x8000(self):
+    def test_expand_li_neg_0x8001(self):
         """
         Correct expansion of "li $v0,-0x8001"
         """
