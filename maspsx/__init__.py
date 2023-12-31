@@ -184,6 +184,34 @@ def div_needs_expanding(line: str) -> bool:
     return r_dest not in ("$zero", "$0")
 
 
+def expand_li(line: str) -> List[str]:
+    res = []
+
+    match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
+    r_dest = match.group(1)
+    operand = int(match.group(2), 0)
+
+    if 0 < operand < 0x10000:
+        res.append(f"ori\t{r_dest},$zero,{operand}")
+    elif operand >= 0x10000:
+        res.append(f"lui\t{r_dest},%hi({operand})")
+        if operand & 0xFFFF:
+            res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
+    elif 0 > operand > -0x8000:
+        res.append(f"addiu\t{r_dest},$zero,{operand}")
+    elif operand == -0x8000:
+        res.append(f"addiu\t{r_dest},$zero,{operand} & 0xFFFF")
+    elif operand < -0x8000:
+        res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
+        if operand & 0xFFFF:
+            res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
+    else:
+        # this would be a sw rather than li, but for completeness:
+        res.append(f"lui\t{r_dest},0")
+
+    return res
+
+
 def is_label(line: str):
     return re.match(r"\$L\d+:$", line)
 
@@ -532,24 +560,30 @@ class MaspsxProcessor:
                         # allow for $at handling later in the script
                         skip = 0
                         break
-                    res.append(inst)
 
-                    if op == "li" and (
-                        match := re.match(r"li\s+.*,-?([0-9a-fA-Fx]+).*", inst)
-                    ):
-                        value = int(match.group(1), 0)
-                        if value > 0xFFFF:
+                    if op == "li":
+                        expanded = expand_li(inst)
+
+                        if self.expand_li:
+                            res += expanded
+                        else:
+                            res.append(inst)
+
+                        if len(expanded) == 2:
                             res.append(
-                                f"#nop  # DEBUG: mflo/mfhi with mult/div and li with large value ({value})"
+                                f"#nop  # DEBUG: mflo/mfhi with mult/div and li expands to 2 ops"
                             )
                         else:
                             res.append(
-                                f"nop  # DEBUG: mflo/mfhi with mult/div and li with small value ({value})"
+                                f"nop  # DEBUG: mflo/mfhi with mult/div and li expands to 1 op"
                             )
+
                     else:
+                        res.append(inst)
                         res.append(
                             "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
                         )
+
                 elif inst == next_next_instruction:
                     if div_needs_expanding(inst):
                         res.append("# DEBUG: div needs expanding")
@@ -882,27 +916,7 @@ class MaspsxProcessor:
         elif op == "li":
             # TODO: handle non-soft floats?
             if self.expand_li:
-                match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
-                r_dest = match.group(1)
-                operand = int(match.group(2), 0)
-
-                if 0 < operand < 0x10000:
-                    res.append(f"ori\t{r_dest},$zero,{operand}")
-                elif operand >= 0x10000:
-                    res.append(f"lui\t{r_dest},%hi({operand})")
-                    if operand & 0xFFFF:
-                        res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
-                elif 0 > operand > -0x8000:
-                    res.append(f"addiu\t{r_dest},$zero,{operand}")
-                elif operand == -0x8000:
-                    res.append(f"addiu\t{r_dest},$zero,{operand} & 0xFFFF")
-                elif operand < -0x8000:
-                    res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
-                    if operand & 0xFFFF:
-                        res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
-                else:
-                    # this would be a sw rather than li, but for completeness:
-                    res.append(f"lui\t{r_dest},0")
+                res += expand_li(line)
             else:
                 res.append(line)
 
