@@ -28,7 +28,7 @@ If `mips-linux-gnu-as` isn't on your path, or you want to use a different assemb
 Current understanding is that `-G0` needs to be passed to GNU `as` in order to get correct behaviour. If you need to pass a non-zero value for `-G` to the GNU assembler, use this flag.
 
 ### `--expand-div`
-If you need `maspsx` to expand `div`, `divu` and `rem` ops, pass `--expand-div` to `maspsx`. There is already handling for partial div expansion (i.e. where `-0` was passed to `ASPSX.EXE`).
+If you need `maspsx` to expand `div/divu` and `rem/remu` ops, pass `--expand-div` to `maspsx`. There is already handling for partial div expansion (i.e. where `-0` was passed to `ASPSX.EXE`).
 
 ### `--no-macro-inc`
 By default, `maspsx` adds a `include "macro.inc"` statement to the output, pass this flag to suppress it.

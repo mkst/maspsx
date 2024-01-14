@@ -404,6 +404,9 @@ class MaspsxProcessor:
                         current_symbol = line.replace(":", "")
                         self.sdata_entries[current_symbol] = 0
                     else:
+                        if line.startswith(".type"):
+                            continue
+
                         if line.startswith(".space"):
                             _, size = line.split()
                             size = int(size)
@@ -715,13 +718,13 @@ class MaspsxProcessor:
                         f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
                     )
 
-        elif op == "divu":
+        elif op in ("divu", "remu"):
             r_dest, r_source, r_operand = rest[0].split(",")
             if r_dest in ("$zero", "$0"):
                 # e.g. divu $zero, $v1, $a2
                 return [line]
 
-            r_dest, r_source, r_operand = rest[0].split(",")
+            move_from = "mfhi" if op == "remu" else "mflo"
             if self.expand_div:
                 res.append("# EXPAND_DIVU START")
                 res.append(".set\tnoat")
@@ -730,13 +733,13 @@ class MaspsxProcessor:
                 res.append("nop")
                 res.append("break\t0x7")
                 res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
-                res.append(f"mflo\t{r_dest}")
+                res.append(f"{move_from}\t{r_dest}")
                 res.append(".set\tat")
                 res.append("# EXPAND_DIVU START")
             else:
                 res.append("# EXPAND_ZERO_DIVU START")
                 res.append(f"divu\t$zero,{r_source},{r_operand}")
-                res.append(f"mflo\t{r_dest}")
+                res.append(f"{move_from}\t{r_dest}")
                 res.append("# EXPAND_ZERO_DIVU END")
 
             extra_nops = self._handle_mflo_mfhi()

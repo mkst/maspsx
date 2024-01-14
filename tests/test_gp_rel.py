@@ -45,3 +45,23 @@ class TestGpRel(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
+
+
+    def test_gp_rel_load_address_with_offset(self):
+        lines = [
+            "	.lcomm	Raziel,1464",
+            "	la	$5,Raziel+1380",
+        ]
+        expected_lines = [
+            "la\t$5,%gp_rel(Raziel+1380)($gp)",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            la_gprel=True,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:1])
