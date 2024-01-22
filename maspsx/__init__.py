@@ -504,9 +504,15 @@ class MaspsxProcessor:
                     _,
                     _,
                 ) = parse_load_or_store(rest)
-                if operand in self.sbss_entries:
+
+                if operand.count("+") == 1:
+                    symbol, _ = operand.split("+")
+                else:
+                    symbol = operand
+
+                if symbol in self.sbss_entries:
                     return True
-                if operand in self.sdata_entries:
+                if symbol in self.sdata_entries:
                     return True
 
         return False
