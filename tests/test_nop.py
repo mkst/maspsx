@@ -290,6 +290,24 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:5])
 
+    def test_nop_gp_lw_sw_pair(self):
+        lines = [
+        "	.comm	gameTrackerX,624",
+            "	lw	$2,gameTrackerX+580",
+            "$L15:",
+            "	sw	$2,gameTrackerX+576",
+        ]
+        expected_lines = [
+            "lw\t$2,%gp_rel(gameTrackerX+580)($gp)",
+            "$L15:",
+            "nop",
+            "sw\t$2,%gp_rel(gameTrackerX+576)($gp)",
+        ]
+        mp = MaspsxProcessor(lines, sdata_limit=1024, nop_gp=True)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:4])
+
     def test_nop_lh_sw_pair_uses_gp(self):
         """
         We need a nop betwen lh/sw pair when the sw uses $gp
