@@ -75,7 +75,7 @@ def main():
     try:
         out_lines = maspsx_processor.process_lines()
     except Exception as err:
-        sys.stderr.write(f"Exception occurred: {err}\n")
+        sys.stderr.write(f"maspsx encountered an exception: {err}\n")
         sys.exit(1)
 
     out_text = "\n".join(preamble + out_lines)
