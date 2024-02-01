@@ -46,7 +46,6 @@ class TestGpRel(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
-
     def test_gp_rel_load_address_with_offset(self):
         lines = [
             "	.lcomm	Raziel,1464",

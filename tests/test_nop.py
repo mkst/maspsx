@@ -292,7 +292,7 @@ class TestNop(unittest.TestCase):
 
     def test_nop_gp_lw_sw_pair(self):
         lines = [
-        "	.comm	gameTrackerX,624",
+            "	.comm	gameTrackerX,624",
             "	lw	$2,gameTrackerX+580",
             "$L15:",
             "	sw	$2,gameTrackerX+576",

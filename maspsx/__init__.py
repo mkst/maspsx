@@ -62,9 +62,14 @@ double_reg_loads = {
 }
 
 
+def strip_comments(line) -> str:
+    if line.count("#") > 0:
+        line = line.split("#")[0]
+    return line.strip()
+
+
 def line_loads_from_reg(line, r_src) -> bool:
-    line = line.split("#")[0]  # strip comments
-    line = line.strip()
+    line = strip_comments(line)
 
     # escape dollar
     r_src = r_src.replace("$", r"\$")
@@ -75,7 +80,19 @@ def line_loads_from_reg(line, r_src) -> bool:
 
     op, rest = line.split("\t")
 
-    if op == "jal":
+    if op in load_mnemonics:
+        # lwl	$9,7($2)
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
+            return True
+
+    elif op in store_mnemonics:
+        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
+            return True
+        # "line_loads_from_reg" is a bit of a lie
+        if re.match(rf"^{r_src},.*$", rest):
+            return True
+
+    elif op == "jal":
         if re.match(rf"^.*,\s*{r_src}$", rest):
             return True
 
@@ -87,18 +104,6 @@ def line_loads_from_reg(line, r_src) -> bool:
         if re.match(rf"^{r_src},.*$", rest):
             return True
         if re.match(rf"^.*,\s*{r_src},.*$", rest):
-            return True
-
-    elif op in load_mnemonics:
-        # lwl	$9,7($2)
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
-            return True
-
-    elif op in store_mnemonics:
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
-            return True
-        # "line_loads_from_reg" is a bit of a lie
-        if re.match(rf"^{r_src},.*$", rest):
             return True
 
     elif op in single_reg_loads:
@@ -122,9 +127,7 @@ def line_loads_from_reg(line, r_src) -> bool:
 
 
 def uses_at(line: str) -> bool:
-    # take everything before the comment
-    line = line.split("#")[0]
-    line = line.strip()
+    line = strip_comments(line)
 
     # sw	$2,D_801813A4
     # sw	$3,g_CurrentRoom+40
@@ -184,7 +187,7 @@ def div_needs_expanding(line: str) -> bool:
     return r_dest not in ("$zero", "$0")
 
 
-def expand_li(line: str) -> List[str]:
+def expand_load_immediate(line: str) -> List[str]:
     res = []
 
     match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
@@ -261,6 +264,7 @@ def get_next_register(reg: str):
         "$a2": "$a3",
         "$t0": "$t1",
         "$t2": "$t3",
+        "$s0": "$s1",
         "$s2": "$s3",
         # nums
         "$2": "$3",  # $v0
@@ -447,26 +451,20 @@ class MaspsxProcessor:
             else:
                 res += self.process_line(line)
 
-        for i, (symbol, size) in enumerate(self.sbss_entries.items()):
-            if i == 0:
-                res.append(".section .sbss")
-            res.extend(
-                [
-                    f"\t.globl {symbol}",
-                    f"{symbol}:",
-                    f"\t.space {size}",
-                ]
-            )
-        for i, (symbol, size) in enumerate(self.bss_entries.items()):
-            if i == 0:
-                res.append(".section .bss")
-            res.extend(
-                [
-                    f"\t.globl {symbol}",
-                    f"{symbol}:",
-                    f"\t.space {size}",
-                ]
-            )
+        for section, entries in [
+            ("sbss", self.sbss_entries),
+            ("bss", self.bss_entries),
+        ]:
+            for i, (symbol, size) in enumerate(entries.items()):
+                if i == 0:
+                    res.append(f".section .{section}")
+                res.extend(
+                    [
+                        f"\t.globl {symbol}",
+                        f"{symbol}:",
+                        f"\t.space {size}",
+                    ]
+                )
 
         return res
 
@@ -490,9 +488,10 @@ class MaspsxProcessor:
         return ""  # warn user?
 
     def _uses_gp(self, line: str) -> bool:
-        line = line.split("#")[0]
-        line = line.strip()
+        if self.sdata_limit == 0:
+            return False
 
+        line = strip_comments(line)
         if uses_at(line):
             op, *rest = line.split("\t")
             if op in load_mnemonics or op in store_mnemonics:
@@ -571,7 +570,7 @@ class MaspsxProcessor:
                         break
 
                     if op == "li":
-                        expanded = expand_li(inst)
+                        expanded = expand_load_immediate(inst)
 
                         if self.expand_li:
                             res += expanded
@@ -580,11 +579,11 @@ class MaspsxProcessor:
 
                         if len(expanded) == 2:
                             res.append(
-                                f"#nop  # DEBUG: mflo/mfhi with mult/div and li expands to 2 ops"
+                                "#nop  # DEBUG: mflo/mfhi with mult/div and li expands to 2 ops"
                             )
                         else:
                             res.append(
-                                f"nop  # DEBUG: mflo/mfhi with mult/div and li expands to 1 op"
+                                "nop  # DEBUG: mflo/mfhi with mult/div and li expands to 1 op"
                             )
 
                     else:
@@ -661,131 +660,16 @@ class MaspsxProcessor:
 
             return res
 
+        if line.startswith("$L"):
+            return [line]
+
         op, *rest = line.split()
 
-        if op == "li.s":
-            res += load_immediate_single(line)
-
-        elif op == "li.d":
-            res += load_immediate_double(line)
-
-        elif op in ("mflo", "mfhi"):
-            res.append(line)
-            res += self._handle_mflo_mfhi()
-
-        elif op == "break":
-            # turn 'break 7' into 'break 0x0,0x7'
-            num = int(rest[0])
-            line = f"break\t0x0,0x{num:X}"
-            res.append(line)
-
-        elif op in ("div", "rem"):
-            r_dest, r_source, r_operand = rest[0].split(",")
-            if r_dest in ("$zero", "$0"):
-                # e.g. div $zero, $v0, $a0
-                return [line]
-
-            move_from = "mfhi" if op == "rem" else "mflo"
-            if self.expand_div:
-                res.append("# EXPAND_DIV START")
-                res.append(".set\tnoat")
-                res.append(f"div\t$zero,{r_source},{r_operand}")
-                res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
-                res.append("nop")
-                res.append("break\t0x7")
-                res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
-                res.append("addiu\t$at,$zero,-1")
-                res.append(
-                    f"bne\t{r_operand},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
-                )
-                res.append("lui\t$at,0x8000")
-                res.append(
-                    f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}"
-                )
-                res.append("nop")
-                res.append("break\t0x6")
-                res.append(f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:")
-                res.append(f"{move_from}\t{r_dest}")
-                res.append(".set\tat")
-                res.append("# EXPAND_DIV END")
-            else:
-                res.append("# EXPAND_ZERO_DIV START")
-                res.append(f"div\t$zero,{r_source},{r_operand}")
-                res.append(f"{move_from}\t{r_dest}")
-                res.append("# EXPAND_ZERO_DIV END")
-
-            extra_nops = self._handle_mflo_mfhi()
-            if len(extra_nops) > 0:
-                res += extra_nops
-            else:
-                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-                if line_loads_from_reg(next_instruction, r_dest):
-                    res.append(
-                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
-                    )
-
-        elif op in ("divu", "remu"):
-            r_dest, r_source, r_operand = rest[0].split(",")
-            if r_dest in ("$zero", "$0"):
-                # e.g. divu $zero, $v1, $a2
-                return [line]
-
-            move_from = "mfhi" if op == "remu" else "mflo"
-            if self.expand_div:
-                res.append("# EXPAND_DIVU START")
-                res.append(".set\tnoat")
-                res.append(f"divu\t$zero,{r_source},{r_operand}")
-                res.append(f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}")
-                res.append("nop")
-                res.append("break\t0x7")
-                res.append(f".L_NOT_DIV_BY_ZERO_{self.line_index}:")
-                res.append(f"{move_from}\t{r_dest}")
-                res.append(".set\tat")
-                res.append("# EXPAND_DIVU START")
-            else:
-                res.append("# EXPAND_ZERO_DIVU START")
-                res.append(f"divu\t$zero,{r_source},{r_operand}")
-                res.append(f"{move_from}\t{r_dest}")
-                res.append("# EXPAND_ZERO_DIVU END")
-
-            extra_nops = self._handle_mflo_mfhi()
-            if len(extra_nops) > 0:
-                res += extra_nops
-            else:
-                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
-                if line_loads_from_reg(next_instruction, r_dest):
-                    res.append(
-                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
-                    )
-
-        elif op == "sltu":
-            r_dest, r_source, r_operand = rest[0].split(",")
-            if re.match(r"^-?\d+$", r_operand) or re.match(
-                r"^-?0x[A-Fa-f0-9]+$", r_operand
-            ):
-                value = int(r_operand)
-                if value < 0:
-                    res.append(f"li\t$at,{r_operand}")
-                    res.append(f"{op}\t{r_dest},{r_source},$at")
-                else:
-                    res.append(line)
-            else:
-                res.append(line)
-
-        elif op in branch_mnemonics or op in jump_mnemonics:
-            res.append(line)
-            if self.is_reorder:
-                res.append("nop  # DEBUG: branch/jump")
-
-        elif op in load_mnemonics:
+        if op in load_mnemonics:
             rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, needs_expanding = parse_load_or_store(
                 rest
             )
-
-            # res.append(
-            #     f"#op: {op}, r_dest: {r_dest}, operand: {operand}, r_source: {r_source}, needs_expanding: {needs_expanding}, is_addend: {is_addend}"
-            # )
 
             next_instruction = self.get_next_instruction(
                 skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
@@ -853,13 +737,17 @@ class MaspsxProcessor:
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
-                res.append("# EXPAND_AT START")
-                res.append(".set\tnoat")
-                res.append(f"lui\t$at,%hi({operand})")
-                res.append(f"addu\t$at,$at,{r_source}")
-                res.append(f"{op}\t{r_dest},%lo({operand})($at)")
-                res.append(".set\tat")
-                res.append("# EXPAND_AT END")
+                res.extend(
+                    [
+                        "# EXPAND_AT START",
+                        ".set\tnoat",
+                        f"lui\t$at,%hi({operand})",
+                        f"addu\t$at,$at,{r_source}",
+                        f"{op}\t{r_dest},%lo({operand})($at)",
+                        ".set\tat",
+                        "# EXPAND_AT END",
+                    ]
+                )
 
                 # TODO: properly handle multi-line macros
                 if ";" in next_instruction:
@@ -889,13 +777,17 @@ class MaspsxProcessor:
             else:
                 if r_source and int(operand) > 32767:
                     # e.g. lhu	$2,49344($2)
-                    res.append("# EXPAND_AT START")
-                    res.append(".set\tnoat")
-                    res.append(f"lui\t$at,%hi({operand})")
-                    res.append(f"addu\t$at,{r_source},$at")
-                    res.append(f"{op}\t{r_dest},%lo({operand})($at)")
-                    res.append(".set\tat")
-                    res.append("# EXPAND_AT END")
+                    res.extend(
+                        [
+                            "# EXPAND_AT START",
+                            ".set\tnoat",
+                            f"lui\t$at,%hi({operand})",
+                            f"addu\t$at,{r_source},$at",
+                            f"{op}\t{r_dest},%lo({operand})($at)",
+                            ".set\tat",
+                            "# EXPAND_AT END",
+                        ]
+                    )
                 else:
                     # e.g. lhu	$2,528482304
                     res.append(line)
@@ -922,25 +814,7 @@ class MaspsxProcessor:
                             self.skip_instructions = 1
                         res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
 
-        elif op == "li":
-            # TODO: handle non-soft floats?
-            if self.expand_li:
-                res += expand_li(line)
-            else:
-                res.append(line)
-
-            rest = " ".join(rest)
-            r_dest, *_ = rest.split(",")
-            # TODO: make this more generic
-            next_instruction = self.get_next_instruction(skip=0)
-            if next_instruction.startswith("div") and next_instruction.endswith(
-                f",{r_dest}"
-            ):
-                res.append(
-                    f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
-                )
-
-        elif (self.la_gprel and op == "la") or op in store_mnemonics:
+        elif op in store_mnemonics or (self.la_gprel and op == "la"):
             rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
 
@@ -955,6 +829,156 @@ class MaspsxProcessor:
 
                 if symbol in self.sdata_entries or symbol in self.sbss_entries:
                     res.append(f"{op}\t{r_dest},{gp_rel}")
+                else:
+                    res.append(line)
+            else:
+                res.append(line)
+
+        elif op in branch_mnemonics or op in jump_mnemonics:
+            res.append(line)
+            if self.is_reorder:
+                res.append("nop  # DEBUG: branch/jump")
+            # else:
+            # res.append(f"#nop # DEBUG: branch/jump, is_reorder: {self.is_reorder}")
+
+        elif op in ("addu", "subu", "move", "sra", "srl", "srr", "sll"):
+            # no extra processing required
+            res.append(line)
+
+        elif op == "li":
+            # TODO: handle non-soft floats?
+            if self.expand_li:
+                res += expand_load_immediate(line)
+            else:
+                res.append(line)
+
+            rest = " ".join(rest)
+            r_dest, *_ = rest.split(",")
+            # TODO: make this more generic
+            next_instruction = self.get_next_instruction(skip=0)
+            if next_instruction.startswith("div") and next_instruction.endswith(
+                f",{r_dest}"
+            ):
+                res.append(
+                    f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
+                )
+
+        elif op == "li.s":
+            res += load_immediate_single(line)
+
+        elif op == "li.d":
+            res += load_immediate_double(line)
+
+        elif op in ("mflo", "mfhi"):
+            res.append(line)
+            res += self._handle_mflo_mfhi()
+
+        elif op == "break":
+            # turn 'break 7' into 'break 0x0,0x7'
+            num = int(rest[0])
+            line = f"break\t0x0,0x{num:X}"
+            res.append(line)
+
+        elif op in ("div", "rem"):
+            r_dest, r_source, r_operand = rest[0].split(",")
+            if r_dest in ("$zero", "$0"):
+                # e.g. div $zero, $v0, $a0
+                return [line]
+
+            move_from = "mfhi" if op == "rem" else "mflo"
+            if self.expand_div:
+                res.extend(
+                    [
+                        "# EXPAND_DIV START",
+                        ".set\tnoat",
+                        f"div\t$zero,{r_source},{r_operand}",
+                        f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}",
+                        "nop",
+                        "break\t0x7",
+                        f".L_NOT_DIV_BY_ZERO_{self.line_index}:",
+                        "addiu\t$at,$zero,-1",
+                        f"bne\t{r_operand},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}",
+                        "lui\t$at,0x8000",
+                        f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}",
+                        "nop",
+                        "break\t0x6",
+                        f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:",
+                        f"{move_from}\t{r_dest}",
+                        ".set\tat",
+                        "# EXPAND_DIV END",
+                    ]
+                )
+            else:
+                res.extend(
+                    [
+                        "# EXPAND_ZERO_DIV START",
+                        f"div\t$zero,{r_source},{r_operand}",
+                        f"{move_from}\t{r_dest}",
+                        "# EXPAND_ZERO_DIV END",
+                    ]
+                )
+
+            extra_nops = self._handle_mflo_mfhi()
+            if len(extra_nops) > 0:
+                res += extra_nops
+            else:
+                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                if line_loads_from_reg(next_instruction, r_dest):
+                    res.append(
+                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
+                    )
+
+        elif op in ("divu", "remu"):
+            r_dest, r_source, r_operand = rest[0].split(",")
+            if r_dest in ("$zero", "$0"):
+                # e.g. divu $zero, $v1, $a2
+                return [line]
+
+            move_from = "mfhi" if op == "remu" else "mflo"
+            if self.expand_div:
+                res.extend(
+                    [
+                        "# EXPAND_DIVU START",
+                        ".set\tnoat",
+                        f"divu\t$zero,{r_source},{r_operand}",
+                        f"bnez\t{r_operand},.L_NOT_DIV_BY_ZERO_{self.line_index}",
+                        "nop",
+                        "break\t0x7",
+                        f".L_NOT_DIV_BY_ZERO_{self.line_index}:",
+                        f"{move_from}\t{r_dest}",
+                        ".set\tat",
+                        "# EXPAND_DIVU END",
+                    ]
+                )
+            else:
+                res.extend(
+                    [
+                        "# EXPAND_ZERO_DIVU START",
+                        f"divu\t$zero,{r_source},{r_operand}",
+                        f"{move_from}\t{r_dest}",
+                        "# EXPAND_ZERO_DIVU END",
+                    ]
+                )
+
+            extra_nops = self._handle_mflo_mfhi()
+            if len(extra_nops) > 0:
+                res += extra_nops
+            else:
+                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                if line_loads_from_reg(next_instruction, r_dest):
+                    res.append(
+                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
+                    )
+
+        elif op == "sltu":
+            r_dest, r_source, r_operand = rest[0].split(",")
+            if re.match(r"^-?\d+$", r_operand) or re.match(
+                r"^-?0x[A-Fa-f0-9]+$", r_operand
+            ):
+                value = int(r_operand)
+                if value < 0:
+                    res.append(f"li\t$at,{r_operand}")
+                    res.append(f"{op}\t{r_dest},{r_source},$at")
                 else:
                     res.append(line)
             else:
