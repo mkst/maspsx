@@ -91,6 +91,7 @@ def main():
     if args.run_assembler:
         cmd = [
             args.gnu_as_path,
+            "-EL",  # TODO: switch from 'mips-linux-gnu-as' to 'mipsel-linux-gnu-as'
             *as_args,
             "-",  # read from stdin
         ]
