@@ -53,7 +53,6 @@ def main():
 
     nop_v0_at = False
     nop_gp = False
-    la_gprel = False
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
@@ -61,7 +60,6 @@ def main():
             nop_v0_at = True
         if aspsx_version >= (2, 79):
             nop_gp = True
-            la_gprel = True
 
     maspsx_processor = MaspsxProcessor(
         in_lines,
@@ -70,7 +68,6 @@ def main():
         expand_li=args.expand_li,
         nop_v0_at=nop_v0_at,
         nop_gp=nop_gp,
-        la_gprel=la_gprel,
     )
     try:
         out_lines = maspsx_processor.process_lines()
