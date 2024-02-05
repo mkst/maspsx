@@ -225,7 +225,7 @@ def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=F
 
     if ignore_nop and line == "#nop":
         return False
-    if ignore_set and line in (".set\treorder", ".set\tnoreorder"):
+    if ignore_set and line in (".set\treorder", ".set\tnoreorder", ".set\tvolatile", ".set\tnovolatile"):
         return False
     if ignore_label and is_label(line):
         return False
@@ -332,7 +332,6 @@ class MaspsxProcessor:
         expand_li=False,
         nop_v0_at=False,
         nop_gp=False,
-        la_gprel=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -343,7 +342,6 @@ class MaspsxProcessor:
 
         self.nop_v0_at = nop_v0_at
         self.nop_gp = nop_gp
-        self.la_gprel = la_gprel
 
         self.bss_entries = {}
         self.sbss_entries = {}
@@ -814,7 +812,7 @@ class MaspsxProcessor:
                             self.skip_instructions = 1
                         res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
 
-        elif op in store_mnemonics or (self.la_gprel and op == "la"):
+        elif op in store_mnemonics:
             rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
 
@@ -829,6 +827,18 @@ class MaspsxProcessor:
 
                 if symbol in self.sdata_entries or symbol in self.sbss_entries:
                     res.append(f"{op}\t{r_dest},{gp_rel}")
+                else:
+                    res.append(line)
+            else:
+                res.append(line)
+
+        elif op == "la" and self.sdata_limit > 0:
+            rest = " ".join(rest)
+            _, r_dest, operand, _, _ = parse_load_or_store(rest)
+            if operand.count("+") == 1:
+                symbol, offset = operand.split("+")
+                if symbol in self.sdata_entries or symbol in self.sbss_entries:
+                    res.append(f"{op}\t{r_dest},%gp_rel({symbol}+{offset})($gp)")
                 else:
                     res.append(line)
             else:
