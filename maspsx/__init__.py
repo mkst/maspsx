@@ -39,6 +39,7 @@ single_reg_loads = {
     "div",
     "divu",
     "rem",
+    "remu",
     "move",
     "negu",
     "nor",
@@ -112,7 +113,7 @@ def line_loads_from_reg(line, r_src) -> bool:
         if op.startswith("mult"):
             if re.match(rf"^{r_src},.*$", rest):
                 return True
-        if op.startswith("div"):
+        if op.startswith("div") or op.startswith("rem"):
             # e.g. div	$3,$3,$7
             if re.match(rf"^.*,{r_src}.*$", rest):
                 return True
