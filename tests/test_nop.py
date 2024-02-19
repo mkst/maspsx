@@ -47,6 +47,47 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_rem_nop(self):
+        """
+        Ensure we place a nop betwen an lw/remu pair that uses the same register
+        """
+        lines = [
+            "	lw	$4,_spu_mem_mode_unit",
+            "	#nop",
+            "	rem	$2,$5,$4",
+        ]
+        expected_lines = [
+            "lw	$4,_spu_mem_mode_unit",
+            "nop",
+        ]
+
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
+    def test_remu_nop(self):
+        """
+        Ensure we place a nop betwen an lw/remu pair that uses the same register
+        Bug: https://github.com/mkst/maspsx/issues/53
+        """
+        lines = [
+            "	lw	$4,_spu_mem_mode_unit",
+            "	#nop",
+            "	remu	$2,$5,$4",
+        ]
+        expected_lines = [
+            "lw	$4,_spu_mem_mode_unit",
+            "nop",
+        ]
+
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
     def test_nop_div_mult(self):
         """
         mult and mflo/mhfi must be separated by at least two instructions
