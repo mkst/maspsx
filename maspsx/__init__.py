@@ -926,8 +926,16 @@ class MaspsxProcessor:
             if len(extra_nops) > 0:
                 res += extra_nops
             else:
-                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                next_instruction = self.get_next_instruction(
+                    skip=0, ignore_set=True, ignore_label=True
+                )
                 if line_loads_from_reg(next_instruction, r_dest):
+                    label = self.get_next_instruction(
+                        skip=0, ignore_nop=True, ignore_set=True
+                    )
+                    if is_label(label):
+                        res.append(label)
+                        self.skip_instructions = 1
                     res.append(
                         f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
                     )
@@ -968,8 +976,16 @@ class MaspsxProcessor:
             if len(extra_nops) > 0:
                 res += extra_nops
             else:
-                next_instruction = self.get_next_instruction(skip=0, ignore_set=True)
+                next_instruction = self.get_next_instruction(
+                    skip=0, ignore_set=True, ignore_label=True
+                )
                 if line_loads_from_reg(next_instruction, r_dest):
+                    label = self.get_next_instruction(
+                        skip=0, ignore_nop=True, ignore_set=True
+                    )
+                    if is_label(label):
+                        res.append(label)
+                        self.skip_instructions = 1
                     res.append(
                         f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
                     )

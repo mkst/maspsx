@@ -450,3 +450,55 @@ class TestNop(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_div_move_nop(self):
+        """
+        div followed by move with label in between
+        BUG: https://github.com/mkst/maspsx/issues/55
+        """
+        lines = [
+            "	div	$2,$2,$3",
+            "$L21:",
+            "",
+            "LM30:",
+            "	move	$16,$2",
+        ]
+        expected_lines = [
+            "div\t$zero,$2,$3",
+            "mflo\t$2",
+            "$L21:",
+            "nop",
+            "",
+            "LM30:",
+            "move\t$16,$2",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_remu_move_nop(self):
+        """
+        div followed by move with label in between
+        BUG: https://github.com/mkst/maspsx/issues/55
+        """
+        lines = [
+            "	remu	$2,$2,$3",
+            "$L21:",
+            "",
+            "LM30:",
+            "	move	$16,$2",
+        ]
+        expected_lines = [
+            "divu\t$zero,$2,$3",
+            "mfhi\t$2",
+            "$L21:",
+            "nop",
+            "",
+            "LM30:",
+            "move\t$16,$2",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
