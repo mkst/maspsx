@@ -502,3 +502,29 @@ class TestNop(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_lw_move_nop(self):
+        lines = [
+            "	lw	$16,16($2)",
+            "$L2:",
+            "",
+            "	.loc	2 17",
+            "$Le1:",
+            "	.bend	$Le1	14",
+            "	move	$2,$16",
+        ]
+        expected_lines = [
+            "lw\t$16,16($2)",
+            "$L2:",
+            "nop",
+            "",
+            ".loc	2 17",
+            "$Le1:",
+            "move\t$2,$16",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        for line in res:
+            print(line)
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
