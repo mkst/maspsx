@@ -524,7 +524,5 @@ class TestNop(unittest.TestCase):
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
-        for line in res:
-            print(line)
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)

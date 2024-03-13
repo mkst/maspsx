@@ -338,6 +338,7 @@ class MaspsxProcessor:
         expand_li=False,
         nop_v0_at=False,
         nop_gp=False,
+        sltu_at=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -348,6 +349,7 @@ class MaspsxProcessor:
 
         self.nop_v0_at = nop_v0_at
         self.nop_gp = nop_gp
+        self.sltu_at = sltu_at
 
         self.bss_entries = {}
         self.sbss_entries = {}
@@ -996,10 +998,11 @@ class MaspsxProcessor:
                 r"^-?0x[A-Fa-f0-9]+$", r_operand
             ):
                 value = int(r_operand)
-                if value < 0:
+                if self.sltu_at and value < 0:
                     res.append(f"li\t$at,{r_operand}")
                     res.append(f"{op}\t{r_dest},{r_source},$at")
                 else:
+                    # TODO: do we want to expand sltu into sltiu?
                     res.append(line)
             else:
                 res.append(line)
