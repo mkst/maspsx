@@ -326,7 +326,7 @@ class TestNop(unittest.TestCase):
             "nop",  # DEBUG: next op loads from $2",
             "sw\t$2,%gp_rel(UnkVar01)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=4, nop_gp=True)
+        mp = MaspsxProcessor(lines, sdata_limit=4,)
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:5])
@@ -344,7 +344,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "sw\t$2,%gp_rel(gameTrackerX+576)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=1024, nop_gp=True)
+        mp = MaspsxProcessor(lines, sdata_limit=1024)
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:4])
@@ -365,7 +365,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "sw\t$2,%gp_rel(Map_water_height)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=4, nop_gp=True)
+        mp = MaspsxProcessor(lines, sdata_limit=4)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
