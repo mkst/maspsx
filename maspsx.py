@@ -52,7 +52,6 @@ def main():
             sdata_limit = int(arg[2:])
 
     nop_v0_at = False
-    nop_gp = False
     sltu_at = True
 
     if args.aspsx_version:
@@ -61,8 +60,6 @@ def main():
             nop_v0_at = True
         if aspsx_version >= (2, 77):
             sltu_at = False
-        if aspsx_version >= (2, 79):
-            nop_gp = True
 
     maspsx_processor = MaspsxProcessor(
         in_lines,
@@ -70,7 +67,6 @@ def main():
         expand_div=args.expand_div,
         expand_li=args.expand_li,
         nop_v0_at=nop_v0_at,
-        nop_gp=nop_gp,
         sltu_at=sltu_at,
     )
     try:
