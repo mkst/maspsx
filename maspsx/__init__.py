@@ -337,7 +337,6 @@ class MaspsxProcessor:
         expand_div=False,
         expand_li=False,
         nop_v0_at=False,
-        nop_gp=False,
         sltu_at=False,
     ):
         self.lines = [x.strip() for x in lines]
@@ -348,7 +347,6 @@ class MaspsxProcessor:
         self.expand_li = expand_li
 
         self.nop_v0_at = nop_v0_at
-        self.nop_gp = nop_gp
         self.sltu_at = sltu_at
 
         self.bss_entries = {}
@@ -721,7 +719,7 @@ class MaspsxProcessor:
                     if not uses_at(next_instruction):
                         reason = f"'{next_instruction}' does not use $at"
                         nop_required = True
-                    if self.nop_gp and self._uses_gp(next_instruction):
+                    if self._uses_gp(next_instruction):
                         reason = f"'{next_instruction}' uses $gp"
                         nop_required = True
                     if self.nop_v0_at:
@@ -765,8 +763,8 @@ class MaspsxProcessor:
                     if not uses_at(next_instruction):
                         reason = f"'{next_instruction}' does not use $at"
                         nop_required = True
-                    if self.nop_gp and self._uses_gp(next_instruction):
-                        reason = f"nop_gp and '{next_instruction}' uses $gp"
+                    if self._uses_gp(next_instruction):
+                        reason = f"'{next_instruction}' uses $gp"
                         nop_required = True
 
                     if nop_required:
@@ -807,7 +805,7 @@ class MaspsxProcessor:
                     if not uses_at(next_instruction):
                         reason = f"'{next_instruction}' does not use $at"
                         nop_required = True
-                    if self.nop_gp and self._uses_gp(next_instruction):
+                    if self._uses_gp(next_instruction):
                         reason = f"'{next_instruction}' uses $gp"
                         nop_required = True
 
