@@ -210,8 +210,9 @@ def expand_load_immediate(line: str) -> List[str]:
         if operand & 0xFFFF:
             res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
     else:
-        # this would be a sw rather than li, but for completeness:
-        res.append(f"lui\t{r_dest},0")
+        # TODO: raise an exception here instead?
+        # ori is actually addiu on ASPSX 2.56+
+        res.append(f"ori\t{r_dest},0")
 
     return res
 
@@ -842,8 +843,6 @@ class MaspsxProcessor:
             res.append(line)
             if self.is_reorder:
                 res.append("nop  # DEBUG: branch/jump")
-            # else:
-            # res.append(f"#nop # DEBUG: branch/jump, is_reorder: {self.is_reorder}")
 
         elif op in ("addu", "subu", "move", "sra", "srl", "srr", "sll"):
             # no extra processing required
@@ -855,17 +854,6 @@ class MaspsxProcessor:
                 res += expand_load_immediate(line)
             else:
                 res.append(line)
-
-            rest = " ".join(rest)
-            r_dest, *_ = rest.split(",")
-            # TODO: make this more generic
-            next_instruction = self.get_next_instruction(skip=0)
-            if next_instruction.startswith("div") and next_instruction.endswith(
-                f",{r_dest}"
-            ):
-                res.append(
-                    f"nop # DEBUG: li {r_dest} followed by div that uses {r_dest}"
-                )
 
         elif op == "li.s":
             res += load_immediate_single(line)
