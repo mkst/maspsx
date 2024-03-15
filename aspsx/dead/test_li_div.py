@@ -79,7 +79,7 @@ TESTS = {
 
 
 class TestLiDiv(unittest.TestCase):
-    def test_nop_gp(self):
+    def test_li_div(self):
         source_asm = Path(__file__).parent / TESTS["source_asm"]
 
         for version in TESTS["versions"]:

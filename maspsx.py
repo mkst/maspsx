@@ -7,16 +7,29 @@ from maspsx import MaspsxProcessor
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--run-assembler", action="store_true")
-    parser.add_argument("--no-macro-inc", action="store_true")
-    parser.add_argument("--force-stdin", action="store_true")
-    parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
-    parser.add_argument("--expand-div", action="store_true")
-    parser.add_argument("--expand-li", action="store_true")
-    parser.add_argument("--dont-force-G0", action="store_true")
     parser.add_argument("--aspsx-version", type=str)
+    parser.add_argument("--run-assembler", action="store_true")
+    parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
+    parser.add_argument("--dont-force-G0", action="store_true")
+    parser.add_argument("--expand-div", action="store_true")
+    parser.add_argument("--macro-inc", action="store_true")
+    parser.add_argument("--dont-expand-li", action="store_true")
+    parser.add_argument("--force-stdin", action="store_true")
+    # deprecated
+    parser.add_argument("--no-macro-inc", action="store_true")
+    parser.add_argument("--expand-li", action="store_true")
 
     args, as_args = parser.parse_known_args()
+
+    if args.no_macro_inc:
+        sys.stderr.write(
+            "MASPSX: --no-macro-inc is no longer required and will be removed in a future update\n"
+        )
+
+    if args.expand_li:
+        sys.stderr.write(
+            "MASPSX: --expand-li is enabled automatically if --aspsx-version is below 2.56\n"
+        )
 
     read_from_file = sys.stdin.isatty()
 
@@ -24,11 +37,11 @@ def main():
         in_lines = sys.stdin.readlines()
         if len(in_lines) == 0:
             if args.force_stdin:
-                sys.stderr.write("Error: No input from stdin!\n")
+                sys.stderr.write("MASPSX: --force-stdin but no input from stdin!\n")
                 sys.exit(1)
             else:
                 sys.stderr.write(
-                    "Warning: No input from stdin, will try to read from a file\n"
+                    "MASPSX: Warning, no input from stdin, will try to read from a file\n"
                 )
                 read_from_file = True
 
@@ -36,14 +49,14 @@ def main():
         try:
             input_file = as_args.pop()
         except IndexError:
-            sys.stderr.write("Error: No input file found!\n")
+            sys.stderr.write("MASPSX: Error, no input file found!\n")
             sys.exit(1)
 
         with open(input_file, "r") as f:
             in_lines = f.readlines()
 
     preamble = [
-        "" if args.no_macro_inc else '.include "macro.inc"',
+        '.include "macro.inc"' if args.macro_inc else "",
     ]
 
     sdata_limit = 0
@@ -53,26 +66,32 @@ def main():
 
     nop_v0_at = False
     sltu_at = True
+    expand_li = True
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
         if aspsx_version == (2, 21):
             nop_v0_at = True
+        if aspsx_version > (2, 34):
+            expand_li = False
         if aspsx_version >= (2, 77):
             sltu_at = False
+
+    if args.dont_expand_li and expand_li:
+        expand_li = False
 
     maspsx_processor = MaspsxProcessor(
         in_lines,
         sdata_limit=sdata_limit,
         expand_div=args.expand_div,
-        expand_li=args.expand_li,
+        expand_li=expand_li,
         nop_v0_at=nop_v0_at,
         sltu_at=sltu_at,
     )
     try:
         out_lines = maspsx_processor.process_lines()
     except Exception as err:
-        sys.stderr.write(f"maspsx encountered an exception: {err}\n")
+        sys.stderr.write(f"MASPSX: An exception occurred: {err}\n")
         sys.exit(1)
 
     out_text = "\n".join(preamble + out_lines)
