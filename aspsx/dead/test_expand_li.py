@@ -78,7 +78,7 @@ TESTS = {
 
 
 class TestExpandLi(unittest.TestCase):
-    def test_nop_gp(self):
+    def test_expand_li(self):
         source_asm = Path(__file__).parent / TESTS["source_asm"]
 
         for version in TESTS["versions"]:

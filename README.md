@@ -18,6 +18,9 @@ There are a number of reasons why using `maspsx` with GNU `as` is preferable to 
 
 `maspsx` supports the following arguments:
 
+### `--aspsx-version`
+**EXPERIMENTAL** There are slight nuances in behaviour across `ASPSX` versions. In order to emulate the correct behaviour, pass the `ASPSX` version to `maspsx`, e.g. `--aspsx-version=2.78`.
+
 ### `--run-assembler`
 The default behaviour of `maspsx` is to write the output to stdout, by passing `--run-assembler`, `maspsx` will run `mips-linux-gnu-as` directly.
 
@@ -30,11 +33,8 @@ Current understanding is that `-G0` needs to be passed to GNU `as` in order to g
 ### `--expand-div`
 If you need `maspsx` to expand `div/divu` and `rem/remu` ops, pass `--expand-div` to `maspsx`. There is already handling for partial div expansion (i.e. where `-0` was passed to `ASPSX.EXE`).
 
-### `--no-macro-inc`
-By default, `maspsx` adds a `include "macro.inc"` statement to the output, pass this flag to suppress it.
-
-### `--aspsx-version`
-**EXPERIMENTAL** There are slight nuances in `nop` placement across `ASPSX` versions. In order to emulate the correct behaviour, pass the `ASPSX` version to `maspsx`, e.g. `--aspsx-version=2.78`.
+### `--macro-inc`
+Get `maspsx` to add an `include "macro.inc"` statement to the output.
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
