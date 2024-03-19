@@ -259,6 +259,50 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_nop_macro_uses_spaces(self):
+        """
+        Maspsx expects mnemonic/registers to be separated by a tab during a macro
+        Bug: https://github.com/mkst/maspsx/issues/67
+        """
+        lines = [
+            "	lw	$10,104($sp)",
+            "	#APP",
+            "	lw    $12, 0($10);lw    $13, 4($10);ctc2    $12, $0;ctc2    $13, $1;lw    $12, 8($10);lw    $13, 12($10);lw    $14, 16($10);ctc2    $12, $2;ctc2    $13, $3;ctc2    $14, $4",
+        ]
+        expected_lines = [
+            "lw\t$10,104($sp)",
+            "nop",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        for line in res:
+            print(line)
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
+    def test_nop_macro_uses_swc2(self):
+        """
+        Maspsx doesn't know that swc2 is a store mnemonic
+        Bug: https://github.com/mkst/maspsx/issues/67
+        """
+        lines = [
+            "	lw	$11,56($sp)",
+            " #APP",
+            "	swc2    $25, 0($11);swc2    $26, 4($11);swc2    $27, 8($11)",
+        ]
+        expected_lines = [
+            "lw	$11,56($sp)",
+            "nop",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        for line in res:
+            print(line)
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
     def test_nop_lw_addu(self):
         """
         Ensure we place a nop betwen an lw/addu pair that uses the same register
