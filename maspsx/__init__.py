@@ -31,6 +31,7 @@ store_mnemonics = {
     "sw",
     "swl",
     "swr",
+    "swc2",
 }
 
 single_reg_loads = {
@@ -75,11 +76,10 @@ def line_loads_from_reg(line, r_src) -> bool:
     # escape dollar
     r_src = r_src.replace("$", r"\$")
 
-    if line.count("\t") != 1:
-        # print warning?
+    if match := re.match("^([A-z][A-z0-9]*)\s+(.*)$", line):
+        op, rest = match.group(1, 2)
+    else:
         return False
-
-    op, rest = line.split("\t")
 
     if op in load_mnemonics:
         # lwl	$9,7($2)
@@ -154,18 +154,13 @@ def uses_at(line: str) -> bool:
 
 def parse_load_or_store(rest):
     if match := re.match(r"(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^(]+)\)", rest):
-        r_dest = match.group(1)
-        operand = match.group(2)
-        r_source = match.group(3)
+        r_dest, operand, r_source = match.group(1, 2, 3)
         needs_expanding = False
     elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", rest):
-        r_dest = match.group(1)
-        operand = match.group(2)
-        r_source = match.group(3)
+        r_dest, operand, r_source = match.group(1, 2, 3)
         needs_expanding = True
     elif match := re.match(r"(\$[a-z0-9]+),\s*([^(]+)", rest):
-        r_dest = match.group(1)
-        operand = match.group(2)
+        r_dest, operand = match.group(1, 2)
         r_source = None
         needs_expanding = True
     else:
