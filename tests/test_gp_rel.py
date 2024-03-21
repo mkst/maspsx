@@ -20,6 +20,7 @@ class TestGpRel(unittest.TestCase):
         mp = MaspsxProcessor(
             lines,
             sdata_limit=65536,
+            gp_allow_offset=True,
         )
         res = mp.process_lines()
 
@@ -40,6 +41,7 @@ class TestGpRel(unittest.TestCase):
         mp = MaspsxProcessor(
             lines,
             sdata_limit=65536,
+            gp_allow_offset=True,
         )
         res = mp.process_lines()
 
@@ -61,31 +63,51 @@ class TestGpRel(unittest.TestCase):
         mp = MaspsxProcessor(
             lines,
             sdata_limit=65536,
+            gp_allow_offset=True,
+            gp_allow_la=True,
         )
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:1])
 
-    # This test is commented out until futher understood
-    #
-    # def test_gp_rel_load_address_no_offset(self):
-    #     """
-    #     https://decomp.me/scratch/AcqnS does not use %gp_rel for accessing the struct.
-    #     """
-    #     lines = [
-    #         "	.lcomm	DefaultStateTable,248",
-    #         "	la	$2,DefaultStateTable",
-    #     ]
-    #     expected_lines = [
-    #         "la\t$2,DefaultStateTable",
-    #     ]
+    def test_gp_rel_load_address_gp_allow_la_false(self):
+        """
+        https://decomp.me/scratch/AcqnS does not use %gp_rel for accessing the struct.
+        """
+        lines = [
+            "	.lcomm	DefaultStateTable,248",
+            "	la	$2,DefaultStateTable",
+        ]
+        expected_lines = [
+            "la\t$2,DefaultStateTable",
+        ]
 
-    #     mp = MaspsxProcessor(
-    #         lines,
-    #         sdata_limit=65536,
-    #     )
-    #     res = mp.process_lines()
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_la=False,
+        )
+        res = mp.process_lines()
 
-    #     clean_lines = strip_comments(res)
-    #     self.assertEqual(expected_lines, clean_lines[:1])
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:1])
+
+    def test_gp_rel_load_address_gp_allow_la_true(self):
+        lines = [
+            "	.lcomm	DefaultStateTable,248",
+            "	la	$2,DefaultStateTable",
+        ]
+        expected_lines = [
+            "la\t$2,%gp_rel(DefaultStateTable)($gp)",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_la=True,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:1])
