@@ -275,9 +275,6 @@ class TestNop(unittest.TestCase):
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
-        for line in res:
-            print(line)
-
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
@@ -297,9 +294,6 @@ class TestNop(unittest.TestCase):
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
-        for line in res:
-            print(line)
-
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
@@ -391,7 +385,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "sw\t$2,%gp_rel(gameTrackerX+576)($gp)",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=1024)
+        mp = MaspsxProcessor(lines, sdata_limit=1024, gp_allow_offset=True)
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:4])

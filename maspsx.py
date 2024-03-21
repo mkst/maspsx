@@ -64,9 +64,11 @@ def main():
         if arg.startswith("-G") and len(arg) > 2:
             sdata_limit = int(arg[2:])
 
-    nop_v0_at = False
-    sltu_at = True
-    expand_li = True
+    nop_v0_at = False         # insert nop between v0/at?
+    sltu_at = True            # sltu uses at?
+    expand_li = True          # turn li into liu/ori
+    gp_allow_offset = False   # use gp for sym+offset?
+    gp_allow_la = False       # use gp for la
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
@@ -76,6 +78,9 @@ def main():
             expand_li = False
         if aspsx_version >= (2, 77):
             sltu_at = False
+            gp_allow_offset = True
+        if aspsx_version >= (2, 81):
+            gp_allow_la = True
 
     if args.dont_expand_li and expand_li:
         expand_li = False
@@ -87,6 +92,8 @@ def main():
         expand_li=expand_li,
         nop_v0_at=nop_v0_at,
         sltu_at=sltu_at,
+        gp_allow_offset=gp_allow_offset,
+        gp_allow_la=gp_allow_la,
     )
     try:
         out_lines = maspsx_processor.process_lines()

@@ -334,6 +334,8 @@ class MaspsxProcessor:
         expand_li=False,
         nop_v0_at=False,
         sltu_at=False,
+        gp_allow_offset=False,
+        gp_allow_la=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -344,6 +346,8 @@ class MaspsxProcessor:
 
         self.nop_v0_at = nop_v0_at
         self.sltu_at = sltu_at
+        self.gp_allow_offset = gp_allow_offset
+        self.gp_allow_la = gp_allow_la
 
         self.bss_entries = {}
         self.sbss_entries = {}
@@ -505,6 +509,8 @@ class MaspsxProcessor:
                 ) = parse_load_or_store(rest)
 
                 if operand.count("+") == 1:
+                    if not self.gp_allow_offset:
+                        return False
                     symbol, _ = operand.split("+")
                 else:
                     symbol = operand
@@ -696,11 +702,13 @@ class MaspsxProcessor:
                 if operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
+                    gp_allowed = self.gp_allow_offset
                 else:
                     symbol = operand
                     gp_rel = f"%gp_rel({symbol})($gp)"
+                    gp_allowed = True
 
-                if symbol in self.sdata_entries or symbol in self.sbss_entries:
+                if gp_allowed and (symbol in self.sdata_entries or symbol in self.sbss_entries):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
@@ -823,11 +831,16 @@ class MaspsxProcessor:
                 if operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
+                    gp_allowed = self.gp_allow_offset
                 else:
                     symbol = operand
                     gp_rel = f"%gp_rel({symbol})($gp)"
+                    gp_allowed = True
 
-                if symbol in self.sdata_entries or symbol in self.sbss_entries:
+                if op == "la" and not self.gp_allow_la:
+                    gp_allowed = False
+
+                if gp_allowed and (symbol in self.sdata_entries or symbol in self.sbss_entries):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
