@@ -67,6 +67,7 @@ def main():
     nop_v0_at = False
     sltu_at = True
     expand_li = True
+    gprel_with_offset_allowed = False
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
@@ -76,6 +77,7 @@ def main():
             expand_li = False
         if aspsx_version >= (2, 77):
             sltu_at = False
+            gprel_with_offset_allowed = True
 
     if args.dont_expand_li and expand_li:
         expand_li = False
@@ -87,6 +89,7 @@ def main():
         expand_li=expand_li,
         nop_v0_at=nop_v0_at,
         sltu_at=sltu_at,
+        gprel_with_offset_allowed=gprel_with_offset_allowed,
     )
     try:
         out_lines = maspsx_processor.process_lines()
