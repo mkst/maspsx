@@ -8,7 +8,7 @@ The goal of `maspsx` is to facilitate the replacement of the combination of `ASP
 
 There are a number of reasons why using `maspsx` with GNU `as` is preferable to the original toolchain:
  - No need to run 16-bit DOS or 32-bit Windows applications
-   - Native, vanilla, [gcc](https://github.com/decompals/old-gcc) versions make dosemu2 and wine unnecessary.
+   - Native, vanilla, [gcc](https://github.com/decompals/old-gcc) versions make `dosemu2` and `wine` unnecessary.
  - Decomp tooling expects ELF objects
  - Support for line numbers in diff!
    - Pass `-gcoff` to gcc to get line numbers in [asm-differ](https://github.com/simonlindholm/asm-differ)
@@ -38,6 +38,16 @@ Get `maspsx` to add an `include "macro.inc"` statement to the output.
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
+
+
+## Known Differences
+
+| Behavior / Version        | 2.21           | 2.34           | 2.56           | 2.67           | 2.77           | 2.79           | 2.81           | 2.86           |
+|:--------------------------|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
+| add nop between $v0/$at   | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use $at for sltu < 0      | :black_circle: | :black_circle: | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use $gp for symbol+offset | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: | :black_circle: | :black_circle: |
+| use $gp for la            | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: |
 
 
 ## Examples
