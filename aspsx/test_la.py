@@ -8,12 +8,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 import util
 
 LA_TEST_RESULT_NO_GP = [
-    '0x3C040000',   # lui         $a0, 0x0
-    '0x24840000',   # addiu       $a0, $a0, 0x0
+    "0x3C040000",  # lui         $a0, 0x0
+    "0x24840000",  # addiu       $a0, $a0, 0x0
 ]
 
 LA_TEST_RESULT_GP = [
-    '0x27840000',   # addiu       $a0, $gp, 0x0
+    "0x27840000",  # addiu       $a0, $gp, 0x0
 ]
 
 TESTS = {
@@ -56,7 +56,7 @@ TESTS = {
 
 
 class TestLa(unittest.TestCase):
-    def test_sltu_at(self):
+    def test_la(self):
         source_asm: Path = Path(__file__).parent / TESTS["source_asm"]
 
         for version in TESTS["versions"]:

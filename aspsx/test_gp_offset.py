@@ -8,12 +8,12 @@ sys.path.insert(0, str(Path(__file__).parent))
 import util
 
 GP_OFFSET_TEST_RESULT_NO_GP = [
-    '0x3C040000',   # lui         $a0, 0x0
-    '0x8C840000',   # lw          $a0, 0x0($a0)
+    "0x3C040000",  # lui         $a0, 0x0
+    "0x8C840000",  # lw          $a0, 0x0($a0)
 ]
 
 GP_OFFSET_TEST_RESULT_GP = [
-    '0x8F840000',   # addiu       $a0, $gp, 0x0
+    "0x8F840000",  # addiu       $a0, $gp, 0x0
 ]
 
 TESTS = {
@@ -55,8 +55,8 @@ TESTS = {
 }
 
 
-class TestGoOffset(unittest.TestCase):
-    def test_sltu_at(self):
+class TestGpOffset(unittest.TestCase):
+    def test_gp_offset(self):
         source_asm: Path = Path(__file__).parent / TESTS["source_asm"]
 
         for version in TESTS["versions"]:

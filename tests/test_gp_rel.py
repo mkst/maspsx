@@ -27,6 +27,27 @@ class TestGpRel(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_gp_rel_load_with_offset_not_allowed(self):
+        lines = [
+            "	.comm	savedInfoTracker,16",
+            "	lw	$4,savedInfoTracker+4",
+            "	lw	$2,savedInfoTracker+8",
+        ]
+        expected_lines = [
+            "lw\t$4,savedInfoTracker+4",
+            "lw\t$2,savedInfoTracker+8",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_offset=False,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
     def test_gp_rel_store_with_offset(self):
         lines = [
             "	.comm	savedInfoTracker,16",
@@ -64,6 +85,29 @@ class TestGpRel(unittest.TestCase):
             lines,
             sdata_limit=65536,
             gp_allow_offset=True,
+            gp_allow_la=True,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:1])
+
+    def test_gp_rel_load_address_with_offset_not_allowed(self):
+        """
+        https://decomp.me/scratch/X5k0K uses %gp_rel for accessing the Raziel struct
+        """
+        lines = [
+            "	.lcomm	Raziel,1464",
+            "	la	$5,Raziel+1380",
+        ]
+        expected_lines = [
+            "la\t$5,Raziel+1380",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_offset=False,
             gp_allow_la=True,
         )
         res = mp.process_lines()

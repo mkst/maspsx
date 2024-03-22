@@ -64,11 +64,11 @@ def main():
         if arg.startswith("-G") and len(arg) > 2:
             sdata_limit = int(arg[2:])
 
-    nop_v0_at = False         # insert nop between v0/at?
-    sltu_at = True            # sltu uses at?
-    expand_li = True          # turn li into liu/ori
-    gp_allow_offset = False   # use gp for sym+offset?
-    gp_allow_la = False       # use gp for la
+    nop_v0_at = False  # insert nop between v0/at?
+    sltu_at = True  # sltu uses at?
+    expand_li = True  # turn li into lui/ori
+    gp_allow_offset = False  # use gp for sym+offset?
+    gp_allow_la = False  # use gp for la
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
