@@ -47,7 +47,7 @@ Get `maspsx` to add an `include "macro.inc"` statement to the output.
 | add nop between $v0/$at   | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | use $at for sltu < 0      | :black_circle: | :black_circle: | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | use $gp for symbol+offset | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: | :black_circle: | :black_circle: |
-| use $gp for la            | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: |
+| use $gp for la            | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: |
 
 
 ## Examples
