@@ -565,8 +565,14 @@ class MaspsxProcessor:
             # addu or lh ...
             # mult ...
             skip = 0
+            no_reorder = False
             while True:
                 inst = self.get_next_instruction(skip=skip)
+                if inst.startswith(".set") and inst.endswith("noreorder"):
+                    no_reorder = True
+                    skip += 1
+                    continue
+
                 skip += 1
                 if inst == next_instruction:
                     op, *_ = inst.strip().split()
@@ -593,10 +599,17 @@ class MaspsxProcessor:
                             )
 
                     else:
-                        res.append(inst)
-                        res.append(
-                            "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
-                        )
+                        if no_reorder:
+                            res.append(
+                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction (noreorder)"
+                            )
+                            res.append(".set\tnoreorder")
+                            res.append(inst)
+                        else:
+                            res.append(inst)
+                            res.append(
+                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
+                            )
 
                 elif inst == next_next_instruction:
                     if div_needs_expanding(inst):

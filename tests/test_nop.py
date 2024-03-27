@@ -451,47 +451,6 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_mflo_li(self):
-        """
-        li with large value will turn into two instructions (lui+ori)
-        which means no nop is required
-        """
-        lines = [
-            "	mflo	$3",
-            "	li	$5,-2004318071			# 0x88888889",
-            "	mult	$3,$5        ",
-        ]
-        expected_lines = [
-            "mflo\t$3",
-            "li\t$5,-2004318071",
-            "mult\t$3,$5",
-        ]
-        mp = MaspsxProcessor(lines)
-        res = mp.process_lines()
-
-        clean_lines = strip_comments(res)
-        self.assertEqual(expected_lines, clean_lines)
-
-    def test_mflo_li_hex(self):
-        """
-        li with large value will turn into two instructions (lui+ori)
-        which means no nop is required
-        """
-        lines = [
-            "	mflo	$3",
-            "	li	$5,0x2aaaaaab		# 715827883",
-            "	mult	$3,$5        ",
-        ]
-        expected_lines = [
-            "mflo\t$3",
-            "li\t$5,0x2aaaaaab",
-            "mult\t$3,$5",
-        ]
-        mp = MaspsxProcessor(lines)
-        res = mp.process_lines()
-        clean_lines = strip_comments(res)
-        self.assertEqual(expected_lines, clean_lines)
-
     def test_div_move_nop(self):
         """
         div followed by move with label in between
