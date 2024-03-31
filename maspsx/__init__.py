@@ -412,6 +412,8 @@ class MaspsxProcessor:
                         current_symbol = line.replace(":", "")
                         self.sdata_entries[current_symbol] = 0
                     else:
+                        if line == "":
+                            continue
                         if line.startswith(".type"):
                             continue
 
