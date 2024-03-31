@@ -45,6 +45,7 @@ Get `maspsx` to add an `include "macro.inc"` statement to the output.
 | Behavior / Version        | 2.21           | 2.34           | 2.56           | 2.67           | 2.77           | 2.79           | 2.81           | 2.86           |
 |:--------------------------|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
 | add nop between $v0/$at   | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| li 1 expands to ori 1     | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | use $at for sltu < 0      | :black_circle: | :black_circle: | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | use $gp for symbol+offset | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: | :black_circle: | :black_circle: |
 | use $gp for la            | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: |
@@ -56,6 +57,7 @@ Projects that use `maspsx` include:
   - [Castlevania: Symphony of the Night Decompilation](https://github.com/Xeeynamo/sotn-decomp)
   - [open-ribbon](https://github.com/open-ribbon/open-ribbon)
   - [Evo's Space Adventures](https://github.com/mkst/esa)
+  - [Croc: Legend of the Gobbos](https://github.com/Xeeynamo/croc)
 
 
 ## Bugs
