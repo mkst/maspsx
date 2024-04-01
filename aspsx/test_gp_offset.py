@@ -8,12 +8,18 @@ sys.path.insert(0, str(Path(__file__).parent))
 import util
 
 GP_OFFSET_TEST_RESULT_NO_GP = [
+    # comm
     "0x3C040000",  # lui         $a0, 0x0
     "0x8C840000",  # lw          $a0, 0x0($a0)
+    # lcomm
+    "0x8F860000",  # lw          $a2, 0x0($gp)
 ]
 
 GP_OFFSET_TEST_RESULT_GP = [
-    "0x8F840000",  # addiu       $a0, $gp, 0x0
+    # comm
+    "0x8F840000",  # lw          $a0, 0x0($gp)
+    # lcomm
+    "0x8F860000",  # lw          $a2, 0x0($gp)
 ]
 
 TESTS = {
