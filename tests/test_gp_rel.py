@@ -48,6 +48,54 @@ class TestGpRel(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_gp_rel_load_with_offset_not_allowed_lcomm(self):
+        lines = [
+            "	.lcomm	savedInfoTracker,16",
+            "	lw	$4,savedInfoTracker+4",
+            "	lw	$2,savedInfoTracker+8",
+        ]
+        expected_lines = [
+            "lw\t$4,%gp_rel(savedInfoTracker+4)($gp)",
+            "lw\t$2,%gp_rel(savedInfoTracker+8)($gp)",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_offset=False,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:2])
+
+    def test_gp_rel_load_with_offset_not_allowed_sdata(self):
+        lines = [
+            "	.sdata",
+            "	savedInfoTracker:",
+            "	.word	1",
+            "	.word	2",
+            "	.word	3",
+            "	.word	4",
+            "	.section .text",
+            "	lw	$4,savedInfoTracker+4",
+            "	lw	$2,savedInfoTracker+8",
+        ]
+        expected_lines = [
+            "lw\t$4,%gp_rel(savedInfoTracker+4)($gp)",
+            "lw\t$2,%gp_rel(savedInfoTracker+8)($gp)",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=65536,
+            gp_allow_offset=False,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[-2:])
+
     def test_gp_rel_store_with_offset(self):
         lines = [
             "	.comm	savedInfoTracker,16",
@@ -74,7 +122,7 @@ class TestGpRel(unittest.TestCase):
         https://decomp.me/scratch/X5k0K uses %gp_rel for accessing the Raziel struct
         """
         lines = [
-            "	.lcomm	Raziel,1464",
+            "	.comm	Raziel,1464",
             "	la	$5,Raziel+1380",
         ]
         expected_lines = [
@@ -97,7 +145,7 @@ class TestGpRel(unittest.TestCase):
         https://decomp.me/scratch/X5k0K uses %gp_rel for accessing the Raziel struct
         """
         lines = [
-            "	.lcomm	Raziel,1464",
+            "	.comm	Raziel,1464",
             "	la	$5,Raziel+1380",
         ]
         expected_lines = [
@@ -120,7 +168,7 @@ class TestGpRel(unittest.TestCase):
         https://decomp.me/scratch/AcqnS does not use %gp_rel for accessing the struct.
         """
         lines = [
-            "	.lcomm	DefaultStateTable,248",
+            "	.comm	DefaultStateTable,248",
             "	la	$2,DefaultStateTable",
         ]
         expected_lines = [
@@ -139,7 +187,7 @@ class TestGpRel(unittest.TestCase):
 
     def test_gp_rel_load_address_gp_allow_la_true(self):
         lines = [
-            "	.lcomm	DefaultStateTable,248",
+            "	.comm	DefaultStateTable,248",
             "	la	$2,DefaultStateTable",
         ]
         expected_lines = [

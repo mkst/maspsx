@@ -352,6 +352,7 @@ class MaspsxProcessor:
         self.bss_entries = {}
         self.sbss_entries = {}
         self.sdata_entries = {}
+
         self.comm_symbols = set()
 
     def preprocess_lines(self):
@@ -359,6 +360,9 @@ class MaspsxProcessor:
         uses_size = False
 
         for line in self.lines:
+            if line == "":
+                continue
+
             if line.startswith(".align"):
                 # TODO: worry about alignment later
                 continue
@@ -376,7 +380,7 @@ class MaspsxProcessor:
                 in_sdata = False
                 continue
 
-            if line == ".section .text":
+            if line.startswith(".section") and line.endswith(".text"):
                 in_sdata = False
                 continue
 
@@ -397,6 +401,7 @@ class MaspsxProcessor:
                     self.sbss_entries[symbol] = size
                 else:
                     self.bss_entries[symbol] = size
+
                 if line.startswith(".comm"):
                     self.comm_symbols.add(symbol)
                 continue
@@ -415,8 +420,6 @@ class MaspsxProcessor:
                         current_symbol = line.replace(":", "")
                         self.sdata_entries[current_symbol] = 0
                     else:
-                        if line == "":
-                            continue
                         if line.startswith(".type"):
                             continue
 
@@ -515,14 +518,14 @@ class MaspsxProcessor:
 
                 if operand.count("+") == 1:
                     symbol, _ = operand.split("+")
-                    if symbol in self.comm_symbols and not self.gp_allow_offset:
-                        return False
+                    gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols
                 else:
                     symbol = operand
+                    gp_allowed = True
 
-                if symbol in self.sbss_entries:
-                    return True
-                if symbol in self.sdata_entries:
+                if gp_allowed and (
+                    symbol in self.sbss_entries or symbol in self.sdata_entries
+                ):
                     return True
 
         return False
@@ -720,7 +723,7 @@ class MaspsxProcessor:
                 if operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
-                    gp_allowed = symbol not in self.comm_symbols or self.gp_allow_offset
+                    gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols
                 else:
                     symbol = operand
                     gp_rel = f"%gp_rel({symbol})($gp)"
@@ -851,7 +854,7 @@ class MaspsxProcessor:
                 if operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
-                    gp_allowed = symbol not in self.comm_symbols or self.gp_allow_offset
+                    gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols
                 else:
                     symbol = operand
                     gp_rel = f"%gp_rel({symbol})($gp)"
