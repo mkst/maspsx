@@ -470,9 +470,18 @@ class MaspsxProcessor:
             for i, (symbol, size) in enumerate(entries.items()):
                 if i == 0:
                     res.append(f".section .{section}")
+
+                if symbol in self.comm_symbols:
+                    res.append(f"\t.comm {symbol},{size}")
+                    continue
+
+                # only mark bss symbols as global
+                if section == "bss":
+                    res.append(
+                        f"\t.globl {symbol}",
+                    )
                 res.extend(
                     [
-                        f"\t.globl {symbol}",
                         f"{symbol}:",
                         f"\t.space {size}",
                     ]
