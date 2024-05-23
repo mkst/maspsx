@@ -477,7 +477,9 @@ class MaspsxProcessor:
 
                 # only mark bss symbols as global
                 if section == "bss":
-                    res.apend(f"\t.globl {symbol}",)
+                    res.append(
+                        f"\t.globl {symbol}",
+                    )
                 res.extend(
                     [
                         f"{symbol}:",
