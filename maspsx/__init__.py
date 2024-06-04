@@ -474,8 +474,17 @@ class MaspsxProcessor:
                     res.append(f".section .{section}")
 
                 if symbol in self.comm_symbols:
-                    res.append(f"\t.comm {symbol},{size}")
+                    # default to 1-byte alignment for COMMON
+                    res.append(f"\t.comm {symbol},{size},1")
                     continue
+
+                if section == "sbss":
+                    if size >= 8:
+                        res.append(f"\t.align 3")
+                    elif size >= 4:
+                        res.append(f"\t.align 2")
+                    elif size >= 2:
+                        res.append(f"\t.align 1")
 
                 # only mark bss symbols as global
                 if section == "bss":
