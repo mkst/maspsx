@@ -187,6 +187,8 @@ def expand_load_immediate(line: str) -> List[str]:
     res = []
 
     match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
+    assert match is not None, "li regex failed"
+
     r_dest = match.group(1)
     operand = int(match.group(2), 0)
 
@@ -284,9 +286,9 @@ def get_next_register(reg: str):
 def load_immediate_single(line: str):
     res = []
     r1, value = line[5:].split(",")
-    (value,) = struct.unpack(">i", struct.pack(">f", float(value)))
-    upper = (value & 0xFFFF_0000) >> 16
-    lower = (value & 0x0000_FFFF) >> 0
+    (num,) = struct.unpack(">i", struct.pack(">f", float(value)))
+    upper = (num & 0xFFFF_0000) >> 16
+    lower = (num & 0x0000_FFFF) >> 0
 
     res.append(f"lui\t{r1},0x{upper:X}")
     # we don't always need the lower part
@@ -299,12 +301,12 @@ def load_immediate_double(line: str):
     res = []
     r1, value = line[5:].split(",")
     r2 = get_next_register(r1)
-    (value,) = struct.unpack(">q", struct.pack(">d", float(value)))
+    (num,) = struct.unpack(">q", struct.pack(">d", float(value)))
 
-    r1_upper = (value & 0x0000_0000_FFFF_0000) >> 16
-    r1_lower = (value & 0x0000_0000_0000_FFFF) >> 0
-    r2_upper = (value & 0xFFFF_0000_0000_0000) >> 48
-    r2_lower = (value & 0x0000_FFFF_0000_0000) >> 32
+    r1_upper = (num & 0x0000_0000_FFFF_0000) >> 16
+    r1_lower = (num & 0x0000_0000_0000_FFFF) >> 0
+    r2_upper = (num & 0xFFFF_0000_0000_0000) >> 48
+    r2_lower = (num & 0x0000_FFFF_0000_0000) >> 32
 
     if r1_upper or r1_lower:
         res.append(f"lui\t{r1},0x{r1_upper:X}")
@@ -349,13 +351,13 @@ class MaspsxProcessor:
         self.gp_allow_offset = gp_allow_offset
         self.gp_allow_la = gp_allow_la
 
-        self.bss_entries = {}
-        self.sbss_entries = {}
-        self.sdata_entries = {}
+        self.bss_entries: dict[str, int] = {}
+        self.sbss_entries: dict[str, int] = {}
+        self.sdata_entries: dict[str, int] = {}
 
-        self.comm_symbols = set()
+        self.comm_symbols: set[str] = set()
 
-    def preprocess_lines(self):
+    def preprocess_lines(self) -> None:
         in_sdata = False
         uses_size = False
 
@@ -395,8 +397,8 @@ class MaspsxProcessor:
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
                 in_sdata = False
                 _, var = line.split()
-                symbol, size = var.split(",")
-                size = int(size)
+                symbol, size_str = var.split(",")
+                size = int(size_str)
                 if size <= self.sdata_limit:
                     self.sbss_entries[symbol] = size
                 else:
@@ -424,8 +426,8 @@ class MaspsxProcessor:
                             continue
 
                         if line.startswith(".space"):
-                            _, size = line.split()
-                            size = int(size)
+                            _, size_str = line.split()
+                            size = int(size_str)
                         elif line.startswith(".word"):
                             size = 4
                         elif line.startswith(".half") or line.startswith(".short"):
@@ -516,14 +518,13 @@ class MaspsxProcessor:
         if uses_at(line):
             op, *rest = line.split("\t")
             if op in load_mnemonics or op in store_mnemonics:
-                rest = " ".join(rest)
                 (
                     _,
                     _,
                     operand,
                     _,
                     _,
-                ) = parse_load_or_store(rest)
+                ) = parse_load_or_store(" ".join(rest))
 
                 if operand.count("+") == 1:
                     symbol, _ = operand.split("+")
