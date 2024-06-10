@@ -58,6 +58,7 @@ Projects that use `maspsx` include:
   - [open-ribbon](https://github.com/open-ribbon/open-ribbon)
   - [Evo's Space Adventures](https://github.com/mkst/esa)
   - [Croc: Legend of the Gobbos](https://github.com/Xeeynamo/croc)
+  - [Legacy of Kain: Soul Reaver](https://github.com/FedericoMilesi/soul-re)
 
 
 ## Bugs
