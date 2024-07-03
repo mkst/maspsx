@@ -825,7 +825,7 @@ class MaspsxProcessor:
                         )
 
             else:
-                if r_source and int(operand) > 32767:
+                if r_source and (int(operand) > 32767 or int(operand) < -32767):
                     # e.g. lhu	$2,49344($2)
                     res.extend(
                         [
