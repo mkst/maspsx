@@ -89,6 +89,8 @@ def read_text_section(data: bytes) -> bytes:
             print(f"UNKNOWN OPCODE {opcode}")
             break
 
+    raise Exception("Didn't find a .text section!")
+
 
 def run_aspsx(source_asm: Path, version, data_limit=""):
     aspsx_version = version["aspsx_version"]
@@ -138,8 +140,8 @@ def run_aspsx(source_asm: Path, version, data_limit=""):
     )
 
     if proc.returncode != 0:
-        print(f"STDOUT: {proc.stdout}")
-        print(f"STDERR: {proc.stderr}")
+        print(f"STDOUT: {proc.stdout.decode('utf')}")
+        print(f"STDERR: {proc.stderr.decode('utf')}")
         raise Exception(
             f"Error running command: {' '.join(cmd)} for ASPSX {aspsx_version}."
         )
