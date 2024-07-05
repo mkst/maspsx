@@ -563,3 +563,32 @@ class TestNop(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_ctc2_nop(self):
+        lines = [
+            "lhu	$9,192($17)",
+            "ctc2	$9,$26",
+        ]
+        expected_lines = [
+            "lhu\t$9,192($17)",
+            "nop",
+            "ctc2\t$9,$26",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_ctc2_no_nop(self):
+        lines = [
+            "lhu	$9,192($17)",
+            "ctc2	$8,$26",
+        ]
+        expected_lines = [
+            "lhu\t$9,192($17)",
+            "ctc2\t$8,$26",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
