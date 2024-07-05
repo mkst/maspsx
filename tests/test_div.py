@@ -150,3 +150,50 @@ class TestDivExpansion(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_div_expand_at_nop(self):
+        lines = [
+            "divu	$2,$2,$3",
+            "sh	$2,gUpdateRate",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "divu\t$zero,$2,$3",
+            "bnez\t$3,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "mflo\t$2",
+            ".set\tat",
+            "nop",
+            "sh\t$2,gUpdateRate",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True, nop_v0_at=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_div_expand_at_no_nop(self):
+        lines = [
+            "divu	$2,$2,$3",
+            "sh	$2,gUpdateRate",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "divu\t$zero,$2,$3",
+            "bnez\t$3,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "mflo\t$2",
+            ".set\tat",
+            "sh\t$2,gUpdateRate",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True, nop_v0_at=False)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

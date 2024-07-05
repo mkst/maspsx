@@ -1001,14 +1001,29 @@ class MaspsxProcessor:
                     skip=0, ignore_set=True, ignore_label=True
                 )
                 if line_loads_from_reg(next_instruction, r_dest):
-                    label = self.get_next_instruction(
-                        skip=0, ignore_nop=True, ignore_set=True
-                    )
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
+                    nop_required = False
+
+                    if not uses_at(next_instruction):
+                        reason = f"'{next_instruction}' does not use $at"
+                        nop_required = True
+                    if self._uses_gp(next_instruction):
+                        reason = f"'{next_instruction}' uses $gp"
+                        nop_required = True
+                    if self.nop_v0_at:
+                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
+                        nop_required = True
+
+                    if nop_required:
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
+                else:
                     res.append(
-                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
+                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
                     )
 
         elif op in ("divu", "remu"):
@@ -1051,14 +1066,29 @@ class MaspsxProcessor:
                     skip=0, ignore_set=True, ignore_label=True
                 )
                 if line_loads_from_reg(next_instruction, r_dest):
-                    label = self.get_next_instruction(
-                        skip=0, ignore_nop=True, ignore_set=True
-                    )
-                    if is_label(label):
-                        res.append(label)
-                        self.skip_instructions = 1
+                    nop_required = False
+
+                    if not uses_at(next_instruction):
+                        reason = f"'{next_instruction}' does not use $at"
+                        nop_required = True
+                    if self._uses_gp(next_instruction):
+                        reason = f"'{next_instruction}' uses $gp"
+                        nop_required = True
+                    if self.nop_v0_at:
+                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
+                        nop_required = True
+
+                    if nop_required:
+                        label = self.get_next_instruction(
+                            skip=0, ignore_nop=True, ignore_set=True
+                        )
+                        if is_label(label):
+                            res.append(label)
+                            self.skip_instructions = 1
+                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
+                else:
                     res.append(
-                        f"nop  # DEBUG: {op} and next_instruction ({next_instruction}) loads from {r_dest}"
+                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
                     )
 
         elif op == "sltu":
