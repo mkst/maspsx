@@ -291,7 +291,9 @@ def expand_macro(line: str):
     res = []
     for l in strip_comments(line).split(";"):
         op, *rest = l.strip().split()
-        res.append((op, " ".join(rest)),)
+        res.append(
+            (op, " ".join(rest)),
+        )
     return res
 
 
@@ -564,6 +566,35 @@ class MaspsxProcessor:
 
         return False
 
+    def _handle_nop_before_next_instruction(self, next_instruction, r_dest):
+        res = []
+
+        if line_loads_from_reg(next_instruction, r_dest):
+            nop_required = False
+
+            if not uses_at(next_instruction):
+                reason = f"'{next_instruction}' does not use $at"
+                nop_required = True
+            if self._uses_gp(next_instruction):
+                reason = f"'{next_instruction}' uses $gp"
+                nop_required = True
+            if self.nop_v0_at:
+                reason = f"'{next_instruction}' inject nop beween $v0 and $at"
+                nop_required = True
+
+            if nop_required:
+                label = self.get_next_instruction(
+                    skip=0, ignore_nop=True, ignore_set=True
+                )
+                if is_label(label):
+                    res.append(label)
+                    self.skip_instructions = 1
+                res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
+        else:
+            res.append(f"#nop # DEBUG: {next_instruction} does not load from {r_dest}")
+
+        return res
+
     def _handle_mflo_mfhi(self):
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
         res = []
@@ -746,6 +777,9 @@ class MaspsxProcessor:
             next_instruction = self.get_next_instruction(
                 skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
             )
+            # Naively handle scenario where *next* line is a macro
+            if ";" in next_instruction:
+                next_instruction = next_instruction.split(";")[0]
 
             if not needs_expanding:
                 res.append(f"{line} # DEBUG: leaving for assembler to expand")
@@ -781,35 +815,10 @@ class MaspsxProcessor:
                 else:
                     res.append(line)
 
-                # TODO: properly handle multi-line macros
-                if ";" in next_instruction:
-                    next_instruction = next_instruction.split(";")[0]
-
-                if line_loads_from_reg(next_instruction, r_dest):
-                    nop_required = False
-
-                    if not uses_at(next_instruction):
-                        reason = f"'{next_instruction}' does not use $at"
-                        nop_required = True
-                    if self._uses_gp(next_instruction):
-                        reason = f"'{next_instruction}' uses $gp"
-                        nop_required = True
-                    if self.nop_v0_at:
-                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
-                        nop_required = True
-
-                    if nop_required:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
-                else:
-                    res.append(
-                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
-                    )
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
@@ -825,30 +834,10 @@ class MaspsxProcessor:
                     ]
                 )
 
-                # TODO: properly handle multi-line macros
-                if ";" in next_instruction:
-                    next_instruction = next_instruction.split(";")[0]
-
-                if line_loads_from_reg(next_instruction, r_dest):
-                    nop_required = False
-
-                    if not uses_at(next_instruction):
-                        reason = f"'{next_instruction}' does not use $at"
-                        nop_required = True
-                    if self._uses_gp(next_instruction):
-                        reason = f"'{next_instruction}' uses $gp"
-                        nop_required = True
-
-                    if nop_required:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(
-                            f"nop # DEBUG: is_addend (r_dest: {r_dest}) {reason}"
-                        )
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
             else:
                 if r_source and (int(operand) > 32767 or int(operand) < -32767):
@@ -872,27 +861,10 @@ class MaspsxProcessor:
                 if actual_r_dest is not None:
                     r_dest = actual_r_dest
 
-                # Naively handle scenario where *next* line is a macro
-                if ";" in next_instruction:
-                    next_instruction = next_instruction.split(";")[0]
-
-                if line_loads_from_reg(next_instruction, r_dest):
-                    nop_required = False
-                    if not uses_at(next_instruction):
-                        reason = f"'{next_instruction}' does not use $at"
-                        nop_required = True
-                    if self._uses_gp(next_instruction):
-                        reason = f"'{next_instruction}' uses $gp"
-                        nop_required = True
-
-                    if nop_required:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
         elif op in store_mnemonics or (op == "la" and self.sdata_limit > 0):
             rest = " ".join(rest)
@@ -1000,31 +972,10 @@ class MaspsxProcessor:
                 next_instruction = self.get_next_instruction(
                     skip=0, ignore_set=True, ignore_label=True
                 )
-                if line_loads_from_reg(next_instruction, r_dest):
-                    nop_required = False
-
-                    if not uses_at(next_instruction):
-                        reason = f"'{next_instruction}' does not use $at"
-                        nop_required = True
-                    if self._uses_gp(next_instruction):
-                        reason = f"'{next_instruction}' uses $gp"
-                        nop_required = True
-                    if self.nop_v0_at:
-                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
-                        nop_required = True
-
-                    if nop_required:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
-                else:
-                    res.append(
-                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
-                    )
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
         elif op in ("divu", "remu"):
             r_dest, r_source, r_operand = rest[0].split(",")
@@ -1065,31 +1016,10 @@ class MaspsxProcessor:
                 next_instruction = self.get_next_instruction(
                     skip=0, ignore_set=True, ignore_label=True
                 )
-                if line_loads_from_reg(next_instruction, r_dest):
-                    nop_required = False
-
-                    if not uses_at(next_instruction):
-                        reason = f"'{next_instruction}' does not use $at"
-                        nop_required = True
-                    if self._uses_gp(next_instruction):
-                        reason = f"'{next_instruction}' uses $gp"
-                        nop_required = True
-                    if self.nop_v0_at:
-                        reason = f"'{next_instruction}' inject nop beween $v0 and $at"
-                        nop_required = True
-
-                    if nop_required:
-                        label = self.get_next_instruction(
-                            skip=0, ignore_nop=True, ignore_set=True
-                        )
-                        if is_label(label):
-                            res.append(label)
-                            self.skip_instructions = 1
-                        res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
-                else:
-                    res.append(
-                        f"#nop # DEBUG: {next_instruction} does not load from {r_dest}"
-                    )
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
         elif op == "sltu":
             r_dest, r_source, r_operand = rest[0].split(",")
