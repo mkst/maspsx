@@ -287,6 +287,14 @@ def get_next_register(reg: str):
     return next_reg
 
 
+def expand_macro(line: str):
+    res = []
+    for l in strip_comments(line).split(";"):
+        op, *rest = l.strip().split()
+        res.append((op, " ".join(rest)),)
+    return res
+
+
 def load_immediate_single(line: str):
     res = []
     r1, value = line[5:].split(",")
@@ -716,6 +724,17 @@ class MaspsxProcessor:
         if line.startswith("$L"):
             return [line]
 
+        is_macro = ";" in line
+        if is_macro:
+            expanded = expand_macro(line)
+            actual_op, actual_rest = expanded[-1]
+            if actual_op in load_mnemonics:
+                _, actual_r_dest, _, _, _ = parse_load_or_store(actual_rest)
+            else:
+                actual_r_dest = None
+        else:
+            actual_r_dest = None
+
         op, *rest = line.split()
 
         if op in load_mnemonics:
@@ -849,7 +868,11 @@ class MaspsxProcessor:
                     # e.g. lhu	$2,528482304
                     res.append(line)
 
-                # TODO: properly handle multi-line macros
+                # Naively handle scenario where *current* line is a macro
+                if actual_r_dest is not None:
+                    r_dest = actual_r_dest
+
+                # Naively handle scenario where *next* line is a macro
                 if ";" in next_instruction:
                     next_instruction = next_instruction.split(";")[0]
 
@@ -906,6 +929,7 @@ class MaspsxProcessor:
         elif op in ("addu", "subu", "move", "sra", "srl", "srr", "sll"):
             # no extra processing required
             res.append(line)
+            # TODO: check if this line is a macro and insert a nop if required?
 
         elif op == "li":
             # TODO: handle non-soft floats?

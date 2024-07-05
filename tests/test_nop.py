@@ -592,3 +592,54 @@ class TestNop(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+
+class TestNopMacro(unittest.TestCase):
+    def test_nop_macro_no_nop_afterwards(self):
+        """
+        Ensure we do not insert a nop between the *final* macro instruction at the
+        next instruction, if one is not required
+        """
+        lines = [
+            " #APP",
+            "	lwc2 $4, 0( $4 );lwc2 $5, 4( $4 )",
+            " #NO_APP",
+            "	.loc 1 1122",
+            "LM439:",
+            "	addu $4,$4,8",
+        ]
+        expected_lines = [
+            "lwc2 $4, 0( $4 );lwc2 $5, 4( $4 )",
+            ".loc 1 1122",
+            "LM439:",
+            "addu $4,$4,8",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_nop_macro_nop_afterwards(self):
+        """
+        Ensure we do insert a nop between the *final* macro instruction at the
+        next instruction, when one is required
+        """
+        lines = [
+            " #APP",
+            "	lwc2 $4, 0( $4 );lwc2 $5, 4( $4 )",
+            " #NO_APP",
+            "	.loc 1 1122",
+            "LM439:",
+            "	addu $4,$5,8",
+        ]
+        expected_lines = [
+            "lwc2 $4, 0( $4 );lwc2 $5, 4( $4 )",
+            "nop",
+            ".loc 1 1122",
+            "LM439:",
+            "addu $4,$5,8",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
