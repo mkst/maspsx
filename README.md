@@ -36,6 +36,9 @@ If you need `maspsx` to expand `div/divu` and `rem/remu` ops, pass `--expand-div
 ### `--macro-inc`
 Get `maspsx` to add an `include "macro.inc"` statement to the output.
 
+### `--use-comm-section`
+Put any common symbols in the `.comm` section
+
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
 
