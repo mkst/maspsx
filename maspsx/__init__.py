@@ -149,9 +149,11 @@ def uses_at(line: str) -> bool:
     else:
         return False
 
-    if re.match(r"^-?\d+$", operand) or re.match(r"^-?0x[A-Fa-f0-9]+$", operand):
+    if match := re.match(r"^-?\d+$", operand) or (match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)):
         # sw	$2,-26($16)
-        return False
+        num = int(match.group(0), 0)
+        if -32769 < num < 32768:
+            return False
 
     return True
 
@@ -843,7 +845,7 @@ class MaspsxProcessor:
                 res.extend(extra_nops)
 
             else:
-                if r_source and (int(operand) > 32767 or int(operand) < -32767):
+                if r_source and (int(operand) > 32767 or int(operand) < -32768):
                     # e.g. lhu	$2,49344($2)
                     res.extend(
                         [
