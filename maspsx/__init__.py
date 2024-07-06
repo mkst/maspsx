@@ -290,7 +290,10 @@ def get_next_register(reg: str):
 def expand_macro(line: str):
     res = []
     for l in strip_comments(line).split(";"):
-        op, *rest = l.strip().split()
+        l = l.strip()
+        if len(l) == 0:
+            continue
+        op, *rest = l.split()
         res.append(
             (op, " ".join(rest)),
         )
