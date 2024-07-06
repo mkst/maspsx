@@ -152,6 +152,10 @@ class TestDivExpansion(unittest.TestCase):
         self.assertEqual(expected_lines, clean_lines)
 
     def test_div_expand_at_nop(self):
+        """
+        Only ASPSX 2.21 should insert a nop here, the sh uses $at.
+        Bug report: https://github.com/mkst/maspsx/issues/76
+        """
         lines = [
             "divu	$2,$2,$3",
             "sh	$2,gUpdateRate",
@@ -176,6 +180,10 @@ class TestDivExpansion(unittest.TestCase):
         self.assertEqual(expected_lines, clean_lines)
 
     def test_div_expand_at_no_nop(self):
+        """
+        Only ASPSX 2.21 should insert a nop here, the sh uses $at.
+        Bug report: https://github.com/mkst/maspsx/issues/76
+        """
         lines = [
             "divu	$2,$2,$3",
             "sh	$2,gUpdateRate",
