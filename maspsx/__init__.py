@@ -149,7 +149,9 @@ def uses_at(line: str) -> bool:
     else:
         return False
 
-    if match := re.match(r"^-?\d+$", operand) or (match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)):
+    if match := re.match(r"^-?\d+$", operand) or (
+        match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)
+    ):
         # sw	$2,-26($16)
         num = int(match.group(0), 0)
         if -32769 < num < 32768:
@@ -218,6 +220,15 @@ def expand_load_immediate(line: str) -> List[str]:
         res.append(f"ori\t{r_dest},0")
 
     return res
+
+
+def expand_move(line: str):
+    op, *rest = line.split()
+    if op == "move":
+        rest = " ".join(rest)
+        r_dest, r_source = rest.split(",")
+        return f"addu\t{r_dest},{r_source},$zero"
+    return line
 
 
 def is_label(line: str):
@@ -571,8 +582,10 @@ class MaspsxProcessor:
 
         return False
 
-    def _handle_nop_before_next_instruction(self, next_instruction, r_dest):
-        res = []
+    def _handle_nop_before_next_instruction(
+        self, next_instruction: str, r_dest: str
+    ) -> List[str]:
+        res: List[str] = []
 
         if line_loads_from_reg(next_instruction, r_dest):
             nop_required = False
@@ -600,9 +613,9 @@ class MaspsxProcessor:
 
         return res
 
-    def _handle_mflo_mfhi(self):
+    def _handle_mflo_mfhi(self) -> List[str]:
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
-        res = []
+        res: List[str] = []
 
         next_instruction = self.get_next_instruction(
             skip=0, ignore_nop=True, ignore_set=True, ignore_label=True
@@ -628,10 +641,10 @@ class MaspsxProcessor:
                         res.append("# DEBUG: div needs expanding")
                         skip -= 1
                     else:
-                        res.append(inst)
+                        res.append(expand_move(inst))
                     break
                 if not inst.startswith("#"):
-                    res.append(inst)
+                    res.append(expand_move(inst))
             self.skip_instructions = skip
 
         elif any(
@@ -675,16 +688,15 @@ class MaspsxProcessor:
                             res.append(
                                 "nop  # DEBUG: mflo/mfhi with mult/div and li expands to 1 op"
                             )
-
                     else:
                         if no_reorder:
                             res.append(
                                 "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction (noreorder)"
                             )
                             res.append(".set\tnoreorder")
-                            res.append(inst)
+                            res.append(expand_move(inst))
                         else:
-                            res.append(inst)
+                            res.append(expand_move(inst))
                             res.append(
                                 "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
                             )
@@ -694,10 +706,10 @@ class MaspsxProcessor:
                         res.append("# DEBUG: div needs expanding")
                         skip -= 1
                     else:
-                        res.append(inst)
+                        res.append(expand_move(inst))
                     break
                 elif not inst.startswith("#"):
-                    res.append(inst)
+                    res.append(expand_move(inst))
             self.skip_instructions = skip
 
         else:
@@ -903,10 +915,14 @@ class MaspsxProcessor:
             if self.is_reorder:
                 res.append("nop  # DEBUG: branch/jump")
 
-        elif op in ("addu", "subu", "move", "sra", "srl", "srr", "sll"):
+        elif op == "move":
+            # expand move $2,$16 to addu $2,$16,$zero
+            res.append(expand_move(line))
+
+        elif op in ("addu", "subu", "sra", "srl", "srr", "sll", "or"):
             # no extra processing required
             res.append(line)
-            # TODO: check if this line is a macro and insert a nop if required?
+            # TODO: check if this line is a macro and insert a nop if required...
 
         elif op == "li":
             # TODO: handle non-soft floats?
