@@ -327,7 +327,6 @@ class TestAt(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-
     def test_expand_lw_dont_use_addiu(self):
         lines = [
             "lw	$2,ctlbuf($2)",
@@ -341,7 +340,7 @@ class TestAt(unittest.TestCase):
             ".set\tat",
         ]
 
-        mp = MaspsxProcessor(lines, )
+        mp = MaspsxProcessor(lines)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

@@ -58,6 +58,7 @@ TESTS = {
     ],
 }
 
+
 class TestExpandLw(unittest.TestCase):
     def test_expand_lw(self):
         source_asm: Path = Path(__file__).parent / TESTS["source_asm"]
@@ -68,11 +69,3 @@ class TestExpandLw(unittest.TestCase):
                 print(f"{source_asm.name}: {version['aspsx_version']}")
                 instructions = util.run_aspsx(source_asm, version)
                 self.assertEqual(target_asm, instructions)
-
-
-
-
-
-
-
-

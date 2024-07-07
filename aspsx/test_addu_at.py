@@ -79,7 +79,7 @@ TESTS = {
         {
             "aspsx_version": "2.86",
             "target_asm": ADDU_AT_TEST_RESULT_2,
-        }
+        },
     ],
 }
 
