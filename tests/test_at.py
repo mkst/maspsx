@@ -306,3 +306,43 @@ class TestAt(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_lw_use_addiu(self):
+        lines = [
+            "lw	$2,ctlbuf($2)",
+        ]
+
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(ctlbuf)",
+            "addiu\t$at,$at,%lo(ctlbuf)",
+            "addu\t$at,$at,$2",
+            "lw\t$2,0x0($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, addiu_at=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+
+    def test_expand_lw_dont_use_addiu(self):
+        lines = [
+            "lw	$2,ctlbuf($2)",
+        ]
+
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(ctlbuf)",
+            "addu\t$at,$at,$2",
+            "lw\t$2,%lo(ctlbuf)($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
