@@ -2,10 +2,12 @@ import argparse
 import subprocess
 import sys
 
+from typing import List
+
 from maspsx import MaspsxProcessor
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--aspsx-version", type=str)
     parser.add_argument("--run-assembler", action="store_true")
@@ -53,7 +55,7 @@ def main():
             sys.stderr.write("MASPSX: Error, no input file found!\n")
             sys.exit(1)
 
-        with open(input_file, "r") as f:
+        with open(input_file, "r", encoding="utf") as f:
             in_lines = f.readlines()
 
     preamble = [
@@ -61,9 +63,20 @@ def main():
     ]
 
     sdata_limit = 0
+    filtered_as_args: List[str] = []
     for arg in as_args:
-        if arg.startswith("-G") and len(arg) > 2:
+        # Can we stop gcc from passing us this flag?
+        if arg == "-KPIC":
+            continue
+
+        # GNU as does not support -mcpu flag
+        if arg.startswith("-mcpu="):
+            arg = arg.replace("-mcpu=", "-mtune=")
+
+        elif arg.startswith("-G") and len(arg) > 2:
             sdata_limit = int(arg[2:])
+
+        filtered_as_args.append(arg)
 
     nop_v0_at = False  # insert nop between v0/at?
     sltu_at = True  # sltu uses at?
@@ -111,16 +124,11 @@ def main():
     # avoid "Warning: end of file not at end of a line; newline inserted"
     out_text += "\n"
 
-    # FIXME: can we stop gcc from passing us this flag?
-    if "-KPIC" in as_args:
-        # sys.stderr.write("WARNING: Removed -KPIC flag!\n")
-        as_args.remove("-KPIC")
-
     if args.run_assembler:
         cmd = [
             args.gnu_as_path,
             "-EL",  # TODO: switch from 'mips-linux-gnu-as' to 'mipsel-linux-gnu-as'
-            *as_args,
+            *filtered_as_args,
             "-",  # read from stdin
         ]
         if not args.dont_force_G0:
