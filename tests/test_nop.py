@@ -470,7 +470,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "",
             "LM30:",
-            "move\t$16,$2",
+            "addu\t$16,$2,$zero",
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
@@ -496,7 +496,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "",
             "LM30:",
-            "move\t$16,$2",
+            "addu\t$16,$2,$zero",
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
@@ -520,7 +520,7 @@ class TestNop(unittest.TestCase):
             "",
             ".loc	2 17",
             "$Le1:",
-            "move\t$2,$16",
+            "addu\t$2,$16,$zero",
         ]
         mp = MaspsxProcessor(lines)
         res = mp.process_lines()
