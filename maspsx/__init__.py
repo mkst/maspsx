@@ -149,7 +149,9 @@ def uses_at(line: str) -> bool:
     else:
         return False
 
-    if match := re.match(r"^-?\d+$", operand) or (match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)):
+    if match := re.match(r"^-?\d+$", operand) or (
+        match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)
+    ):
         # sw	$2,-26($16)
         num = int(match.group(0), 0)
         if -32769 < num < 32768:
@@ -355,6 +357,7 @@ class MaspsxProcessor:
         expand_li=False,
         nop_v0_at=False,
         sltu_at=False,
+        addiu_at=False,
         gp_allow_offset=False,
         gp_allow_la=False,
         use_comm_section=False,
@@ -368,6 +371,8 @@ class MaspsxProcessor:
 
         self.nop_v0_at = nop_v0_at
         self.sltu_at = sltu_at
+        self.addiu_at = addiu_at
+
         self.gp_allow_offset = gp_allow_offset
         self.gp_allow_la = gp_allow_la
 
@@ -827,17 +832,31 @@ class MaspsxProcessor:
 
             elif is_addend and r_source:
                 # e.g. lw	$2,test_sym($4)
-                res.extend(
-                    [
-                        "# EXPAND_AT START",
-                        ".set\tnoat",
-                        f"lui\t$at,%hi({operand})",
-                        f"addu\t$at,$at,{r_source}",
-                        f"{op}\t{r_dest},%lo({operand})($at)",
-                        ".set\tat",
-                        "# EXPAND_AT END",
-                    ]
-                )
+                if self.addiu_at:
+                    res.extend(
+                        [
+                            "# EXPAND_AT START",
+                            ".set\tnoat",
+                            f"lui\t$at,%hi({operand})",
+                            f"addiu\t$at,$at,%lo({operand})",
+                            f"addu\t$at,$at,{r_source}",
+                            f"{op}\t{r_dest},0x0($at)",
+                            ".set\tat",
+                            "# EXPAND_AT END",
+                        ]
+                    )
+                else:
+                    res.extend(
+                        [
+                            "# EXPAND_AT START",
+                            ".set\tnoat",
+                            f"lui\t$at,%hi({operand})",
+                            f"addu\t$at,$at,{r_source}",
+                            f"{op}\t{r_dest},%lo({operand})($at)",
+                            ".set\tat",
+                            "# EXPAND_AT END",
+                        ]
+                    )
 
                 extra_nops = self._handle_nop_before_next_instruction(
                     next_instruction, r_dest
@@ -893,6 +912,23 @@ class MaspsxProcessor:
                     symbol in self.sdata_entries or symbol in self.sbss_entries
                 ):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
+                else:
+                    res.append(line)
+            elif is_addend and r_source:
+                # e.g. sw	$a0,ctlbuf($v0)
+                if self.addiu_at and op != "la":
+                    res.extend(
+                        [
+                            "# EXPAND_AT START",
+                            ".set\tnoat",
+                            f"lui\t$at,%hi({operand})",
+                            f"addiu\t$at,$at,%lo({operand})",
+                            f"addu\t$at,$at,{r_source}",
+                            f"{op}\t{r_dest},0x0($at)",
+                            ".set\tat",
+                            "# EXPAND_AT END",
+                        ]
+                    )
                 else:
                     res.append(line)
             else:

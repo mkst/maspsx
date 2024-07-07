@@ -70,11 +70,13 @@ def main():
     expand_li = True  # turn li into lui/ori
     gp_allow_offset = False  # use gp for sym+offset?
     gp_allow_la = False  # use gp for la
+    addiu_at = False  # use addiu when expanding lw to use $at
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
         if aspsx_version == (2, 21):
             nop_v0_at = True
+            addiu_at = True
         if aspsx_version > (2, 34):
             expand_li = False
         if aspsx_version >= (2, 77):
@@ -93,6 +95,7 @@ def main():
         expand_li=expand_li,
         nop_v0_at=nop_v0_at,
         sltu_at=sltu_at,
+        addiu_at=addiu_at,
         gp_allow_offset=gp_allow_offset,
         gp_allow_la=gp_allow_la,
         use_comm_section=args.use_comm_section,
