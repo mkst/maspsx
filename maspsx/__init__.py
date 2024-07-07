@@ -914,6 +914,23 @@ class MaspsxProcessor:
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
+            elif is_addend and r_source:
+                # e.g. sw	$a0,ctlbuf($v0)
+                if self.addiu_at and op != "la":
+                    res.extend(
+                        [
+                            "# EXPAND_AT START",
+                            ".set\tnoat",
+                            f"lui\t$at,%hi({operand})",
+                            f"addiu\t$at,$at,%lo({operand})",
+                            f"addu\t$at,$at,{r_source}",
+                            f"{op}\t{r_dest},0x0($at)",
+                            ".set\tat",
+                            "# EXPAND_AT END",
+                        ]
+                    )
+                else:
+                    res.append(line)
             else:
                 res.append(line)
 
