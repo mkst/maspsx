@@ -76,7 +76,7 @@ def line_loads_from_reg(line, r_src) -> bool:
     # escape dollar
     r_src = r_src.replace("$", r"\$")
 
-    if match := re.match("^([A-z][A-z0-9]*)\s+(.*)$", line):
+    if match := re.match(r"^([A-z][A-z0-9]*)\s+(.*)$", line):
         op, rest = match.group(1, 2)
     else:
         return False
@@ -225,8 +225,8 @@ def expand_load_immediate(line: str) -> List[str]:
 def expand_move(line: str):
     op, *rest = line.split()
     if op == "move":
-        rest = " ".join(rest)
-        r_dest, r_source = rest.split(",")
+        args = " ".join(rest)
+        r_dest, r_source = args.split(",")
         return f"addu\t{r_dest},{r_source},$zero"
     return line
 
@@ -516,11 +516,11 @@ class MaspsxProcessor:
 
                 if section == "sbss":
                     if size >= 8:
-                        res.append(f"\t.align 3")
+                        res.append("\t.align 3")
                     elif size >= 4:
-                        res.append(f"\t.align 2")
+                        res.append("\t.align 2")
                     elif size >= 2:
-                        res.append(f"\t.align 1")
+                        res.append("\t.align 1")
 
                 # only mark bss symbols as global
                 if section == "bss":
@@ -727,7 +727,7 @@ class MaspsxProcessor:
         if len(line) == 0:
             return [line]
 
-        if line == "#nop":
+        if line.startswith("#"):
             return []
 
         if line.startswith("."):
@@ -775,16 +775,16 @@ class MaspsxProcessor:
         if line.startswith("$L"):
             return [line]
 
+        actual_r_dest = None
         is_macro = ";" in line
         if is_macro:
             expanded = expand_macro(line)
-            actual_op, actual_rest = expanded[-1]
-            if actual_op in load_mnemonics:
-                _, actual_r_dest, _, _, _ = parse_load_or_store(actual_rest)
-            else:
-                actual_r_dest = None
-        else:
-            actual_r_dest = None
+            if len(expanded) > 0:
+                actual_op, *actual_rest = expanded[-1]
+                if actual_op in load_mnemonics:
+                    _, actual_r_dest, _, _, _ = parse_load_or_store(
+                        " ".join(actual_rest)
+                    )
 
         op, *rest = line.split()
 
