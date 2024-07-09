@@ -370,6 +370,7 @@ class MaspsxProcessor:
         gp_allow_offset=False,
         gp_allow_la=False,
         use_comm_section=False,
+        use_comm_for_lcomm=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -386,6 +387,7 @@ class MaspsxProcessor:
         self.gp_allow_la = gp_allow_la
 
         self.use_comm_section = use_comm_section
+        self.use_comm_for_lcomm = use_comm_for_lcomm
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -509,7 +511,7 @@ class MaspsxProcessor:
                 if i == 0:
                     res.append(f".section .{section}")
 
-                if self.use_comm_section and symbol in self.comm_symbols:
+                if self.use_comm_section and (symbol in self.comm_symbols or self.use_comm_for_lcomm):
                     # default to 1-byte alignment for COMMON
                     res.append(f"\t.comm {symbol},{size},1")
                     continue

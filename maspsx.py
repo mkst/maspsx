@@ -18,6 +18,7 @@ def main() -> None:
     parser.add_argument("--dont-expand-li", action="store_true")
     parser.add_argument("--force-stdin", action="store_true")
     parser.add_argument("--use-comm-section", action="store_true")
+    parser.add_argument("--use-comm-for-lcomm", action="store_true")
     # deprecated
     parser.add_argument("--no-macro-inc", action="store_true")
     parser.add_argument("--expand-li", action="store_true")
@@ -112,6 +113,7 @@ def main() -> None:
         gp_allow_offset=gp_allow_offset,
         gp_allow_la=gp_allow_la,
         use_comm_section=args.use_comm_section,
+        use_comm_for_lcomm=args.use_comm_for_lcomm,
     )
     try:
         out_lines = maspsx_processor.process_lines()
