@@ -37,7 +37,12 @@ If you need `maspsx` to expand `div/divu` and `rem/remu` ops, pass `--expand-div
 Get `maspsx` to add an `include "macro.inc"` statement to the output.
 
 ### `--use-comm-section`
-Put any common symbols in the `.comm` section
+Put any common symbols (in C, this means non-`static` global variables without an initializer) in the `.comm` section (which is the default ccpsx behaviour).
+
+### `--use-comm-for-lcomm`
+Also put `.lcomm`-declared symbols (in C, this means `static` variables without an initializer) in the `.comm` section.
+This can be convenient with games using `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
+Do note that this also makes the symbols global (unlike what `static` normally does).
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
