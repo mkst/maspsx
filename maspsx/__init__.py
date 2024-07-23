@@ -511,7 +511,9 @@ class MaspsxProcessor:
                 if i == 0:
                     res.append(f".section .{section}")
 
-                if self.use_comm_section and (symbol in self.comm_symbols or self.use_comm_for_lcomm):
+                if self.use_comm_section and (
+                    symbol in self.comm_symbols or self.use_comm_for_lcomm
+                ):
                     # default to 1-byte alignment for COMMON
                     res.append(f"\t.comm {symbol},{size},1")
                     continue
@@ -979,8 +981,8 @@ class MaspsxProcessor:
 
         elif op == "break":
             # turn 'break 7' into 'break 0x0,0x7'
-            num = int(rest[0])
-            line = f"break\t0x0,0x{num:X}"
+            num = int(rest[0], 0)
+            line = f"break\t0x{num >> 10:X},0x{num & 0x3FF:X}"
             res.append(line)
 
         elif op in ("div", "rem"):
