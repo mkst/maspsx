@@ -380,3 +380,26 @@ class TestAt(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_sw_pointer_offset(self):
+        """
+        Expand sw with large operand
+        BUG: https://github.com/mkst/maspsx/issues/85
+        """
+
+        lines = [
+            "sw	$2,56200($4)",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(56200)",
+            "addu\t$at,$4,$at",
+            "sw\t$2,%lo(56200)($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
