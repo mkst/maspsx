@@ -203,7 +203,7 @@ def expand_load_immediate(line: str) -> List[str]:
     if 0 < operand < 0x10000:
         res.append(f"ori\t{r_dest},$zero,{operand}")
     elif operand >= 0x10000:
-        res.append(f"lui\t{r_dest},%hi({operand})")
+        res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
         if operand & 0xFFFF:
             res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
     elif 0 > operand > -0x8000:

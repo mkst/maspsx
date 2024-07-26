@@ -79,7 +79,7 @@ class TestLi(unittest.TestCase):
             "	li	$2,0x0010000		# 65536",
         ]
         expected_lines = [
-            "lui	$2,%hi(65536)",
+            "lui	$2,(65536 >> 16) & 0xFFFF",
         ]
         mp = MaspsxProcessor(lines, expand_li=True)
         res = mp.process_lines()
@@ -95,7 +95,7 @@ class TestLi(unittest.TestCase):
             "	li	$2,0x0010001		# 65537",
         ]
         expected_lines = [
-            "lui	$2,%hi(65537)",
+            "lui	$2,(65537 >> 16) & 0xFFFF",
             "ori	$2,$2,65537 & 0xFFFF",
         ]
         mp = MaspsxProcessor(lines, expand_li=True)
@@ -147,6 +147,25 @@ class TestLi(unittest.TestCase):
             "lui	$v0,(-32769 >> 16) & 0xFFFF",
             "ori	$v0,$v0,-32769 & 0xFFFF",
         ]
+        mp = MaspsxProcessor(lines, expand_li=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_li_0x00ffffff(self):
+        """
+        Correct expansion of "li $6,0x00ffffff"
+        BUG: https://github.com/mkst/maspsx/issues/85
+        """
+        lines = [
+            "li	$6,0x00ffffff",
+        ]
+        expected_lines = [
+            "lui	$6,(16777215 >> 16) & 0xFFFF",
+            "ori	$6,$6,16777215 & 0xFFFF",
+        ]
+
         mp = MaspsxProcessor(lines, expand_li=True)
         res = mp.process_lines()
 

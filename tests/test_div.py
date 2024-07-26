@@ -131,7 +131,7 @@ class TestDivExpansion(unittest.TestCase):
             "div	$zero,$16,$2",
             "mflo	$16",
             # EXPAND_ZERO_DIV END
-            "lui	$4,%hi(65537)",
+            "lui\t$4,(65537 >> 16) & 0xFFFF",
             "ori	$4,$4,65537 & 0xFFFF",
             # nop  # DEBUG: mflo/mfhi with mult/div and li expands to 2 ops
             # DEBUG: div needs expanding
