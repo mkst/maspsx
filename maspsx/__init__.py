@@ -945,6 +945,19 @@ class MaspsxProcessor:
                     )
                 else:
                     res.append(line)
+            elif r_source and (int(operand) > 32767 or int(operand) < -32768):
+                # e.g. sw	$2,56200($4)
+                res.extend(
+                    [
+                        "# EXPAND_AT START",
+                        ".set\tnoat",
+                        f"lui\t$at,%hi({operand})",
+                        f"addu\t$at,{r_source},$at",
+                        f"{op}\t{r_dest},%lo({operand})($at)",
+                        ".set\tat",
+                        "# EXPAND_AT END",
+                    ]
+                )
             else:
                 res.append(line)
 
