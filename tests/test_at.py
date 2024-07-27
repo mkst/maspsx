@@ -403,3 +403,71 @@ class TestAt(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_lh_lbu_nop_v0_at(self):
+        """
+        Ensure we place a nop between v0/at
+        BUG: https://github.com/mkst/maspsx/issues/87
+        """
+        lines = [
+            "lh	$2,10($18)",
+            "lbu	$2,buttonDoorIdx.29($2)",
+        ]
+
+        expected_lines = [
+            "lh	$2,10($18)",
+            "nop",
+            ".set\tnoat",
+            "lui\t$at,%hi(buttonDoorIdx.29)",
+            "addu\t$at,$at,$2",
+            "lbu\t$2,%lo(buttonDoorIdx.29)($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_lh_lbu_nop_v0_at_v1(self):
+        lines = [
+            "lh	$3,10($18)",
+            "lbu	$2,buttonDoorIdx.29($2)",
+        ]
+
+        expected_lines = [
+            "lh	$3,10($18)",
+            ".set\tnoat",
+            "lui\t$at,%hi(buttonDoorIdx.29)",
+            "addu\t$at,$at,$2",
+            "lbu\t$2,%lo(buttonDoorIdx.29)($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_lh_lbu_no_nop_v0_at(self):
+        lines = [
+            "lh	$2,10($18)",
+            "lbu	$2,buttonDoorIdx.29($2)",
+        ]
+
+        expected_lines = [
+            "lh	$2,10($18)",
+            ".set\tnoat",
+            "lui\t$at,%hi(buttonDoorIdx.29)",
+            "addu\t$at,$at,$2",
+            "lbu\t$2,%lo(buttonDoorIdx.29)($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_v0_at=False)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

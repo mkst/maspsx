@@ -615,8 +615,14 @@ class MaspsxProcessor:
                     res.append(label)
                     self.skip_instructions = 1
                 res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
+        elif self.nop_v0_at and r_dest in ("$2", "$v0") and uses_at(next_instruction):
+            res.append(
+                f"nop # DEBUG: '{next_instruction}' inject nop beween $v0 and $at"
+            )
         else:
-            res.append(f"#nop # DEBUG: {next_instruction} does not load from {r_dest}")
+            res.append(
+                f"#nop # DEBUG: '{next_instruction}' does not load from {r_dest}"
+            )
 
         return res
 
