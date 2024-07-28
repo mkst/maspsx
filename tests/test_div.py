@@ -173,7 +173,7 @@ class TestDivExpansion(unittest.TestCase):
             "sh\t$2,gUpdateRate",
         ]
 
-        mp = MaspsxProcessor(lines, expand_div=True, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, expand_div=True, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -200,7 +200,7 @@ class TestDivExpansion(unittest.TestCase):
             "sh\t$2,gUpdateRate",
         ]
 
-        mp = MaspsxProcessor(lines, expand_div=True, nop_v0_at=False)
+        mp = MaspsxProcessor(lines, expand_div=True, nop_at_expansion=False)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

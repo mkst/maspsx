@@ -79,7 +79,7 @@ def main() -> None:
 
         filtered_as_args.append(arg)
 
-    nop_v0_at = False  # insert nop between v0/at?
+    nop_at_expansion = False  # insert nop between v0/at?
     sltu_at = True  # sltu uses at?
     expand_li = True  # turn li into lui/ori
     gp_allow_offset = False  # use gp for sym+offset?
@@ -89,7 +89,7 @@ def main() -> None:
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
         if aspsx_version == (2, 21):
-            nop_v0_at = True
+            nop_at_expansion = True
             addiu_at = True
         if aspsx_version > (2, 34):
             expand_li = False
@@ -107,7 +107,7 @@ def main() -> None:
         sdata_limit=sdata_limit,
         expand_div=args.expand_div,
         expand_li=expand_li,
-        nop_v0_at=nop_v0_at,
+        nop_at_expansion=nop_at_expansion,
         sltu_at=sltu_at,
         addiu_at=addiu_at,
         gp_allow_offset=gp_allow_offset,

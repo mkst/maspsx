@@ -541,7 +541,7 @@ class TestNop(unittest.TestCase):
             "nop",
             "sw\t$2,D_801C34D4",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
