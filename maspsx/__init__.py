@@ -71,6 +71,9 @@ def strip_comments(line) -> str:
 
 
 def line_loads_from_reg(line, r_src) -> bool:
+    """
+    NOTE: Returns True even if line might use $at expansion
+    """
     line = strip_comments(line)
 
     # escape dollar
@@ -83,7 +86,7 @@ def line_loads_from_reg(line, r_src) -> bool:
 
     if op in load_mnemonics:
         # lwl	$9,7($2)
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
+        if re.match(rf"^.*\(\s*{r_src}\s*\)$", rest):
             return True
 
     elif op in store_mnemonics:
@@ -364,7 +367,7 @@ class MaspsxProcessor:
         sdata_limit=0,
         expand_div=False,
         expand_li=False,
-        nop_v0_at=False,
+        nop_at_expansion=False,
         sltu_at=False,
         addiu_at=False,
         gp_allow_offset=False,
@@ -379,7 +382,7 @@ class MaspsxProcessor:
         self.expand_div = expand_div
         self.expand_li = expand_li
 
-        self.nop_v0_at = nop_v0_at
+        self.nop_at_expansion = nop_at_expansion
         self.sltu_at = sltu_at
         self.addiu_at = addiu_at
 
@@ -603,8 +606,10 @@ class MaspsxProcessor:
             if self._uses_gp(next_instruction):
                 reason = f"'{next_instruction}' uses $gp"
                 nop_required = True
-            if self.nop_v0_at:
-                reason = f"'{next_instruction}' inject nop beween $v0 and $at"
+            if uses_at(next_instruction) and self.nop_at_expansion:
+                reason = (
+                    f"'{next_instruction}' inject nop beween {r_dest} and $at expansion"
+                )
                 nop_required = True
 
             if nop_required:
@@ -615,10 +620,6 @@ class MaspsxProcessor:
                     res.append(label)
                     self.skip_instructions = 1
                 res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
-        elif self.nop_v0_at and r_dest in ("$2", "$v0") and uses_at(next_instruction):
-            res.append(
-                f"nop # DEBUG: '{next_instruction}' inject nop beween $v0 and $at"
-            )
         else:
             res.append(
                 f"#nop # DEBUG: '{next_instruction}' does not load from {r_dest}"
@@ -812,6 +813,7 @@ class MaspsxProcessor:
                 next_instruction = next_instruction.split(";")[0]
 
             if not needs_expanding:
+                # newer GCCs can emit %hi() and %lo() separately...
                 res.append(f"{line} # DEBUG: leaving for assembler to expand")
                 nop = self.get_next_instruction(skip=0)
                 if nop == "#nop":
@@ -819,13 +821,11 @@ class MaspsxProcessor:
                     if op in branch_mnemonics:
                         res.append("nop  # DEBUG: next instruction is branch")
                         self.skip_instructions = 1
-                    elif line_loads_from_reg(next_instruction, r_dest):
-                        res.append(f"nop  # DEBUG: next op ({op}) loads from {r_dest}")
-                        self.skip_instructions = 1
                     else:
-                        res.append(
-                            f"#nop  # DEBUG: next op ({op}) does not load from {r_dest}"
+                        extra_nops = self._handle_nop_before_next_instruction(
+                            next_instruction, r_dest
                         )
+                        res.extend(extra_nops)
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0

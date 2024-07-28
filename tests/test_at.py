@@ -65,7 +65,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(32768)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -89,7 +89,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(-32769)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -113,7 +113,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(32768)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=False)
+        mp = MaspsxProcessor(lines, nop_at_expansion=False)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -137,7 +137,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(-32769)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=False)
+        mp = MaspsxProcessor(lines, nop_at_expansion=False)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -272,7 +272,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(32768)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -301,7 +301,7 @@ class TestAt(unittest.TestCase):
             "lh\t$2,%lo(-32769)($at)",
             ".set\tat",
         ]
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
@@ -404,7 +404,7 @@ class TestAt(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_expand_lh_lbu_nop_v0_at(self):
+    def test_expand_lh_lbu_nop_at_expansion(self):
         """
         Ensure we place a nop between v0/at
         BUG: https://github.com/mkst/maspsx/issues/87
@@ -424,34 +424,35 @@ class TestAt(unittest.TestCase):
             ".set\tat",
         ]
 
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_expand_lh_lbu_nop_v0_at_v1(self):
+    def test_expand_lh_lbu_nop_at_expansion_v1(self):
         lines = [
             "lh	$3,10($18)",
-            "lbu	$2,buttonDoorIdx.29($2)",
+            "lbu	$2,buttonDoorIdx.29($3)",
         ]
 
         expected_lines = [
             "lh	$3,10($18)",
+            "nop",
             ".set\tnoat",
             "lui\t$at,%hi(buttonDoorIdx.29)",
-            "addu\t$at,$at,$2",
+            "addu\t$at,$at,$3",
             "lbu\t$2,%lo(buttonDoorIdx.29)($at)",
             ".set\tat",
         ]
 
-        mp = MaspsxProcessor(lines, nop_v0_at=True)
+        mp = MaspsxProcessor(lines, nop_at_expansion=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_expand_lh_lbu_no_nop_v0_at(self):
+    def test_expand_lh_lbu_no_nop_at_expansion(self):
         lines = [
             "lh	$2,10($18)",
             "lbu	$2,buttonDoorIdx.29($2)",
@@ -466,7 +467,7 @@ class TestAt(unittest.TestCase):
             ".set\tat",
         ]
 
-        mp = MaspsxProcessor(lines, nop_v0_at=False)
+        mp = MaspsxProcessor(lines, nop_at_expansion=False)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

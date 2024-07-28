@@ -50,14 +50,15 @@ Do note that this also makes the symbols global (unlike what `static` normally d
 
 ## Known Differences
 
-| Behavior / Version         | 2.21           | 2.34           | 2.56           | 2.67           | 2.77           | 2.79           | 2.81           | 2.86           |
-|:---------------------------|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
-| add nop between $v0/$at    | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use addiu in $at expansion | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| li 1 expands to ori 1      | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use $at for sltu < 0       | :black_circle: | :black_circle: | :black_circle: | :black_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use $gp for symbol+offset  | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: | :black_circle: | :black_circle: |
-| use $gp for la             | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :black_circle: | :black_circle: |
+| Behavior / Version           | 2.21           | 2.34           | 2.56           | 2.67           | 2.77           | 2.79           | 2.81           | 2.86           |
+|:-----------------------------|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
+| add nop before $at expansion | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use addiu in $at expansion   | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| li 1 expands to ori 1        | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use $at for sltu < 0         | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| support for %hi/%lo macros   | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| use $gp for symbol+offset    | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| use $gp for la               | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
 
 
 ## Examples
