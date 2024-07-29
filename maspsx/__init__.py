@@ -368,6 +368,7 @@ class MaspsxProcessor:
         expand_div=False,
         expand_li=False,
         nop_at_expansion=False,
+        nop_mflo_mfhi=True,
         sltu_at=False,
         addiu_at=False,
         gp_allow_offset=False,
@@ -383,6 +384,8 @@ class MaspsxProcessor:
         self.expand_li = expand_li
 
         self.nop_at_expansion = nop_at_expansion
+        self.nop_mflo_mfhi = nop_mflo_mfhi
+
         self.sltu_at = sltu_at
         self.addiu_at = addiu_at
 
@@ -630,6 +633,9 @@ class MaspsxProcessor:
     def _handle_mflo_mfhi(self) -> List[str]:
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
         res: List[str] = []
+
+        if not self.nop_mflo_mfhi:
+            return res
 
         next_instruction = self.get_next_instruction(
             skip=0, ignore_nop=True, ignore_set=True, ignore_label=True

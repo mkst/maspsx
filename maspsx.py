@@ -19,6 +19,9 @@ def main() -> None:
     parser.add_argument("--force-stdin", action="store_true")
     parser.add_argument("--use-comm-section", action="store_true")
     parser.add_argument("--use-comm-for-lcomm", action="store_true")
+    # decomp.me debugging
+    parser.add_argument("--print-output", action="store_true")
+    parser.add_argument("--print-input", action="store_true")
     # deprecated
     parser.add_argument("--no-macro-inc", action="store_true")
     parser.add_argument("--expand-li", action="store_true")
@@ -59,6 +62,9 @@ def main() -> None:
         with open(input_file, "r", encoding="utf") as f:
             in_lines = f.readlines()
 
+    if args.print_input:
+        sys.stderr.write("".join(in_lines))
+
     preamble = [
         '.include "macro.inc"' if args.macro_inc else "",
     ]
@@ -80,6 +86,7 @@ def main() -> None:
         filtered_as_args.append(arg)
 
     nop_at_expansion = False  # insert nop between v0/at?
+    nop_mflo_mfhi = True  # ensure 2 ops between mfhi/mflo and div/mult
     sltu_at = True  # sltu uses at?
     expand_li = True  # turn li into lui/ori
     gp_allow_offset = False  # use gp for sym+offset?
@@ -90,6 +97,7 @@ def main() -> None:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
         if aspsx_version == (2, 21):
             nop_at_expansion = True
+            nop_mflo_mfhi = False
             addiu_at = True
         if aspsx_version > (2, 34):
             expand_li = False
@@ -108,6 +116,7 @@ def main() -> None:
         expand_div=args.expand_div,
         expand_li=expand_li,
         nop_at_expansion=nop_at_expansion,
+        nop_mflo_mfhi=nop_mflo_mfhi,
         sltu_at=sltu_at,
         addiu_at=addiu_at,
         gp_allow_offset=gp_allow_offset,
@@ -125,6 +134,9 @@ def main() -> None:
 
     # avoid "Warning: end of file not at end of a line; newline inserted"
     out_text += "\n"
+
+    if args.print_output:
+        sys.stderr.write(out_text)
 
     if args.run_assembler:
         cmd = [
