@@ -8,6 +8,26 @@ from .util import strip_comments
 
 class TestMflo(unittest.TestCase):
 
+    def test_mflo_disabled(self):
+        lines = [
+            "mult	$4,$2",
+            "mflo	$4",
+            "#nop",
+            "#nop",
+            "mult	$4,$5",
+        ]
+        expected_lines = [
+            "mult	$4,$2",
+            "mflo	$4",
+            "mult	$4,$5",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_mflo_mfhi=False)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_mflo_li(self):
         """
         li with large value will turn into two instructions (lui+ori)
