@@ -472,3 +472,28 @@ class TestAt(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_lbu_sb_nop_at_expansion(self):
+
+        lines = [
+            "lbu	$3,104($4)",
+            "#nop",
+            "sb	$2,gPartyMemberSlain-1($3)",
+        ]
+
+        expected_lines = [
+            "lbu\t$3,104($4)",
+            "nop",
+            ".set\tnoat",
+            "lui\t$at,%hi(gPartyMemberSlain-1)",
+            "addiu\t$at,$at,%lo(gPartyMemberSlain-1)",
+            "addu\t$at,$at,$3",
+            "sb	$2,0x0($at)",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_at_expansion=True, addiu_at=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

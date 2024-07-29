@@ -90,7 +90,7 @@ def line_loads_from_reg(line, r_src) -> bool:
             return True
 
     elif op in store_mnemonics:
-        if re.match(rf"^.*,\s?-?(0x)?[0-9a-f]*\(\s*{r_src}\s*\)$", rest):
+        if re.match(rf"^.*\(\s*{r_src}\s*\)$", rest):
             return True
         # "line_loads_from_reg" is a bit of a lie
         if re.match(rf"^{r_src},.*$", rest):
