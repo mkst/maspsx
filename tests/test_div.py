@@ -6,6 +6,118 @@ from .util import strip_comments
 
 
 class TestDivExpansion(unittest.TestCase):
+    def test_div_expand(self):
+        lines = [
+            "	div	$16,$16,$2",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "div\t$zero,$16,$2",
+            "bnez\t$2,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "addiu\t$at,$zero,-1",
+            "bne\t$2,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "lui\t$at,0x8000",
+            "bne\t$16,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "nop",
+            "break\t0x6",
+            ".L_DIV_BY_POSITIVE_SIGN_0:",
+            "mflo\t$16",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_rem_expand(self):
+        lines = [
+            "	rem	$16,$16,$2",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "div\t$zero,$16,$2",
+            "bnez\t$2,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "addiu\t$at,$zero,-1",
+            "bne\t$2,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "lui\t$at,0x8000",
+            "bne\t$16,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "nop",
+            "break\t0x6",
+            ".L_DIV_BY_POSITIVE_SIGN_0:",
+            "mfhi\t$16",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_div_expand_tge(self):
+        lines = [
+            "	div	$16,$16,$2",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "div\t$zero,$16,$2",
+            "bnez\t$2,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "addiu\t$at,$zero,-1",
+            "bne\t$2,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "lui\t$at,0x8000",
+            "bne\t$16,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "nop",
+            "tge\t$zero,$zero,93",
+            ".L_DIV_BY_POSITIVE_SIGN_0:",
+            "mflo\t$16",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True, div_uses_tge=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_rem_expand_tge(self):
+        lines = [
+            "	rem	$16,$16,$2",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "div\t$zero,$16,$2",
+            "bnez\t$2,.L_NOT_DIV_BY_ZERO_0",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_0:",
+            "addiu\t$at,$zero,-1",
+            "bne\t$2,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "lui\t$at,0x8000",
+            "bne\t$16,$at,.L_DIV_BY_POSITIVE_SIGN_0",
+            "nop",
+            "tge\t$zero,$zero,93",
+            ".L_DIV_BY_POSITIVE_SIGN_0:",
+            "mfhi\t$16",
+            ".set\tat",
+        ]
+
+        mp = MaspsxProcessor(lines, expand_div=True, div_uses_tge=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_div_nop(self):
         """
         Ensure we expand an li instruction during div/mflo handling

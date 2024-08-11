@@ -85,6 +85,7 @@ def main() -> None:
 
         filtered_as_args.append(arg)
 
+    div_uses_tge = False  # use tge instruction instead of break in divide
     nop_at_expansion = False  # insert nop between v0/at?
     nop_mflo_mfhi = True  # ensure 2 ops between mfhi/mflo and div/mult
     sltu_at = True  # sltu uses at?
@@ -95,7 +96,9 @@ def main() -> None:
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
-        if aspsx_version == (2, 21):
+        if aspsx_version == (2, 8):
+            div_uses_tge = True
+        if aspsx_version <= (2, 21):
             nop_at_expansion = True
             nop_mflo_mfhi = False
             addiu_at = True
@@ -119,6 +122,7 @@ def main() -> None:
         nop_mflo_mfhi=nop_mflo_mfhi,
         sltu_at=sltu_at,
         addiu_at=addiu_at,
+        div_uses_tge=div_uses_tge,
         gp_allow_offset=gp_allow_offset,
         gp_allow_la=gp_allow_la,
         use_comm_section=args.use_comm_section,
