@@ -7,71 +7,75 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 import util
 
-SLTU_TEST_RESULT_AT_1 = [
-    "0x34030064",  # ori     v1,0x64
-    "0x2401FFE9",  # li      at,-23
-    "0x0061182B",  # sltu    v1,v1,at
-]
-SLTU_TEST_RESULT_AT_2 = [
-    "0x24030064",  # addiu   v1,100
-    "0x2401FFE9",  # li      at,-23
-    "0x0061182B",  # sltu    v1,v1,at
-]
-SLTU_TEST_RESULT_NO_AT = [
-    "0x24030064",  # addiu   v1,100
-    "0x2C63FFE9",  # sltiu   v1,v1,-23
+NO_GP_RESULT = [
+    "0x3C020000",  # lui         $v0, 0x0
+    "0x8C420000",  # lw          $v0, 0x0($v0)
+    "0x3C040000",  # lui         $a0, 0x0
+    "0x8C840000",  # lw          $a0, 0x0($a0)
 ]
 
+GP_RESULT_1 = [
+    "0x8F820000",  # lw          $v0, 0x0($gp)
+    "0x3C040000",  # lui         $a0, 0x0
+    "0x8C840000",  # lw          $a0, 0x0($a0)
+]
+
+GP_RESULT_2 = [
+    "0x8F820000",  # lw          $v0, 0x0($gp)
+    "0x8F840000",  # lw          $a0, 0x0($gp)
+]
+
+
 TESTS = {
-    "source_asm": "ASM/SLTU_AT.S",
+    "source_asm": "ASM/GP.S",
     "versions": [
         {
             "aspsx_version": "2.08",
-            "target_asm": SLTU_TEST_RESULT_AT_1,
+            "target_asm": NO_GP_RESULT,
         },
         {
             "aspsx_version": "2.21",
-            "target_asm": SLTU_TEST_RESULT_AT_1,
+            "target_asm": GP_RESULT_1,
         },
         {
             "aspsx_version": "2.34",
-            "target_asm": SLTU_TEST_RESULT_AT_1,
+            "target_asm": GP_RESULT_1,
         },
         {
             "aspsx_version": "2.56",
-            "target_asm": SLTU_TEST_RESULT_AT_2,
+            "target_asm": GP_RESULT_1,
         },
         {
             "aspsx_version": "2.67",
-            "target_asm": SLTU_TEST_RESULT_NO_AT,
+            "target_asm": GP_RESULT_1,
         },
         {
             "aspsx_version": "2.77",
-            "target_asm": SLTU_TEST_RESULT_NO_AT,
+            "target_asm": GP_RESULT_2,
         },
         {
             "aspsx_version": "2.79",
-            "target_asm": SLTU_TEST_RESULT_NO_AT,
+            "target_asm": GP_RESULT_2,
         },
         {
             "aspsx_version": "2.81",
-            "target_asm": SLTU_TEST_RESULT_NO_AT,
+            "target_asm": GP_RESULT_2,
         },
         {
             "aspsx_version": "2.86",
-            "target_asm": SLTU_TEST_RESULT_NO_AT,
+            "target_asm": GP_RESULT_2,
         },
     ],
 }
 
 
-class TestSltuAt(unittest.TestCase):
-    def test_sltu_at(self):
+class TestGpOffset(unittest.TestCase):
+    def test_gp_offset(self):
         source_asm: Path = Path(__file__).parent / TESTS["source_asm"]
 
         for version in TESTS["versions"]:
             with self.subTest(version=version):
                 target_asm = version["target_asm"]
                 print(f"{source_asm.name}: {version['aspsx_version']}")
-                instructions = util.run_aspsx(source_asm, version)
+                instructions = util.run_aspsx(source_asm, version, data_limit="-G999")
                 self.assertEqual(target_asm, instructions)

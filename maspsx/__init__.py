@@ -371,6 +371,7 @@ class MaspsxProcessor:
         nop_mflo_mfhi=True,
         sltu_at=False,
         addiu_at=False,
+        div_uses_tge=False,
         gp_allow_offset=False,
         gp_allow_la=False,
         use_comm_section=False,
@@ -388,6 +389,7 @@ class MaspsxProcessor:
 
         self.sltu_at = sltu_at
         self.addiu_at = addiu_at
+        self.div_uses_tge = div_uses_tge
 
         self.gp_allow_offset = gp_allow_offset
         self.gp_allow_la = gp_allow_la
@@ -1032,7 +1034,7 @@ class MaspsxProcessor:
                         "lui\t$at,0x8000",
                         f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}",
                         "nop",
-                        "break\t0x6",
+                        "tge\t$zero,$zero,93" if self.div_uses_tge else "break\t0x6",
                         f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:",
                         f"{move_from}\t{r_dest}",
                         ".set\tat",

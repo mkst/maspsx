@@ -5,6 +5,7 @@ import shutil
 
 ASPSX_RUNNER_LOOKUP = {
     # 16 bit
+    "2.08": "dosemu2",
     "2.21": "dosemu2",
     "2.34": "dosemu2",
     # 32 bit
@@ -17,6 +18,7 @@ ASPSX_RUNNER_LOOKUP = {
 }
 
 ASPSX_PSYQ_VERSION_LOOKUP = {
+    "2.08": "2.08",
     "2.21": "psyq3.3",
     "2.34": "psyq3.5",
     "2.56": "psyq4.0",
@@ -92,7 +94,7 @@ def read_text_section(data: bytes) -> bytes:
     raise Exception("Didn't find a .text section!")
 
 
-def run_aspsx(source_asm: Path, version, data_limit=""):
+def run_aspsx(source_asm: Path, version, data_limit="", extra_flags=""):
     aspsx_version = version["aspsx_version"]
     psyq_version = ASPSX_PSYQ_VERSION_LOOKUP[aspsx_version]
 
@@ -114,6 +116,7 @@ def run_aspsx(source_asm: Path, version, data_limit=""):
             "wine",
             str(aspsx_path),
             data_limit,
+            extra_flags,
             "-o",
             str(object_file),
             str(source_asm),
@@ -127,7 +130,7 @@ def run_aspsx(source_asm: Path, version, data_limit=""):
             "-K",
             f"{psyq_base}",
             "-E",
-            f"ASPSX.EXE {data_limit} -o {object_file.name} {source_asm.name}",
+            f"ASPSX.EXE {data_limit} {extra_flags} -o {object_file.name} {source_asm.name}",
         ]
 
     print(f"Executing \"{' '.join(cmd)}\"")
