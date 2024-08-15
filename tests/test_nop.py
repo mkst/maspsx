@@ -550,3 +550,20 @@ class TestNopMacro(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_nop_mtc2(self):
+        lines = [
+            "	lhu	$8,370($18)",
+            " #APP",
+            "	mtc2    $8, $8",
+            " #NO_APP",
+        ]
+        expected_lines = [
+            "lhu	$8,370($18)",
+            "nop",
+            "mtc2    $8, $8",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

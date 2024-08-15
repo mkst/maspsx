@@ -104,7 +104,7 @@ def line_loads_from_reg(line, r_src) -> bool:
         if re.match(rf"^{r_src}$", rest):
             return True
 
-    elif op == "ctc2":
+    elif op in ("ctc2", "mtc0", "mtc2"):
         if re.match(rf"^{r_src},.*$", rest):
             return True
 
