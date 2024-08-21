@@ -235,7 +235,7 @@ def expand_move(line: str):
 
 
 def is_label(line: str):
-    return re.match(r"\$Le?\d+:$", line)
+    return re.match(r"\$L(b|e)?\d+:$", line)
 
 
 def is_instruction(line: str, ignore_nop=False, ignore_set=False, ignore_label=False):
