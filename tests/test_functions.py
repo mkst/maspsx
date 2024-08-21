@@ -4,6 +4,7 @@ from maspsx import (
     strip_comments,
     line_loads_from_reg,
     uses_at,
+    is_label,
 )
 
 
@@ -42,3 +43,14 @@ class TestMaspsxFunctions(unittest.TestCase):
     def test_line_uses_at(self):
         line = "sb   $2, g_InputSaveName($3)"
         self.assertTrue(uses_at(line))
+
+    def test_is_label(self):
+        labels = [
+            "$L38:",
+            "$Lb0:",
+            "$Le3:",
+            # "LM132:",  # NOTE: this is a line marker not true label
+        ]
+        for label in labels:
+            with self.subTest():
+                self.assertTrue(is_label(label))
