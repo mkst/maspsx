@@ -64,6 +64,26 @@ Do note that this also makes the symbols global (unlike what `static` normally d
 | use $gp for la                | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
 
 
+## `INCLUDE_ASM` reordering workaround hack
+
+Whenever compiling with non-zero `-G` value, some versions of gcc reorder all functions to appear *after* data definitions in the output assembly. Unfortunately, this also causes functions to be placed *after* `__asm__` statements, thus breaking the usual implementation of the `INCLUDE_ASM` macro.
+
+This can be worked around with maspsx by wrapping each `__asm__` statement in a function whose name starts with `__maspsx_include_asm_hack`, and appending `# maspsx-keep` to each line of the `__asm__` statement. Thus a working version of `INCLUDE_ASM` would look like:
+````
+#define INCLUDE_ASM(FOLDER, NAME) \
+    void __maspsx_include_asm_hack_##NAME() { \
+        __asm__( \
+            ".text # maspsx-keep \n" \
+            "\t.align\t2 # maspsx-keep\n" \
+            "\t.set noreorder # maspsx-keep\n" \
+            "\t.set noat # maspsx-keep\n" \
+            ".include \""FOLDER"/"#NAME".s\" # maspsx-keep\n" \
+            "\t.set reorder # maspsx-keep\n" \
+            "\t.set at # maspsx-keep\n" \
+        ); \
+    }
+````
+
 ## Examples
 
 Projects that use `maspsx` include:
