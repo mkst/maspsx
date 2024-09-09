@@ -26,6 +26,10 @@ TESTS = {
     "source_asm": "ASM/V0_AT.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": V0_AT_RESULT_NOP,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": V0_AT_RESULT_NOP,
         },

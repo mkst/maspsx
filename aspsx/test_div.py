@@ -39,6 +39,10 @@ TESTS = {
     "source_asm": "ASM/DIV.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": DIV_TEST_RESULT_BREAK,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": DIV_TEST_RESULT_TGE,
         },

@@ -26,6 +26,10 @@ TESTS = {
     "source_asm": "ASM/SLTU_AT.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": SLTU_TEST_RESULT_AT_1,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": SLTU_TEST_RESULT_AT_1,
         },

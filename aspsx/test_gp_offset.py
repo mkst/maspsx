@@ -33,6 +33,10 @@ TESTS = {
     "source_asm": "ASM/GP_OFFST.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": GP_OFFSET_TEST_RESULT_NO_GP_ANY,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": GP_OFFSET_TEST_RESULT_NO_GP_ANY,
         },

@@ -20,6 +20,10 @@ TESTS = {
     "source_asm": "ASM/LA.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": LA_TEST_RESULT_NO_GP,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": LA_TEST_RESULT_NO_GP,
         },

@@ -42,6 +42,14 @@ TESTS = {
     "source_asm": "ASM/EXPND_LI.S",  # 8.3 filenames
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": EXPAND_LI_RESULT_1,
+        },
+        {
+            "aspsx_version": "2.08",
+            "target_asm": EXPAND_LI_RESULT_1,
+        },
+        {
             "aspsx_version": "2.21",
             "target_asm": EXPAND_LI_RESULT_1,
         },

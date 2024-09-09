@@ -24,6 +24,10 @@ TESTS = {
     "source_asm": "ASM/EXPND_SW.S",
     "versions": [
         {
+            "aspsx_version": "1.07",
+            "target_asm": EXPAND_SW_TEST_RESULT_1,
+        },
+        {
             "aspsx_version": "2.08",
             "target_asm": EXPAND_SW_TEST_RESULT_1,
         },

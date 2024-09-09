@@ -1,1 +1,1 @@
-lw	$2,ctlbuf($2)
+	lw	$2,ctlbuf($2)

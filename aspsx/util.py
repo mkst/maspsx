@@ -5,6 +5,7 @@ import shutil
 
 ASPSX_RUNNER_LOOKUP = {
     # 16 bit
+    "1.07": "dosemu2",
     "2.08": "dosemu2",
     "2.21": "dosemu2",
     "2.34": "dosemu2",
@@ -18,6 +19,7 @@ ASPSX_RUNNER_LOOKUP = {
 }
 
 ASPSX_PSYQ_VERSION_LOOKUP = {
+    "1.07": "1.07",
     "2.08": "2.08",
     "2.21": "psyq3.3",
     "2.34": "psyq3.5",
