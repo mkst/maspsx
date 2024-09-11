@@ -502,8 +502,21 @@ class MaspsxProcessor:
         self.preprocess_lines()
 
         res = []
+        in_include_asm_hack = False
         for i, line in enumerate(self.lines):
             self.line_index = i
+
+            if ".ent\t__maspsx_include_asm_hack" in line:
+                in_include_asm_hack = True
+
+            if in_include_asm_hack:
+                if "# maspsx-keep" in line:
+                    res += [line]
+                else:
+                    res += [f"# {line} # DEBUG: skipped due to include asm hack"]
+                if ".end\t__maspsx_include_asm_hack" in line:
+                    in_include_asm_hack = False
+                continue
 
             if is_instruction(line) and self.skip_instructions > 0:
                 self.skip_instructions -= 1
