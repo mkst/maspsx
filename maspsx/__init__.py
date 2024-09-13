@@ -836,17 +836,10 @@ class MaspsxProcessor:
             if not needs_expanding:
                 # newer GCCs can emit %hi() and %lo() separately...
                 res.append(f"{line} # DEBUG: leaving for assembler to expand")
-                nop = self.get_next_instruction(skip=0)
-                if nop == "#nop":
-                    op, *_ = next_instruction.split()
-                    if op in branch_mnemonics:
-                        res.append("nop  # DEBUG: next instruction is branch")
-                        self.skip_instructions = 1
-                    else:
-                        extra_nops = self._handle_nop_before_next_instruction(
-                            next_instruction, r_dest
-                        )
-                        res.extend(extra_nops)
+                extra_nops = self._handle_nop_before_next_instruction(
+                    next_instruction, r_dest
+                )
+                res.extend(extra_nops)
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0

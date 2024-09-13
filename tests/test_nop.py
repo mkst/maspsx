@@ -567,3 +567,20 @@ class TestNopMacro(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_lw_lo_macro(self):
+        lines = [
+            "	lw	$5,%lo(objectAccess+204)($2)",
+            "$L3:",
+            "	beq	$5,$0,$L4",
+        ]
+        expected_lines = [
+            "lw\t$5,%lo(objectAccess+204)($2)",
+            "$L3:",
+            "nop",
+            "beq\t$5,$0,$L4",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[:4])
