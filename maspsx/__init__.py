@@ -660,7 +660,7 @@ class MaspsxProcessor:
         )
         if any(
             next_instruction.startswith(x)
-            for x in ["mult\t", "multu\t", "div\t", "divu\t"]
+            for x in ["mult\t", "multu\t", "div\t", "divu\t", "rem\t", "remu\t"]
         ):
             # #nop
             # #nop
@@ -684,7 +684,7 @@ class MaspsxProcessor:
 
         elif any(
             next_next_instruction.startswith(x)
-            for x in ["mult\t", "multu\t", "div\t", "divu\t"]
+            for x in ["mult\t", "multu\t", "div\t", "divu\t", "rem\t", "remu\t"]
         ):
             # #nop
             # #nop
