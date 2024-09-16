@@ -7,11 +7,14 @@ on:
     branches: [ master ]
 jobs:
   run_tests:
-    name: Ensure black is happy with formatting
+    name: Ensure linter is happy with formatting
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Run unit tests
+      - name: Install deps
+        run: python3 -m pip install "black==24.8.0"
+
+      - name: Run black
         run: python3 -m black .
