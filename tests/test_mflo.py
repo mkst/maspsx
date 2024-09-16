@@ -115,3 +115,22 @@ class TestMflo(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_rem(self):
+        lines = [
+            "mflo	$7",
+            "#nop",
+            "sll	$2,$3,12",
+            "rem	$7,$7,$2",
+        ]
+        expected_lines = [
+            "mflo\t$7",
+            "sll\t$2,$3,12",
+            "nop",
+            "div\t$zero,$7,$2",
+            "mfhi\t$7",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
