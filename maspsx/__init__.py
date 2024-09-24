@@ -70,14 +70,14 @@ def strip_comments(line) -> str:
     return line.strip()
 
 
-def line_loads_from_reg(line, r_src) -> bool:
+def line_loads_from_reg(line, r_source) -> bool:
     """
     NOTE: Returns True even if line might use $at expansion
     """
     line = strip_comments(line)
 
     # escape dollar
-    r_src = r_src.replace("$", r"\$")
+    r_source = r_source.replace("$", r"\$")
 
     if match := re.match(r"^([A-z][A-z0-9]*)\s+(.*)$", line):
         op, rest = match.group(1, 2)
@@ -86,49 +86,49 @@ def line_loads_from_reg(line, r_src) -> bool:
 
     if op in load_mnemonics:
         # lwl	$9,7($2)
-        if re.match(rf"^.*\(\s*{r_src}\s*\)$", rest):
+        if re.match(rf"^.*\(\s*{r_source}\s*\)$", rest):
             return True
 
     elif op in store_mnemonics:
-        if re.match(rf"^.*\(\s*{r_src}\s*\)$", rest):
+        if re.match(rf"^.*\(\s*{r_source}\s*\)$", rest):
             return True
         # "line_loads_from_reg" is a bit of a lie
-        if re.match(rf"^{r_src},.*$", rest):
+        if re.match(rf"^{r_source},.*$", rest):
             return True
 
     elif op == "jal":
-        if re.match(rf"^.*,\s*{r_src}$", rest):
+        if re.match(rf"^.*,\s*{r_source}$", rest):
             return True
 
     elif op == "j":
-        if re.match(rf"^{r_src}$", rest):
+        if re.match(rf"^{r_source}$", rest):
             return True
 
     elif op in ("ctc2", "mtc0", "mtc2"):
-        if re.match(rf"^{r_src},.*$", rest):
+        if re.match(rf"^{r_source},.*$", rest):
             return True
 
     elif op in branch_mnemonics:
-        if re.match(rf"^{r_src},.*$", rest):
+        if re.match(rf"^{r_source},.*$", rest):
             return True
-        if re.match(rf"^.*,\s*{r_src},.*$", rest):
+        if re.match(rf"^.*,\s*{r_source},.*$", rest):
             return True
 
     elif op in single_reg_loads:
-        if re.match(rf"^.*,\s*{r_src}$", rest):
+        if re.match(rf"^.*,\s*{r_source}$", rest):
             return True
         if op.startswith("mult"):
-            if re.match(rf"^{r_src},.*$", rest):
+            if re.match(rf"^{r_source},.*$", rest):
                 return True
         if op.startswith("div") or op.startswith("rem"):
             # e.g. div	$3,$3,$7
-            if re.match(rf"^.*,{r_src}.*$", rest):
+            if re.match(rf"^.*,{r_source}.*$", rest):
                 return True
 
     elif op in double_reg_loads:
-        if re.match(rf"^.*,\s*{r_src},.*$", rest):
+        if re.match(rf"^.*,\s*{r_source},.*$", rest):
             return True
-        if re.match(rf"^.*,.*,\s*{r_src}$", rest):
+        if re.match(rf"^.*,.*,\s*{r_source}$", rest):
             return True
 
     return False
@@ -645,7 +645,7 @@ class MaspsxProcessor:
 
         return res
 
-    def _handle_mflo_mfhi(self) -> List[str]:
+    def _handle_mflo_mfhi(self, r_source=None) -> List[str]:
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
         res: List[str] = []
 
@@ -658,6 +658,7 @@ class MaspsxProcessor:
         next_next_instruction = self.get_next_instruction(
             skip=1, ignore_nop=True, ignore_set=True, ignore_label=True
         )
+
         if any(
             next_instruction.startswith(x)
             for x in ["mult\t", "multu\t", "div\t", "divu\t", "rem\t", "remu\t"]
@@ -717,31 +718,43 @@ class MaspsxProcessor:
 
                         if len(expanded) == 2:
                             res.append(
-                                "#nop  # DEBUG: mflo/mfhi with mult/div and li expands to 2 ops"
+                                "#nop  # DEBUG: mflo/mfhi with mult/div/rem and li expands to 2 ops"
                             )
                         else:
                             res.append(
-                                "nop  # DEBUG: mflo/mfhi with mult/div and li expands to 1 op"
+                                "nop  # DEBUG: mflo/mfhi with mult/div/rem and li expands to 1 op"
                             )
                     else:
                         if no_reorder:
                             res.append(
-                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction (noreorder)"
+                                "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (noreorder)"
                             )
                             res.append(".set\tnoreorder")
                             res.append(expand_move(inst))
                         else:
-                            res.append(expand_move(inst))
-                            res.append(
-                                "nop  # DEBUG: mflo/mfhi with mult/div and 1 instruction"
-                            )
+                            if r_source and line_loads_from_reg(inst, r_source):
+                                # NOTE: only relevant when div has been expanded (i.e. -0 flag)
+                                res.extend(
+                                    [
+                                        f"nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction which loads from {r_source}",
+                                        expand_move(inst),
+                                    ]
+                                )
+                            else:
+                                res.extend(
+                                    [
+                                        expand_move(inst),
+                                        "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction",
+                                    ]
+                                )
 
                 elif inst == next_next_instruction:
+                    # reached mult/div/rem
                     if div_needs_expanding(inst):
                         res.append("# DEBUG: div needs expanding")
                         skip -= 1
                     else:
-                        res.append(expand_move(inst))
+                        res.append(inst)
                     break
                 elif not inst.startswith("#"):
                     res.append(expand_move(inst))
@@ -1057,7 +1070,7 @@ class MaspsxProcessor:
                     ]
                 )
 
-            extra_nops = self._handle_mflo_mfhi()
+            extra_nops = self._handle_mflo_mfhi(r_source=r_dest)
             if len(extra_nops) > 0:
                 res += extra_nops
             else:
@@ -1101,7 +1114,7 @@ class MaspsxProcessor:
                     ]
                 )
 
-            extra_nops = self._handle_mflo_mfhi()
+            extra_nops = self._handle_mflo_mfhi(r_source=r_dest)
             if len(extra_nops) > 0:
                 res += extra_nops
             else:
