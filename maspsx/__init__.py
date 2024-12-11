@@ -439,6 +439,10 @@ class MaspsxProcessor:
                 in_sdata = True
                 continue
 
+            if line.startswith(".file"):
+                in_sdata = False
+                continue
+
             if line.startswith(".comm") or line.startswith(".lcomm"):
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
                 in_sdata = False
