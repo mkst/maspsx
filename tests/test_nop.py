@@ -584,3 +584,42 @@ class TestNopMacro(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:4])
+
+    def test_lw_sw_lo_macro(self):
+        """
+        Need a nop between the lw/sw as the sw does not expand to use $at
+        BUG: https://github.com/mkst/maspsx/issues/109
+        """
+        lines = [
+            "lw	$2,0($5)",
+            "#nop",
+            "sw	$2,%lo(s_attr)($3)",
+        ]
+        expected_lines = [
+            "lw	$2,0($5)",
+            "nop",
+            "sw	$2,%lo(s_attr)($3)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_lw_sw_no_lo_macro(self):
+        """
+        This doesn't a nop between the lw/sw as the sw does expand to use $at
+        BUG: https://github.com/mkst/maspsx/issues/109
+        """
+        lines = [
+            "lw	$2,0($5)",
+            "#nop",
+            "sw	$2,s_attr($3)",
+        ]
+        expected_lines = [
+            "lw	$2,0($5)",
+            "sw	$2,s_attr($3)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
