@@ -137,6 +137,10 @@ def line_loads_from_reg(line, r_source) -> bool:
 def uses_at(line: str) -> bool:
     line = strip_comments(line)
 
+    # sw	$2,%lo(s_attr)($3)
+    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^)]+)\)", line):
+        return False
+
     # sw	$2,D_801813A4
     # sw	$3,g_CurrentRoom+40
     if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*([A-z0-9_+]+)$", line):
