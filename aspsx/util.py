@@ -5,9 +5,12 @@ import shutil
 
 ASPSX_RUNNER_LOOKUP = {
     # 16 bit
+    "1.05": "dosemu2",
     "1.07": "dosemu2",
+    "2.05": "dosemu2",
     "2.08": "dosemu2",
     "2.21": "dosemu2",
+    "2.30": "dosemu2",
     "2.34": "dosemu2",
     # 32 bit
     "2.56": "wine",
@@ -19,8 +22,11 @@ ASPSX_RUNNER_LOOKUP = {
 }
 
 ASPSX_PSYQ_VERSION_LOOKUP = {
+    "1.05": "1.05",
     "1.07": "1.07",
+    "2.05": "2.05",
     "2.08": "2.08",
+    "2.30": "2.30",
     "2.21": "psyq3.3",
     "2.34": "psyq3.5",
     "2.56": "psyq4.0",
@@ -88,6 +94,20 @@ def read_text_section(data: bytes) -> bytes:
 
             if current_section == ".text":
                 return payload
+
+        elif opcode == 28:  #
+            unknown = int.from_bytes(
+                data[ptr : ptr + 2], byteorder="little"
+            )  # always 9?
+            ptr += 2
+
+            strlen = data[ptr]
+            ptr += 1
+
+            filename = data[ptr : ptr + strlen].decode("utf")
+            # print(f"filename: {filename}")
+
+            ptr += strlen
 
         else:
             print(f"UNKNOWN OPCODE {opcode}")

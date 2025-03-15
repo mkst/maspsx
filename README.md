@@ -41,8 +41,8 @@ Put any common symbols (in C, this means non-`static` global variables without a
 
 ### `--use-comm-for-lcomm`
 Also put `.lcomm`-declared symbols (in C, this means `static` variables without an initializer) in the `.comm` section.
-This can be convenient with games using `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
-Do note that this also makes the symbols global (unlike what `static` normally does).
+This can be convenient with games using non-zeo `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
+**NOTE:** This also makes the symbols **global* (unlike regular `static` behaviour).
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
@@ -50,23 +50,23 @@ Do note that this also makes the symbols global (unlike what `static` normally d
 
 ## Known Differences
 
-| Behavior / Version            | 1.07           | 2.08           | 2.21          | 2.34           | 2.56           | 2.67           | 2.77           | 2.79           | 2.81           | 2.86           |
-|:------------------------------|:--------------:|:--------------:|:-------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
-| div uses tge not break        | :white_circle: | :green_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| add nop before $at expansion  | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use addiu in $at expansion    | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| li 1 expands to ori 1         | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use $at for sltu < 0          | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| supports `-0` argument        | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| mflo+mfhi / mult+div inst gap | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| support for %hi/%lo macros    | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| use $gp for symbol+offset     | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| use $gp for la                | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
+| Behavior / Version            | 1.05/1.07      | 2.05/2.08      | 2.21          | 2.30/2.34      | 2.56           | 2.67           | 2.77/2.79      | 2.81/2.86      |
+|:------------------------------|:--------------:|:--------------:|:-------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
+| div uses tge not break        | :white_circle: | :green_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| add nop before $at expansion  | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use addiu in $at expansion    | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| li 1 expands to ori 1         | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use $at for sltu < 0          | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: |
+| supports `-0` argument        | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| mflo+mfhi / mult+div inst gap | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| support for %hi/%lo macros    | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: |
+| use $gp for symbol+offset     | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
+| use $gp for la                | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: |
 
 
 ## `INCLUDE_ASM` reordering workaround hack
 
-Whenever compiling with non-zero `-G` value, some versions of gcc reorder all functions to appear *after* data definitions in the output assembly. Unfortunately, this also causes functions to be placed *after* `__asm__` statements, thus breaking the usual implementation of the `INCLUDE_ASM` macro.
+Whenever compiling with non-zero `-G` value, some versions of `gcc` reorder all functions to appear *after* data definitions in the output assembly. Unfortunately, this also causes functions to be placed *after* `__asm__` statements, thus breaking the usual implementation of the `INCLUDE_ASM` macro.
 
 This can be worked around with maspsx by wrapping each `__asm__` statement in a function whose name starts with `__maspsx_include_asm_hack`, and appending `# maspsx-keep` to each line of the `__asm__` statement. Thus a working version of `INCLUDE_ASM` would look like:
 ````
@@ -93,6 +93,9 @@ Projects that use `maspsx` include:
   - [Croc: Legend of the Gobbos](https://github.com/Xeeynamo/croc)
   - [Legacy of Kain: Soul Reaver](https://github.com/FedericoMilesi/soul-re)
   - [Silent Hill](https://github.com/Vatuu/silent-hill-decomp)
+  - [Rayman 1](https://github.com/fuerchter/rayman-ps1-decomp)
+  - [Spyro The Dragon](https://github.com/TheMobyCollective/spyro-1)
+  - [MediEvil 1](https://github.com/MediEvilDecompilation/medievil-decomp)
 
 
 ## Bugs

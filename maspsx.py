@@ -96,18 +96,18 @@ def main() -> None:
 
     if args.aspsx_version:
         aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
-        if aspsx_version == (2, 8):
+        if (1, 10) < aspsx_version < (2, 10):
             div_uses_tge = True
-        if aspsx_version <= (2, 21):
+        if aspsx_version < (2, 30):
             nop_at_expansion = True
             nop_mflo_mfhi = False
             addiu_at = True
-        if aspsx_version > (2, 34):
+        if aspsx_version > (2, 30):
             expand_li = False
-        if aspsx_version >= (2, 77):
+        if aspsx_version >= (2, 70):
             sltu_at = False
             gp_allow_offset = True
-        if aspsx_version >= (2, 81):
+        if aspsx_version >= (2, 80):
             gp_allow_la = True
 
     if args.dont_expand_li and expand_li:
