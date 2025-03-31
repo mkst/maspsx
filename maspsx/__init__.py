@@ -716,6 +716,11 @@ class MaspsxProcessor:
                         skip = 0
                         break
 
+                    if op in ("mflo", "mfhi"):
+                        # allow for mflo/mfhi handling later on
+                        skip = 0
+                        break
+
                     if op == "li":
                         expanded = expand_load_immediate(inst)
 

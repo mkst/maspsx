@@ -194,3 +194,27 @@ class TestMflo(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_multu(self):
+        """
+        Handle a mflo/mfhi/mult combination
+        BUG: https://github.com/mkst/maspsx/issues/112
+        """
+        lines = [
+            "mfhi	$5",
+            "mflo	$4",
+            "#nop",
+            "#nop",
+            "mult	$6,$9",
+        ]
+        expected_lines = [
+            "mfhi\t$5",
+            "mflo\t$4",
+            "nop",
+            "nop",
+            "mult\t$6,$9",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
