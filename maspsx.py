@@ -102,7 +102,7 @@ def main() -> None:
             nop_at_expansion = True
             nop_mflo_mfhi = False
             addiu_at = True
-        if aspsx_version > (2, 30):
+        if aspsx_version >= (2, 50):
             expand_li = False
         if aspsx_version >= (2, 70):
             sltu_at = False
