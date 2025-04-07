@@ -230,6 +230,7 @@ def expand_load_immediate(line: str) -> List[str]:
 
 
 def expand_move(line: str):
+    line = strip_comments(line)
     op, *rest = line.split()
     if op == "move":
         args = " ".join(rest)

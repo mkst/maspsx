@@ -24,6 +24,22 @@ class TestMove(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_move_with_comment(self):
+        """
+        Ensure we can handle comments
+        """
+        lines = [
+            "move $2,$6 # sp not trusted here",
+        ]
+        expected_lines = [
+            "addu\t$2,$6,$zero",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_mflo_move(self):
         """
         Ensure we expand a move instruction when processing an mflo expansion
