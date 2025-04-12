@@ -134,6 +134,12 @@ def line_loads_from_reg(line, r_source) -> bool:
     return False
 
 
+def is_number(value: str) -> bool:
+    if re.match(r"^-?\d+$", value) or re.match(r"^-?0x[A-Fa-f0-9]+$", value):
+        return True
+    return False
+
+
 def uses_at(line: str) -> bool:
     line = strip_comments(line)
 
@@ -143,24 +149,25 @@ def uses_at(line: str) -> bool:
 
     # sw	$2,D_801813A4
     # sw	$3,g_CurrentRoom+40
-    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*([A-z0-9_+]+)$", line):
-        return True
-
-    if match := re.match(r"l[a-z]+\s+(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", line):
+    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*(-?[A-z0-9_+]+)$", line):
         operand = match.group(2)
+        if not is_number(operand):
+            return True
 
     # sb	$2,g_InputSaveName($3)
+    # sw	$2,-26($16)
     elif match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", line):
+        operand = match.group(2)
+
+    # lw	$2,-1000($16)
+    elif match := re.match(r"l[a-z]+\s+(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", line):
         operand = match.group(2)
 
     else:
         return False
 
-    if match := re.match(r"^-?\d+$", operand) or (
-        match := re.match(r"^-?0x[A-Fa-f0-9]+$", operand)
-    ):
-        # sw	$2,-26($16)
-        num = int(match.group(0), 0)
+    if is_number(operand):
+        num = int(operand, 0)
         if -32769 < num < 32768:
             return False
 

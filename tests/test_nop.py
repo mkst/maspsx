@@ -471,6 +471,37 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_at_large_sb_no_nop(self):
+        lines = [
+            "lhu	$2,16($sp)",
+            "#nop",
+            "sb	$2,-2147292186",
+        ]
+        expected_lines = [
+            "lhu	$2,16($sp)",
+            "sb	$2,-2147292186",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_at_small_sb_nop(self):
+        lines = [
+            "lhu	$2,16($sp)",
+            "#nop",
+            "sb	$2,10000",
+        ]
+        expected_lines = [
+            "lhu	$2,16($sp)",
+            "nop",
+            "sb	$2,10000",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_ctc2_nop(self):
         lines = [
             "lhu	$9,192($17)",
