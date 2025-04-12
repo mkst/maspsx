@@ -41,8 +41,8 @@ Put any common symbols (in C, this means non-`static` global variables without a
 
 ### `--use-comm-for-lcomm`
 Also put `.lcomm`-declared symbols (in C, this means `static` variables without an initializer) in the `.comm` section.
-This can be convenient with games using non-zeo `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
-**NOTE:** This also makes the symbols **global* (unlike regular `static` behaviour).
+This can be convenient with games using non-zero `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
+**NOTE:** This also makes the symbols *global* (unlike regular `static` behaviour).
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
