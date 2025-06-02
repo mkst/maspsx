@@ -455,6 +455,10 @@ class MaspsxProcessor:
                 in_sdata = False
                 continue
 
+            if line.startswith(".extern"):
+                in_sdata = False
+                continue
+
             if line.startswith(".comm") or line.startswith(".lcomm"):
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
                 in_sdata = False
