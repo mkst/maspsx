@@ -557,10 +557,10 @@ class TestNopMacro(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
-    def test_nop_macro_nop_afterwards(self):
+    def test_nop_macro_no_nop_afterwards_2(self):
         """
-        Ensure we do insert a nop between the *final* macro instruction at the
-        next instruction, when one is required
+        Ensure we do not insert a nop between the *final* macro instruction at the
+        next instruction, if one is not required
         """
         lines = [
             " #APP",
@@ -572,7 +572,6 @@ class TestNopMacro(unittest.TestCase):
         ]
         expected_lines = [
             "lwc2 $4, 0( $4 );lwc2 $5, 4( $4 )",
-            "nop",
             ".loc 1 1122",
             "LM439:",
             "addu $4,$5,8",
