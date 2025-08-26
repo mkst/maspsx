@@ -23,7 +23,6 @@ load_mnemonics = {
     "lw",
     "lwl",
     "lwr",
-    "lwc2",
 }
 store_mnemonics = {
     "sb",
@@ -94,6 +93,11 @@ def line_loads_from_reg(line, r_source) -> bool:
             return True
         # "line_loads_from_reg" is a bit of a lie
         if re.match(rf"^{r_source},.*$", rest):
+            return True
+
+    elif op == "lwc2":
+        # lwc2 $5, 4( $4
+        if re.match(rf"^.*\(\s*{r_source}\s*\)$", rest):
             return True
 
     elif op == "jal":
