@@ -770,12 +770,23 @@ class MaspsxProcessor:
                                     ]
                                 )
                             else:
-                                res.extend(
-                                    [
-                                        expand_move(inst),
-                                        "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction",
-                                    ]
-                                )
+                                maybe_label = self.get_next_instruction(skip=skip)
+                                if is_label(maybe_label):
+                                    res.extend(
+                                        [
+                                            expand_move(inst),
+                                            maybe_label,
+                                            "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (label)",
+                                        ]
+                                    )
+                                    skip += 1
+                                else:
+                                    res.extend(
+                                        [
+                                            expand_move(inst),
+                                            "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction",
+                                        ]
+                                    )
 
                 elif inst == next_next_instruction:
                     # reached mult/div/rem
