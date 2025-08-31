@@ -218,3 +218,29 @@ class TestMflo(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_div_div_label(self):
+        """
+        Ensure correct nop placement when encountering a label
+        BUG: https://github.com/mkst/maspsx/issues/121
+        """
+        lines = [
+            "	div	$16,$2,$4",
+            "	sll	$2,$17,12",
+            "$L15:",
+            "	div	$17,$2,$4",
+        ]
+        expected_lines = [
+            "div\t$zero,$2,$4",
+            "mflo\t$16",
+            "sll\t$2,$17,12",
+            "$L15:",
+            "nop",
+            "div\t$zero,$2,$4",
+            "mflo\t$17",
+        ]
+
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
