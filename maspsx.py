@@ -1,8 +1,10 @@
 import argparse
+import shutil
 import subprocess
 import sys
 
 from typing import List
+from pathlib import Path
 
 from maspsx import MaspsxProcessor
 
@@ -11,7 +13,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--aspsx-version", type=str)
     parser.add_argument("--run-assembler", action="store_true")
-    parser.add_argument("--gnu-as-path", default="mips-linux-gnu-as")
+    parser.add_argument("--gnu-as-path", default="mipsel-linux-gnu-as")
     parser.add_argument("--dont-force-G0", action="store_true")
     parser.add_argument("--expand-div", action="store_true")
     parser.add_argument("--macro-inc", action="store_true")
@@ -143,9 +145,13 @@ def main() -> None:
         sys.stderr.write(out_text)
 
     if args.run_assembler:
+        gnu_as_path = Path(args.gnu_as_path)
+        if not gnu_as_path.is_file() and not shutil.which(args.gnu_as_path):
+            sys.stderr.write(f"MASPSX: {args.gnu_as_path} not found")
+            sys.exit(1)
+
         cmd = [
             args.gnu_as_path,
-            "-EL",  # TODO: switch from 'mips-linux-gnu-as' to 'mipsel-linux-gnu-as'
             *filtered_as_args,
             "-",  # read from stdin
         ]
