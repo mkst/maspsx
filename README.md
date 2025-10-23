@@ -22,10 +22,10 @@ There are a number of reasons why using `maspsx` with GNU `as` is preferable to 
 **EXPERIMENTAL** There are slight nuances in behaviour across `ASPSX` versions. In order to emulate the correct behaviour, pass the `ASPSX` version to `maspsx`, e.g. `--aspsx-version=2.78`.
 
 ### `--run-assembler`
-The default behaviour of `maspsx` is to write the output to stdout, by passing `--run-assembler`, `maspsx` will run `mips-linux-gnu-as` directly.
+The default behaviour of `maspsx` is to write the output to stdout, by passing `--run-assembler`, `maspsx` will run `mipsel-linux-gnu-as` directly.
 
 ### `--gnu-as-path`
-If `mips-linux-gnu-as` isn't on your path, or you want to use a different assembler (e.g. `mipsel-linux-gnu-as`), specify the full path here.
+If `mipsel-linux-gnu-as` isn't on your path, or you want to use a different assembler (e.g. `mips-linux-gnu-as`), specify the **full path** here.
 
 ### `--dont-force-G0`
 Current understanding is that `-G0` needs to be passed to GNU `as` in order to get correct behaviour. If you need to pass a non-zero value for `-G` to the GNU assembler, use this flag.
