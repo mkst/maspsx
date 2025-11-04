@@ -559,8 +559,8 @@ class MaspsxProcessor:
                 if self.use_comm_section and (
                     symbol in self.comm_symbols or self.use_comm_for_lcomm
                 ):
-                    # default to 1-byte alignment for COMMON
-                    res.append(f"\t.comm {symbol},{size},1")
+                    # implicit alignment for COMMON
+                    res.append(f"\t.comm {symbol},{size}")
                     continue
 
                 if section == "sbss":
