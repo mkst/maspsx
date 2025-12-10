@@ -153,7 +153,8 @@ def uses_at(line: str) -> bool:
 
     # sw	$2,D_801813A4
     # sw	$3,g_CurrentRoom+40
-    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*(-?[A-z0-9_+]+)$", line):
+    # sw	$2,D_us_8017863C.4
+    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*(-?[A-z0-9_.+]+)$", line):
         operand = match.group(2)
         if not is_number(operand):
             return True
