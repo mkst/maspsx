@@ -96,3 +96,7 @@ class TestMaspsxUsesAt(unittest.TestCase):
     def test_uses_at_lw_large_offset(self):
         line = "lw	$2,-32769($16)"
         self.assertTrue(uses_at(line))
+
+    def test_uses_at_sw_struct_offset(self):
+        line = "sw	$2,D_us_8017863C.4"
+        self.assertTrue(uses_at(line))
