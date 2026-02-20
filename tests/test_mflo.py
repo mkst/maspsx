@@ -244,3 +244,23 @@ class TestMflo(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_mult_branch_label(self):
+        lines = [
+            "	mflo	$20",
+            "	#nop",
+            "	bne	$2,$0,$L78",
+            "$L83:",
+            "	mult	$16,$16",
+        ]
+        expected_lines = [
+            "mflo\t$20",
+            "bne\t$2,$0,$L78",
+            "nop",
+            "$L83:",
+            "mult\t$16,$16",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

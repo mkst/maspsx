@@ -712,14 +712,16 @@ class MaspsxProcessor:
             next_next_instruction.startswith(x)
             for x in ["mult\t", "multu\t", "div\t", "divu\t", "rem\t", "remu\t"]
         ):
+
             # #nop
             # #nop
-            # addu or lh ...
+            # bne or addu or lh ...
             # mult ...
             skip = 0
             no_reorder = False
             while True:
                 inst = self.get_next_instruction(skip=skip)
+
                 if inst.startswith(".set") and inst.endswith("noreorder"):
                     no_reorder = True
                     skip += 1
@@ -754,7 +756,9 @@ class MaspsxProcessor:
                             res.append(
                                 "nop  # DEBUG: mflo/mfhi with mult/div/rem and li expands to 1 op"
                             )
+
                     else:
+
                         if no_reorder:
                             res.append(
                                 "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (noreorder)"
@@ -771,23 +775,31 @@ class MaspsxProcessor:
                                     ]
                                 )
                             else:
-                                maybe_label = self.get_next_instruction(skip=skip)
-                                if is_label(maybe_label):
+                                if op in branch_mnemonics:
                                     res.extend(
                                         [
-                                            expand_move(inst),
-                                            maybe_label,
-                                            "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (label)",
+                                            inst,
+                                            "nop # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (branch)",
                                         ]
                                     )
-                                    skip += 1
                                 else:
-                                    res.extend(
-                                        [
-                                            expand_move(inst),
-                                            "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction",
-                                        ]
-                                    )
+                                    maybe_label = self.get_next_instruction(skip=skip)
+                                    if is_label(maybe_label):
+                                        res.extend(
+                                            [
+                                                expand_move(inst),
+                                                maybe_label,
+                                                "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction (label)",
+                                            ]
+                                        )
+                                        skip += 1
+                                    else:
+                                        res.extend(
+                                            [
+                                                expand_move(inst),
+                                                "nop  # DEBUG: mflo/mfhi with mult/div/rem and 1 instruction",
+                                            ]
+                                        )
 
                 elif inst == next_next_instruction:
                     # reached mult/div/rem
