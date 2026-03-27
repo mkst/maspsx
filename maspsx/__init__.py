@@ -112,6 +112,10 @@ def line_loads_from_reg(line, r_source) -> bool:
         if re.match(rf"^{r_source},.*$", rest):
             return True
 
+    elif op in ("mtlo", "mthi"):
+        if re.match(rf"^{r_source}$", rest):
+            return True
+
     elif op in branch_mnemonics:
         if re.match(rf"^{r_source},.*$", rest):
             return True
