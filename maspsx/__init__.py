@@ -63,13 +63,13 @@ double_reg_loads = {
 }
 
 
-def strip_comments(line) -> str:
+def strip_comments(line: str) -> str:
     if line.count("#") > 0:
         line = line.split("#")[0]
     return line.strip()
 
 
-def line_loads_from_reg(line, r_source) -> bool:
+def line_loads_from_reg(line: str, r_source: str) -> bool:
     """
     NOTE: Returns True even if line might use $at expansion
     """
@@ -183,7 +183,7 @@ def uses_at(line: str) -> bool:
     return True
 
 
-def parse_load_or_store(rest):
+def parse_load_or_store(rest: str):
     if match := re.match(r"(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^(]+)\)", rest):
         r_dest, operand, r_source = match.group(1, 2, 3)
         needs_expanding = False
@@ -823,7 +823,7 @@ class MaspsxProcessor:
 
         return res
 
-    def process_line(self, line):
+    def process_line(self, line: str):
         res = []
 
         if len(line) == 0:
@@ -849,7 +849,7 @@ class MaspsxProcessor:
 
             elif line.startswith(".file\t"):
                 # fix same-numbered files
-                _, num, filename = line.split()
+                _, file_num, filename = line.split(maxsplit=2)
                 res.append(f".file\t{self.file_num} {filename}")
                 self.file_num += 1
 
@@ -891,9 +891,8 @@ class MaspsxProcessor:
         op, *rest = line.split()
 
         if op in load_mnemonics:
-            rest = " ".join(rest)
             r_source, r_dest, operand, is_addend, needs_expanding = parse_load_or_store(
-                rest
+                " ".join(rest)
             )
 
             next_instruction = self.get_next_instruction(
@@ -995,8 +994,9 @@ class MaspsxProcessor:
                 res.extend(extra_nops)
 
         elif op in store_mnemonics or (op == "la" and self.sdata_limit > 0):
-            rest = " ".join(rest)
-            r_source, r_dest, operand, is_addend, _ = parse_load_or_store(rest)
+            r_source, r_dest, operand, is_addend, _ = parse_load_or_store(
+                " ".join(rest)
+            )
 
             if is_addend and r_source is None:
                 # e.g. sw	$v0,D_800E52E0
