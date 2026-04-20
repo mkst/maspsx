@@ -106,8 +106,9 @@ def main() -> None:
             addiu_at = True
         if aspsx_version >= (2, 50):
             expand_li = False
-        if aspsx_version >= (2, 70):
+        if aspsx_version >= (2, 60):
             sltu_at = False
+        if aspsx_version >= (2, 70):
             gp_allow_offset = True
         if aspsx_version >= (2, 80):
             gp_allow_la = True
