@@ -56,7 +56,7 @@ This can be convenient with games using non-zero `-G` in situations where a vari
 | add nop before $at expansion  | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | use addiu in $at expansion    | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
 | li 1 expands to ori 1         | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use $at for sltu < 0          | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: |
+| use $at for sltu < 0          | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: |
 | supports `-0` argument        | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
 | mflo+mfhi / mult+div inst gap | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
 | support for %hi/%lo macros    | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: |
