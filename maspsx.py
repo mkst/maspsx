@@ -3,10 +3,48 @@ import shutil
 import subprocess
 import sys
 
+from dataclasses import dataclass
 from typing import List
 from pathlib import Path
 
 from maspsx import MaspsxProcessor
+
+
+@dataclass
+class AspsxVersionConfig:
+    div_uses_tge: bool = False
+    nop_at_expansion: bool = False
+    nop_mflo_mfhi: bool = True
+    sltu_at: bool = True
+    expand_li: bool = True
+    gp_allow_offset: bool = False
+    gp_allow_la: bool = False
+    addiu_at: bool = False
+
+
+def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfig:
+    config = AspsxVersionConfig()
+
+    if aspsx_version_arg is None:
+        return config
+
+    aspsx_version = tuple(int(x) for x in aspsx_version_arg.split("."))
+    if (1, 10) < aspsx_version < (2, 10):
+        config.div_uses_tge = True
+    if aspsx_version < (2, 30):
+        config.nop_at_expansion = True
+        config.nop_mflo_mfhi = False
+        config.addiu_at = True
+    if aspsx_version >= (2, 50):
+        config.expand_li = False
+    if aspsx_version >= (2, 60):
+        config.sltu_at = False
+    if aspsx_version >= (2, 70):
+        config.gp_allow_offset = True
+    if aspsx_version >= (2, 80):
+        config.gp_allow_la = True
+
+    return config
 
 
 def main() -> None:
@@ -87,47 +125,23 @@ def main() -> None:
 
         filtered_as_args.append(arg)
 
-    div_uses_tge = False  # use tge instruction instead of break in divide
-    nop_at_expansion = False  # insert nop between v0/at?
-    nop_mflo_mfhi = True  # ensure 2 ops between mfhi/mflo and div/mult
-    sltu_at = True  # sltu uses at?
-    expand_li = True  # turn li into lui/ori
-    gp_allow_offset = False  # use gp for sym+offset?
-    gp_allow_la = False  # use gp for la
-    addiu_at = False  # use addiu when expanding lw to use $at
+    version_config = config_for_aspsx_version(args.aspsx_version)
 
-    if args.aspsx_version:
-        aspsx_version = tuple(int(x) for x in args.aspsx_version.split("."))
-        if (1, 10) < aspsx_version < (2, 10):
-            div_uses_tge = True
-        if aspsx_version < (2, 30):
-            nop_at_expansion = True
-            nop_mflo_mfhi = False
-            addiu_at = True
-        if aspsx_version >= (2, 50):
-            expand_li = False
-        if aspsx_version >= (2, 60):
-            sltu_at = False
-        if aspsx_version >= (2, 70):
-            gp_allow_offset = True
-        if aspsx_version >= (2, 80):
-            gp_allow_la = True
-
-    if args.dont_expand_li and expand_li:
-        expand_li = False
+    if args.dont_expand_li and version_config.expand_li:
+        version_config.expand_li = False
 
     maspsx_processor = MaspsxProcessor(
         in_lines,
         sdata_limit=sdata_limit,
         expand_div=args.expand_div,
-        expand_li=expand_li,
-        nop_at_expansion=nop_at_expansion,
-        nop_mflo_mfhi=nop_mflo_mfhi,
-        sltu_at=sltu_at,
-        addiu_at=addiu_at,
-        div_uses_tge=div_uses_tge,
-        gp_allow_offset=gp_allow_offset,
-        gp_allow_la=gp_allow_la,
+        expand_li=version_config.expand_li,
+        nop_at_expansion=version_config.nop_at_expansion,
+        nop_mflo_mfhi=version_config.nop_mflo_mfhi,
+        sltu_at=version_config.sltu_at,
+        addiu_at=version_config.addiu_at,
+        div_uses_tge=version_config.div_uses_tge,
+        gp_allow_offset=version_config.gp_allow_offset,
+        gp_allow_la=version_config.gp_allow_la,
         use_comm_section=args.use_comm_section,
         use_comm_for_lcomm=args.use_comm_for_lcomm,
     )
@@ -168,6 +182,8 @@ def main() -> None:
                 sys.stdout.write(stdout.decode("utf"))
             if len(stderr):
                 sys.stderr.write(stderr.decode("utf"))
+            if process.returncode != 0:
+                sys.exit(process.returncode)
     else:
         sys.stdout.write(out_text)
 

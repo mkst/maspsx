@@ -472,7 +472,7 @@ class MaspsxProcessor:
                 # e.g.	.comm	MENU_RadarScale_800AB480,4
                 in_sdata = False
                 _, var = line.split()
-                symbol, size_str = var.split(",")
+                symbol, size_str, *_ = var.split(",")
                 size = int(size_str)
                 if size <= self.sdata_limit:
                     self.sbss_entries[symbol] = size
@@ -967,7 +967,7 @@ class MaspsxProcessor:
                 res.extend(extra_nops)
 
             else:
-                if r_source and (int(operand) > 32767 or int(operand) < -32768):
+                if r_source and (int(operand, 0) > 32767 or int(operand, 0) < -32768):
                     # e.g. lhu	$2,49344($2)
                     res.extend(
                         [
@@ -1035,7 +1035,7 @@ class MaspsxProcessor:
                     )
                 else:
                     res.append(line)
-            elif r_source and (int(operand) > 32767 or int(operand) < -32768):
+            elif r_source and (int(operand, 0) > 32767 or int(operand, 0) < -32768):
                 # e.g. sw	$2,56200($4)
                 res.extend(
                     [

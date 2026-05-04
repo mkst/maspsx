@@ -119,6 +119,23 @@ class TestAt(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_at_expansion_hex_offset(self):
+        lines = [
+            "lh	$2,0x8000($2)",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(0x8000)",
+            "addu\t$at,$2,$at",
+            "lh\t$2,%lo(0x8000)($at)",
+            ".set\tat",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_at_expansion_no_nop_negative(self):
         """
         The 2nd value being loaded is less than -0x8000 therefore $at is used

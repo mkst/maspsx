@@ -46,6 +46,7 @@ This can be convenient with games using non-zero `-G` in situations where a vari
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
+Pass this as a single argument, e.g. `-G8`, rather than `-G 8`.
 
 
 ## Known Differences
