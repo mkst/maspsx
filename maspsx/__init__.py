@@ -847,6 +847,12 @@ class MaspsxProcessor:
                 elif line.endswith("\treorder"):
                     self.is_reorder = True
 
+            elif line == ".set noreorder":
+                self.is_reorder = False
+
+            elif line == ".set reorder":
+                self.is_reorder = True
+
             elif line.startswith(".file\t"):
                 # fix same-numbered files
                 _, file_num, filename = line.split(maxsplit=2)
