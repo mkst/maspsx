@@ -376,6 +376,39 @@ def load_immediate_double(line: str):
     return res
 
 
+def is_coff_directive(line: str):
+    # skip coff directives - gnu as does not like them
+    if not line.startswith("."):
+        return False
+    return (
+        line.startswith(".def\t")
+        or line.startswith(".begin\t")
+        or line.startswith(".bend\t")
+    )
+
+
+class PassthroughProcessor:
+
+    def __init__(self, lines: List[str]):
+        self.lines = [x.strip() for x in lines]
+
+    def process_lines(self) -> List[str]:
+        res = []
+
+        for line in self.lines:
+            res += self.process_line(line)
+
+        return res
+
+    def process_line(self, line: str):
+        res = []
+
+        if not is_coff_directive(line):
+            res.append(line)
+
+        return res
+
+
 class MaspsxProcessor:
     is_reorder = True
     skip_instructions = 0
@@ -833,12 +866,7 @@ class MaspsxProcessor:
             return []
 
         if line.startswith("."):
-            if (
-                line.startswith(".def\t")
-                or line.startswith(".begin\t")
-                or line.startswith(".bend\t")
-            ):
-                # skip these coff directives - gnu as does not like them
+            if is_coff_directive(line):
                 pass
 
             elif line.startswith(".set\t"):

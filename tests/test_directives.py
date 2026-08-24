@@ -1,9 +1,32 @@
 import unittest
 
-from maspsx import MaspsxProcessor
+from maspsx import MaspsxProcessor, PassthroughProcessor
 
 
 class TestDirectives(unittest.TestCase):
+
+    def test_passthrough_processor_only_removes_coff_directives(self):
+        lines = [
+            '  .file 1 "test.c"',
+            "\t.def\tfoo",
+            "\t.begin\tfoo",
+            "foo:",
+            "\tmove\t$2, $3  # preserve",
+            "\t.bend\tfoo",
+            "",
+        ]
+
+        processor = PassthroughProcessor(lines)
+
+        self.assertEqual(
+            [
+                '.file 1 "test.c"',
+                "foo:",
+                "move\t$2, $3  # preserve",
+                "",
+            ],
+            processor.process_lines(),
+        )
 
     def test_file_directive(self):
         line = '.file\t1 "/tmp/code.c"'

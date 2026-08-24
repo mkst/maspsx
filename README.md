@@ -24,6 +24,9 @@ There are a number of reasons why using `maspsx` with GNU `as` is preferable to 
 ### `--run-assembler`
 The default behaviour of `maspsx` is to write the output to stdout, by passing `--run-assembler`, `maspsx` will run `mipsel-linux-gnu-as` directly.
 
+### `--passthrough`
+Pass assembly through unchanged.
+
 ### `--gnu-as-path`
 If `mipsel-linux-gnu-as` isn't on your path, or you want to use a different assembler (e.g. `mips-linux-gnu-as`), specify the **full path** here.
 
