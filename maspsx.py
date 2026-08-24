@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import List
 from pathlib import Path
 
-from maspsx import MaspsxProcessor
+from maspsx import MaspsxProcessor, PassthroughProcessor
 
 
 @dataclass
@@ -57,6 +57,7 @@ def main() -> None:
     parser.add_argument("--macro-inc", action="store_true")
     parser.add_argument("--dont-expand-li", action="store_true")
     parser.add_argument("--force-stdin", action="store_true")
+    parser.add_argument("--passthrough", action="store_true")
     parser.add_argument("--use-comm-section", action="store_true")
     parser.add_argument("--use-comm-for-lcomm", action="store_true")
     # decomp.me debugging
@@ -125,28 +126,34 @@ def main() -> None:
 
         filtered_as_args.append(arg)
 
-    version_config = config_for_aspsx_version(args.aspsx_version)
+    if args.passthrough:
+        processor = PassthroughProcessor(in_lines)
 
-    if args.dont_expand_li and version_config.expand_li:
-        version_config.expand_li = False
+    else:
+        version_config = config_for_aspsx_version(args.aspsx_version)
 
-    maspsx_processor = MaspsxProcessor(
-        in_lines,
-        sdata_limit=sdata_limit,
-        expand_div=args.expand_div,
-        expand_li=version_config.expand_li,
-        nop_at_expansion=version_config.nop_at_expansion,
-        nop_mflo_mfhi=version_config.nop_mflo_mfhi,
-        sltu_at=version_config.sltu_at,
-        addiu_at=version_config.addiu_at,
-        div_uses_tge=version_config.div_uses_tge,
-        gp_allow_offset=version_config.gp_allow_offset,
-        gp_allow_la=version_config.gp_allow_la,
-        use_comm_section=args.use_comm_section,
-        use_comm_for_lcomm=args.use_comm_for_lcomm,
-    )
+        if args.dont_expand_li and version_config.expand_li:
+            version_config.expand_li = False
+
+        processor = MaspsxProcessor(
+            in_lines,
+            sdata_limit=sdata_limit,
+            expand_div=args.expand_div,
+            expand_li=version_config.expand_li,
+            nop_at_expansion=version_config.nop_at_expansion,
+            nop_mflo_mfhi=version_config.nop_mflo_mfhi,
+            sltu_at=version_config.sltu_at,
+            addiu_at=version_config.addiu_at,
+            div_uses_tge=version_config.div_uses_tge,
+            gp_allow_offset=version_config.gp_allow_offset,
+            gp_allow_la=version_config.gp_allow_la,
+            use_comm_section=args.use_comm_section,
+            use_comm_for_lcomm=args.use_comm_for_lcomm,
+        )
+
     try:
-        out_lines = maspsx_processor.process_lines()
+        out_lines = processor.process_lines()
+
     except Exception as err:
         sys.stderr.write(f"MASPSX: An exception occurred: {err}\n")
         sys.exit(1)
