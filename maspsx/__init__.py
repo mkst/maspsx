@@ -69,7 +69,7 @@ def strip_comments(line: str) -> str:
     return line.strip()
 
 
-def line_loads_from_reg(line: str, r_source: str) -> bool:
+def line_loads_from_reg(line: str, r_source: str, loads_to_reg=False) -> bool:
     """
     NOTE: Returns True even if line might use $at expansion
     """
@@ -86,6 +86,10 @@ def line_loads_from_reg(line: str, r_source: str) -> bool:
     if op in load_mnemonics:
         # lwl	$9,7($2)
         if re.match(rf"^.*\(\s*{r_source}\s*\)$", rest):
+            return True
+
+        # ASPSX < 2.30 behaviour
+        if loads_to_reg and re.match(rf"^{r_source},.*$", rest):
             return True
 
     elif op in store_mnemonics:
@@ -423,6 +427,7 @@ class MaspsxProcessor:
         expand_li=False,
         nop_at_expansion=False,
         nop_mflo_mfhi=True,
+        nop_lw_lw=False,
         sltu_at=False,
         addiu_at=False,
         div_uses_tge=False,
@@ -440,6 +445,7 @@ class MaspsxProcessor:
 
         self.nop_at_expansion = nop_at_expansion
         self.nop_mflo_mfhi = nop_mflo_mfhi
+        self.nop_lw_lw = nop_lw_lw
 
         self.sltu_at = sltu_at
         self.addiu_at = addiu_at
@@ -677,7 +683,7 @@ class MaspsxProcessor:
     ) -> List[str]:
         res: List[str] = []
 
-        if line_loads_from_reg(next_instruction, r_dest):
+        if line_loads_from_reg(next_instruction, r_dest, loads_to_reg=self.nop_lw_lw):
             nop_required = False
 
             if not uses_at(next_instruction):
@@ -803,7 +809,9 @@ class MaspsxProcessor:
                             res.append(".set\tnoreorder")
                             res.append(expand_move(inst))
                         else:
-                            if r_source and line_loads_from_reg(inst, r_source):
+                            if r_source and line_loads_from_reg(
+                                inst, r_source, loads_to_reg=self.nop_lw_lw
+                            ):
                                 # NOTE: only relevant when div has been expanded (i.e. -0 flag)
                                 res.extend(
                                     [

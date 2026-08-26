@@ -15,6 +15,7 @@ class AspsxVersionConfig:
     div_uses_tge: bool = False
     nop_at_expansion: bool = False
     nop_mflo_mfhi: bool = True
+    nop_lw_lw: bool = False
     sltu_at: bool = True
     expand_li: bool = True
     gp_allow_offset: bool = False
@@ -35,6 +36,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.nop_at_expansion = True
         config.nop_mflo_mfhi = False
         config.addiu_at = True
+        config.nop_lw_lw = True
     if aspsx_version >= (2, 50):
         config.expand_li = False
     if aspsx_version >= (2, 60):
@@ -142,6 +144,7 @@ def main() -> None:
             expand_li=version_config.expand_li,
             nop_at_expansion=version_config.nop_at_expansion,
             nop_mflo_mfhi=version_config.nop_mflo_mfhi,
+            nop_lw_lw=version_config.nop_lw_lw,
             sltu_at=version_config.sltu_at,
             addiu_at=version_config.addiu_at,
             div_uses_tge=version_config.div_uses_tge,

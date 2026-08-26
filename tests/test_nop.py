@@ -531,6 +531,59 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_lw_lw_nop(self):
+        lines = [
+            "	#.set	volatile",
+            "	lw	$2,Savemap+2944",
+            "	#.set	novolatile",
+            "",
+            "	.loc	2 32",
+            "LM18:",
+            "	#nop",
+            "	#.set	volatile",
+            "	lw	$2,0($3)",
+            "	#.set	novolatile",
+        ]
+        expected_lines = [
+            "lw\t$2,Savemap+2944",
+            "nop",
+            "",
+            ".loc\t2 32",
+            "LM18:",
+            "lw\t$2,0($3)",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_lw_lw=True)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_lw_lw_no_nop(self):
+        lines = [
+            "	#.set	volatile",
+            "	lw	$2,Savemap+2944",
+            "	#.set	novolatile",
+            "",
+            "	.loc	2 32",
+            "LM18:",
+            "	#nop",
+            "	#.set	volatile",
+            "	lw	$2,0($3)",
+            "	#.set	novolatile",
+        ]
+        expected_lines = [
+            "lw\t$2,Savemap+2944",
+            "",
+            ".loc\t2 32",
+            "LM18:",
+            "lw\t$2,0($3)",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_lw_lw=False)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
 
 class TestNopMacro(unittest.TestCase):
     def test_nop_macro_no_nop_afterwards(self):
