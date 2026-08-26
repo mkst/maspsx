@@ -25,17 +25,20 @@ class TestCli(unittest.TestCase):
             "1.05": self.maspsx_cli.AspsxVersionConfig(
                 nop_at_expansion=True,
                 nop_mflo_mfhi=False,
+                nop_lw_lw=True,
                 addiu_at=True,
             ),
             "2.05": self.maspsx_cli.AspsxVersionConfig(
                 div_uses_tge=True,
                 nop_at_expansion=True,
                 nop_mflo_mfhi=False,
+                nop_lw_lw=True,
                 addiu_at=True,
             ),
             "2.21": self.maspsx_cli.AspsxVersionConfig(
                 nop_at_expansion=True,
                 nop_mflo_mfhi=False,
+                nop_lw_lw=True,
                 addiu_at=True,
             ),
             "2.30": self.maspsx_cli.AspsxVersionConfig(),
