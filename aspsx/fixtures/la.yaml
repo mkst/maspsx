@@ -1,0 +1,17 @@
+source: ASM/LA.S
+options:
+  data_limit: "-G999"
+cases:
+  "1.07": &la_1_07_expected
+    - "0x3C040000"  # lui         $a0, 0x0
+    - "0x24840000"  # addiu       $a0, $a0, 0x0
+  "2.08": *la_1_07_expected
+  "2.21": *la_1_07_expected
+  "2.34": *la_1_07_expected
+  "2.56": *la_1_07_expected
+  "2.67": *la_1_07_expected
+  "2.77": *la_1_07_expected
+  "2.79": *la_1_07_expected
+  "2.81": &la_2_81_expected
+    - "0x27840000"  # addiu       $a0, $gp, 0x0
+  "2.86": *la_2_81_expected

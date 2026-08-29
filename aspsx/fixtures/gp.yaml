@@ -1,0 +1,23 @@
+source: ASM/GP.S
+options:
+  data_limit: "-G999"
+cases:
+  "1.07": &gp_1_07_expected
+    - "0x3C020000"  # lui         $v0, 0x0
+    - "0x8C420000"  # lw          $v0, 0x0($v0)
+    - "0x3C040000"  # lui         $a0, 0x0
+    - "0x8C840000"  # lw          $a0, 0x0($a0)
+  "2.08": *gp_1_07_expected
+  "2.21": &gp_2_21_expected
+    - "0x8F820000"  # lw          $v0, 0x0($gp)
+    - "0x3C040000"  # lui         $a0, 0x0
+    - "0x8C840000"  # lw          $a0, 0x0($a0)
+  "2.34": *gp_2_21_expected
+  "2.56": *gp_2_21_expected
+  "2.67": *gp_2_21_expected
+  "2.77": &gp_2_77_expected
+    - "0x8F820000"  # lw          $v0, 0x0($gp)
+    - "0x8F840000"  # lw          $a0, 0x0($gp)
+  "2.79": *gp_2_77_expected
+  "2.81": *gp_2_77_expected
+  "2.86": *gp_2_77_expected

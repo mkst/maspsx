@@ -1,0 +1,21 @@
+source: ASM/MFLOMT.S
+cases:
+  "1.05": &mflomt_old_expected
+    - "0x00001012"  # mflo        $v0
+    - "0x00640018"  # mult        $v1, $a0
+  "1.07": *mflomt_old_expected
+  "2.05": *mflomt_old_expected
+  "2.08": *mflomt_old_expected
+  "2.21": *mflomt_old_expected
+  "2.30": &mflomt_new_expected
+    - "0x00001012"  # mflo        $v0
+    - "0x00000000"  # nop
+    - "0x00000000"  # nop
+    - "0x00640018"  # mult        $v1, $a0
+  "2.34": *mflomt_new_expected
+  "2.56": *mflomt_new_expected
+  "2.67": *mflomt_new_expected
+  "2.77": *mflomt_new_expected
+  "2.79": *mflomt_new_expected
+  "2.81": *mflomt_new_expected
+  "2.86": *mflomt_new_expected

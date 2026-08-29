@@ -1,0 +1,22 @@
+source: ASM/V0_AT.S
+options:
+  data_limit: "-G8"
+cases:
+  "2.08": &v0_at_2_08_expected
+    - "0x3C020000"  # lui         $v0, 0x0
+    - "0x8C420000"  # lw          $v0, 0x0($v0)
+    - "0x00000000"  # nop
+    - "0x3C010000"  # lui         $at, 0x0
+    - "0xAC220000"  # sw          $v0, 0x0($at)
+  "2.21": *v0_at_2_08_expected
+  "2.34": &v0_at_2_34_expected
+    - "0x3C020000"  # lui         $v0, 0x0
+    - "0x8C420000"  # lw          $v0, 0x0($v0)
+    - "0x3C010000"  # lui         $at, 0x0
+    - "0xAC220000"  # sw          $v0, 0x0($at)
+  "2.56": *v0_at_2_34_expected
+  "2.67": *v0_at_2_34_expected
+  "2.77": *v0_at_2_34_expected
+  "2.79": *v0_at_2_34_expected
+  "2.81": *v0_at_2_34_expected
+  "2.86": *v0_at_2_34_expected

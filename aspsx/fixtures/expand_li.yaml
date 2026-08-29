@@ -1,0 +1,36 @@
+source: ASM/EXPND_LI.S
+cases:
+  "1.07": &expand_li_1_07_expected
+    - "0x34020000"  # ori         $v0, $zero, 0x0
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x34420001"  # ori         $v0, $v0, 0x1
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x34421000"  # ori         $v0, $v0, 0x1000
+    - "0x2402FFFF"  # addiu       $v0, $zero, -0x1
+    - "0x24028000"  # addiu       $v0, $zero, -0x8000
+    - "0x3C02FFFF"  # lui         $v0, 0xFFFF
+    - "0x34427FFF"  # ori         $v0, $v0, 0x7FFF
+    - "0x3C02FFFF"  # lui         $v0, 0xFFFF
+    - "0x34427000"  # ori         $v0, $v0, 0x7000
+  "2.08": *expand_li_1_07_expected
+  "2.21": *expand_li_1_07_expected
+  "2.34": *expand_li_1_07_expected
+  "2.56": &expand_li_2_56_expected
+    - "0x24020000"  # addiu       $v0, $zero, 0x0
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x34420001"  # ori         $v0, $v0, 0x1
+    - "0x3C020001"  # lui         $v0, 0x1
+    - "0x34421000"  # ori         $v0, $v0, 0x1000
+    - "0x2402FFFF"  # addiu       $v0, $zero, -0x1
+    - "0x24028000"  # addiu       $v0, $zero, -0x8000
+    - "0x3C02FFFF"  # lui         $v0, 0xFFFF
+    - "0x34427FFF"  # ori         $v0, $v0, 0x7FFF
+    - "0x3C02FFFF"  # lui         $v0, 0xFFFF
+    - "0x34427000"  # ori         $v0, $v0, 0x7000
+  "2.67": *expand_li_2_56_expected
+  "2.77": *expand_li_2_56_expected
+  "2.79": *expand_li_2_56_expected
+  "2.81": *expand_li_2_56_expected
+  "2.86": *expand_li_2_56_expected

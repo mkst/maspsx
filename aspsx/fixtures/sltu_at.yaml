@@ -1,0 +1,20 @@
+source: ASM/SLTU_AT.S
+cases:
+  "1.07": &sltu_at_1_07_expected
+    - "0x34030064"  # ori         $v1, $zero, 0x64
+    - "0x2401FFE9"  # addiu       $at, $zero, -0x17
+    - "0x0061182B"  # sltu        $v1, $v1, $at
+  "2.08": *sltu_at_1_07_expected
+  "2.21": *sltu_at_1_07_expected
+  "2.34": *sltu_at_1_07_expected
+  "2.56":
+    - "0x24030064"  # addiu       $v1, $zero, 0x64
+    - "0x2401FFE9"  # addiu       $at, $zero, -0x17
+    - "0x0061182B"  # sltu        $v1, $v1, $at
+  "2.67": &sltu_at_2_67_expected
+    - "0x24030064"  # addiu       $v1, $zero, 0x64
+    - "0x2C63FFE9"  # sltiu       $v1, $v1, -0x17
+  "2.77": *sltu_at_2_67_expected
+  "2.79": *sltu_at_2_67_expected
+  "2.81": *sltu_at_2_67_expected
+  "2.86": *sltu_at_2_67_expected
