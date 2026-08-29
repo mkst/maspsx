@@ -41,14 +41,19 @@ def check() -> list[tuple[bool, str]]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--strict", action="store_true",
-                        help="return failure when any dependency is missing")
+    parser.add_argument(
+        "--strict",
+        action="store_true",
+        help="return failure when any dependency is missing",
+    )
     args = parser.parse_args(argv)
     results = check()
     for ok, label in results:
         print(f"{'OK' if ok else 'MISSING':7} {label}")
     missing = sum(not ok for ok, _ in results)
-    print(f"\n{len(results)} checks: {len(results) - missing} available, {missing} missing")
+    print(
+        f"\n{len(results)} checks: {len(results) - missing} available, {missing} missing"
+    )
     return 1 if args.strict and missing else 0
 
 

@@ -25,10 +25,16 @@ class AssemblerCase:
 def _load_fixture(path: Path) -> dict:
     with path.open(encoding="utf-8") as stream:
         fixture = yaml.safe_load(stream)
-    if not isinstance(fixture, dict) or "source" not in fixture or "cases" not in fixture:
+    if (
+        not isinstance(fixture, dict)
+        or "source" not in fixture
+        or "cases" not in fixture
+    ):
         raise ValueError(f"invalid fixture file {path}: expected source and cases")
     if not isinstance(fixture["source"], str) or not fixture["source"]:
-        raise ValueError(f"invalid fixture file {path}: source must be a non-empty string")
+        raise ValueError(
+            f"invalid fixture file {path}: source must be a non-empty string"
+        )
     if not isinstance(fixture["cases"], dict) or not fixture["cases"]:
         raise ValueError(f"invalid fixture file {path}: cases must be a non-empty map")
     options = fixture.get("options", {})
@@ -57,12 +63,14 @@ def discover_cases() -> list[AssemblerCase]:
         source = ROOT / fixture["source"]
         options = fixture.get("options", {})
         for aspsx_version, expected in fixture["cases"].items():
-            cases.append(AssemblerCase(
-                f"{path.stem}:{aspsx_version}",
-                source,
-                str(aspsx_version),
-                expected,
-                options.get("data_limit", ""),
-                options.get("extra_flags", ""),
-            ))
+            cases.append(
+                AssemblerCase(
+                    f"{path.stem}:{aspsx_version}",
+                    source,
+                    str(aspsx_version),
+                    expected,
+                    options.get("data_limit", ""),
+                    options.get("extra_flags", ""),
+                )
+            )
     return cases
