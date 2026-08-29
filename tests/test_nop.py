@@ -558,6 +558,21 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_lwl_lwr_no_nop(self):
+        lines = [
+            "	lwl	$3,3($8)",
+            "	lwr	$3,0($8)",
+        ]
+        expected_lines = [
+            "lwl\t$3,3($8)",
+            "lwr\t$3,0($8)",
+        ]
+
+        mp = MaspsxProcessor(lines, nop_lw_lw=True)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_lw_lw_no_nop(self):
         lines = [
             "	#.set	volatile",
