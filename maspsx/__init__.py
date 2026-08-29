@@ -15,23 +15,32 @@ jump_mnemonics = {
     "j",
     "jal",
 }
-load_mnemonics = {
+aligned_load_mnemonics = {
     "lb",
     "lbu",
     "lh",
     "lhu",
     "lw",
-    "lwl",
-    "lwr",
 }
-store_mnemonics = {
+load_mnemonics = aligned_load_mnemonics.union(
+    {
+        "lwl",
+        "lwr",
+        # lwc2 ?
+    }
+)
+aligned_store_mnemonics = {
     "sb",
     "sh",
     "sw",
-    "swl",
-    "swr",
-    "swc2",
 }
+store_mnemonics = aligned_store_mnemonics.union(
+    {
+        "swl",
+        "swr",
+        "swc2",
+    }
+)
 
 single_reg_loads = {
     "mult",
@@ -89,7 +98,11 @@ def line_loads_from_reg(line: str, r_source: str, loads_to_reg=False) -> bool:
             return True
 
         # ASPSX < 2.30 behaviour
-        if loads_to_reg and re.match(rf"^{r_source},.*$", rest):
+        if (
+            loads_to_reg
+            and op in aligned_load_mnemonics
+            and re.match(rf"^{r_source},.*$", rest)
+        ):
             return True
 
     elif op in store_mnemonics:
@@ -100,7 +113,7 @@ def line_loads_from_reg(line: str, r_source: str, loads_to_reg=False) -> bool:
             return True
 
     elif op == "lwc2":
-        # lwc2 $5, 4( $4
+        # lwc2 $5, 4( $4 )
         if re.match(rf"^.*\(\s*{r_source}\s*\)$", rest):
             return True
 
