@@ -1,0 +1,19 @@
+source: ASM/EXPND_SW.S
+cases:
+  "1.07": &expand_sw_1_07_expected
+    - "0x3C010000"  # lui         $at, 0x0
+    - "0x24210000"  # addiu       $at, $at, 0x0
+    - "0x00220821"  # addu        $at, $at, $v0
+    - "0xAC240000"  # sw          $a0, 0x0($at)
+  "2.08": *expand_sw_1_07_expected
+  "2.21": *expand_sw_1_07_expected
+  "2.34": &expand_sw_2_34_expected
+    - "0x3C010000"  # lui         $at, 0x0
+    - "0x00220821"  # addu        $at, $at, $v0
+    - "0xAC240000"  # sw          $a0, 0x0($at)
+  "2.56": *expand_sw_2_34_expected
+  "2.67": *expand_sw_2_34_expected
+  "2.77": *expand_sw_2_34_expected
+  "2.79": *expand_sw_2_34_expected
+  "2.81": *expand_sw_2_34_expected
+  "2.86": *expand_sw_2_34_expected

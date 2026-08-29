@@ -1,0 +1,32 @@
+source: ASM/ADDU.S
+cases:
+  "1.07": &addu_at_1_07_expected
+    - "0x84427FFF"  # lh          $v0, 0x7FFF($v0)
+    - "0x00000000"  # nop
+    - "0x3C010001"  # lui         $at, 0x1
+    - "0x00410821"  # addu        $at, $v0, $at
+    - "0x84228000"  # lh          $v0, -0x8000($at)
+    - "0x00000000"  # nop
+    - "0x84428000"  # lh          $v0, -0x8000($v0)
+    - "0x00000000"  # nop
+    - "0x3C01FFFF"  # lui         $at, 0xFFFF
+    - "0x00410821"  # addu        $at, $v0, $at
+    - "0x84227FFF"  # lh          $v0, 0x7FFF($at)
+  "2.08": *addu_at_1_07_expected
+  "2.21": *addu_at_1_07_expected
+  "2.34": &addu_at_2_34_expected
+    - "0x84427FFF"  # lh          $v0, 0x7FFF($v0)
+    - "0x3C010001"  # lui         $at, 0x1
+    - "0x00410821"  # addu        $at, $v0, $at
+    - "0x84228000"  # lh          $v0, -0x8000($at)
+    - "0x00000000"  # nop
+    - "0x84428000"  # lh          $v0, -0x8000($v0)
+    - "0x3C01FFFF"  # lui         $at, 0xFFFF
+    - "0x00410821"  # addu        $at, $v0, $at
+    - "0x84227FFF"  # lh          $v0, 0x7FFF($at)
+  "2.56": *addu_at_2_34_expected
+  "2.67": *addu_at_2_34_expected
+  "2.77": *addu_at_2_34_expected
+  "2.79": *addu_at_2_34_expected
+  "2.81": *addu_at_2_34_expected
+  "2.86": *addu_at_2_34_expected

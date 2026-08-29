@@ -1,0 +1,22 @@
+source: ASM/LWLW.S
+cases:
+  "1.05": &lwlw_1_05_expected
+    - "0x3C020000"  # lui         $v0, 0x0
+    - "0x8C420000"  # lw          $v0, 0x0($v0)
+    - "0x00000000"  # nop
+    - "0x8C620000"  # lw          $v0, 0x0($v1)
+  "1.07": *lwlw_1_05_expected
+  "2.05": *lwlw_1_05_expected
+  "2.08": *lwlw_1_05_expected
+  "2.21": *lwlw_1_05_expected
+  "2.30": &lwlw_2_30_expected
+    - "0x3C020000"  # lui         $v0, 0x0
+    - "0x8C420000"  # lw          $v0, 0x0($v0)
+    - "0x8C620000"  # lw          $v0, 0x0($v1)
+  "2.34": *lwlw_2_30_expected
+  "2.56": *lwlw_2_30_expected
+  "2.67": *lwlw_2_30_expected
+  "2.77": *lwlw_2_30_expected
+  "2.79": *lwlw_2_30_expected
+  "2.81": *lwlw_2_30_expected
+  "2.86": *lwlw_2_30_expected
