@@ -643,7 +643,12 @@ class MaspsxProcessor:
         return res
 
     def get_next_instruction(
-        self, skip=0, ignore_nop=False, ignore_set=False, ignore_label=False
+        self,
+        skip=0,
+        ignore_nop=False,
+        ignore_set=False,
+        ignore_label=False,
+        return_index=False,
     ):
         i = self.line_index + 1
         while i < len(self.lines):
@@ -655,7 +660,7 @@ class MaspsxProcessor:
                 ignore_label=ignore_label,
             ):
                 if skip == 0:
-                    return line
+                    return i if return_index else line
                 skip -= 1
             i += 1
 
@@ -712,20 +717,17 @@ class MaspsxProcessor:
                 nop_required = True
 
             if nop_required:
-                label = self.get_next_instruction(
-                    skip=0, ignore_nop=True, ignore_set=True
+                index = self.get_next_instruction(
+                    skip=0, ignore_nop=True, ignore_set=True, return_index=True
                 )
-                if is_label(label):
-                    res.append(label)
-                    self.skip_instructions = 1
-
-                    # ASPSX keeps consecutive labels together before the nop.
-                    index = self.lines.index(label, self.line_index + 1) + 1
-                    while index < len(self.lines) and is_label(self.lines[index]):
-                        res.append(self.lines[index])
-                        self.skip_instructions += 1
-                        index += 1
-
+                # ASPSX keeps consecutive labels together before the nop.
+                labels = 0
+                while index != "" and is_label(self.lines[index]):
+                    res.append(self.lines[index])
+                    labels += 1
+                    index += 1
+                if labels:
+                    self.skip_instructions = labels
                 res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
         else:
             res.append(
