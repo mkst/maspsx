@@ -423,10 +423,10 @@ class TestNop(unittest.TestCase):
         expected_lines = [
             "lw\t$16,16($2)",
             "$L2:",
+            "$Le1:",
             "nop",
             "",
             ".loc	2 17",
-            "$Le1:",
             "addu\t$2,$16,$zero",
         ]
         mp = MaspsxProcessor(lines)
@@ -596,6 +596,32 @@ class TestNop(unittest.TestCase):
 
         mp = MaspsxProcessor(lines, nop_lw_lw=False)
         res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_load_delay_keeps_consecutive_labels_together(self):
+        """
+        ASPSX 2.67 prints every consecutive label first and then the nop,
+        so all of the labels share one address.
+        """
+        lines = [
+            "\tlw\t$9,188($sp)",
+            "$L1:",
+            "$L2:",
+            "$L3:",
+            "\tlw\t$2,40($9)",
+        ]
+        expected_lines = [
+            "lw\t$9,188($sp)",
+            "$L1:",
+            "$L2:",
+            "$L3:",
+            "nop",
+            "lw\t$2,40($9)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
