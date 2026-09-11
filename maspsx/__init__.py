@@ -318,6 +318,8 @@ def get_next_register(reg: str):
         "$f2": "$f3",
         "$f4": "$f5",
         "$f6": "$f7",
+        "$f8": "$f9",
+        "$f10": "$f11",
         "$f12": "$f13",
         "$f14": "$f15",
         # names
@@ -328,13 +330,20 @@ def get_next_register(reg: str):
         "$t2": "$t3",
         "$s0": "$s1",
         "$s2": "$s3",
+        "$s4": "$s5",
+        "$s6": "$s7",
         # nums
         "$2": "$3",  # $v0
         "$4": "$5",  # $a0
         "$6": "$7",  # $a2
         "$8": "$9",  # $t0
         "$10": "$11",  # t2
+        "$12": "$13",  # t4
+        "$14": "$15",  # t6
+        "$16": "$17",  # s0
         "$18": "$19",  # s2
+        "$20": "$21",  # s4
+        "$22": "$23",  # s6
     }
     next_reg = lut.get(reg)
     assert next_reg is not None, f"Unknown mapping for {reg}"
@@ -712,12 +721,18 @@ class MaspsxProcessor:
                 nop_required = True
 
             if nop_required:
-                label = self.get_next_instruction(
-                    skip=0, ignore_nop=True, ignore_set=True
-                )
-                if is_label(label):
-                    res.append(label)
-                    self.skip_instructions = 1
+                skip = 0
+                while True:
+                    maybe_label = self.get_next_instruction(
+                        skip=skip, ignore_nop=True, ignore_set=True
+                    )
+                    if not is_label(maybe_label):
+                        break
+
+                    res.append(maybe_label)
+                    skip += 1
+                    self.skip_instructions = skip
+
                 res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
         else:
             res.append(
