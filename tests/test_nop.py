@@ -724,7 +724,7 @@ class TestNopMacro(unittest.TestCase):
 
     def test_load_delay_keeps_consecutive_labels_together(self):
         """
-        ASPSX 2.67 prints every consecutive label first and then the nop, 
+        ASPSX 2.67 prints every consecutive label first and then the nop,
         so all of the labels share one address.
         """
         for labels in (["$L1:", "$L2:"], ["$L1:", "$L2:", "$L3:"]):

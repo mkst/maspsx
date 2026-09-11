@@ -718,14 +718,14 @@ class MaspsxProcessor:
                 if is_label(label):
                     res.append(label)
                     self.skip_instructions = 1
-                  
+
                     # ASPSX keeps consecutive labels together before the nop.
                     index = self.lines.index(label, self.line_index + 1) + 1
                     while index < len(self.lines) and is_label(self.lines[index]):
                         res.append(self.lines[index])
                         self.skip_instructions += 1
                         index += 1
-                        
+
                 res.append(f"nop # DEBUG: Reuse of '{r_dest}'. {reason}")
         else:
             res.append(
