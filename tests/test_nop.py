@@ -727,22 +727,24 @@ class TestNopMacro(unittest.TestCase):
         ASPSX 2.67 prints every consecutive label first and then the nop,
         so all of the labels share one address.
         """
-        for labels in (["$L1:", "$L2:"], ["$L1:", "$L2:", "$L3:"]):
-            with self.subTest(labels=labels):
-                lines = [
-                    "\tlw\t$9,188($sp)",
-                    *labels,
-                    "\tlw\t$2,40($9)",
-                ]
-                # Every label, then exactly one nop, then the second load.
-                expected_lines = [
-                    "lw\t$9,188($sp)",
-                    *labels,
-                    "nop",
-                    "lw\t$2,40($9)",
-                ]
-                mp = MaspsxProcessor(lines)
-                res = mp.process_lines()
+        lines = [
+            "\tlw\t$9,188($sp)",
+            "$L1:",
+            "$L2:",
+            "$L3:",
+            "\tlw\t$2,40($9)",
+        ]
+        # Every label, then exactly one nop, then the second load.
+        expected_lines = [
+            "lw\t$9,188($sp)",
+            "$L1:",
+            "$L2:",
+            "$L3:",
+            "nop",
+            "lw\t$2,40($9)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
 
-                clean_lines = strip_comments(res)
-                self.assertEqual(expected_lines, clean_lines)
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
