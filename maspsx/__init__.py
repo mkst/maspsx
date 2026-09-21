@@ -147,7 +147,7 @@ def line_loads_from_reg(line: str, r_source: str, loads_to_reg=False) -> bool:
                 return True
         if op.startswith("div") or op.startswith("rem"):
             # e.g. div	$3,$3,$7
-            if re.match(rf"^.*,{r_source}.*$", rest):
+            if re.match(rf"^.*,{r_source},.*$", rest):
                 return True
 
     elif op in double_reg_loads:
