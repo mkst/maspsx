@@ -625,6 +625,18 @@ class TestNop(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_nop_greedy_div_regex(self):
+        lines = [
+            "	lhu	$2,420($2)",
+            "	div	$23,$20,$18",
+        ]
+        expected_lines = ["lhu\t$2,420($2)", "div\t$zero,$20,$18", "mflo\t$23"]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
 
 class TestNopMacro(unittest.TestCase):
     def test_nop_macro_no_nop_afterwards(self):
