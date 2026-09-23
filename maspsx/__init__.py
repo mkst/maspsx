@@ -836,6 +836,15 @@ class MaspsxProcessor:
                             )
                             res.append(".set\tnoreorder")
                             res.append(expand_move(inst))
+                        elif uses_at(inst):
+                            # a symbolic load/store expands to lui/addu/op
+                            # through $at, which covers the hazard
+                            res.extend(
+                                [
+                                    expand_move(inst),
+                                    "#nop  # DEBUG: mflo/mfhi with mult/div/rem and instruction expands through $at",
+                                ]
+                            )
                         else:
                             if r_source and line_loads_from_reg(
                                 inst, r_source, loads_to_reg=self.nop_lw_lw

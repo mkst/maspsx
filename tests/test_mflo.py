@@ -264,3 +264,46 @@ class TestMflo(unittest.TestCase):
         res = mp.process_lines()
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_store_at_expansion(self):
+        """
+        A store to a symbolic address expands through $at (lui/addu/sh),
+        which covers the mflo -> mult hazard, so no nop is required.
+        """
+        lines = [
+            "\tmflo\t$2",
+            "\tsh\t$2,D_800FBE08+136($4)",
+            "\tmult\t$3,$5",
+        ]
+        expected_lines = [
+            "mflo\t$2",
+            "sh\t$2,D_800FBE08+136($4)",
+            "mult\t$3,$5",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_store_small_offset_nop(self):
+        """
+        A store with a small numeric offset is a single instruction, so the
+        nop is still required.
+        """
+        lines = [
+            "\tmflo\t$2",
+            "\tsh\t$2,8($4)",
+            "\tmult\t$3,$5",
+        ]
+        expected_lines = [
+            "mflo\t$2",
+            "sh\t$2,8($4)",
+            "nop",
+            "mult\t$3,$5",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
