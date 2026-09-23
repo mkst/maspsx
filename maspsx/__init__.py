@@ -169,20 +169,26 @@ def uses_at(line: str) -> bool:
     line = strip_comments(line)
 
     # sw	$2,%lo(s_attr)($3)
-    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^)]+)\)", line):
+    if match := re.match(
+        r"^s(?:[wbh]|w[lr])\s+(\$[a-z0-9]+),\s*%lo\(([^(]+)\)\(([^)]+)\)", line
+    ):
         return False
 
     # sw	$2,D_801813A4
     # sw	$3,g_CurrentRoom+40
     # sw	$2,D_us_8017863C.4
-    if match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*(-?[A-z0-9_.+]+)$", line):
+    if match := re.match(
+        r"^s(?:[wbh]|w[lr])\s+(\$[a-z0-9]+),\s*(-?[A-z0-9_.+]+)$", line
+    ):
         operand = match.group(2)
         if not is_number(operand):
             return True
 
     # sb	$2,g_InputSaveName($3)
     # sw	$2,-26($16)
-    elif match := re.match(r"^s[wbh]\s+(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", line):
+    elif match := re.match(
+        r"^s(?:[wbh]|w[lr])\s+(\$[a-z0-9]+),\s*([^(]+)\(([^)]+)\)", line
+    ):
         operand = match.group(2)
 
     # lw	$2,-1000($16)
