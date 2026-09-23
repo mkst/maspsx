@@ -514,3 +514,71 @@ class TestAt(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_swl_at_expansion_no_nop(self):
+        """
+        swl with a symbolic operand expands through $at like sw/sb/sh,
+        so no load-delay nop is needed after the preceding load of the
+        stored register (ASPSX 2.30+).
+        """
+        lines = [
+            "lw\t$3,D_800F7A60+16($2)",
+            "swl\t$3,D_800F7A60+19($4)",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(D_800F7A60+16)",
+            "addu\t$at,$at,$2",
+            "lw\t$3,%lo(D_800F7A60+16)($at)",
+            ".set\tat",
+            "swl\t$3,D_800F7A60+19($4)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_swr_at_expansion_no_nop(self):
+        """
+        swr with a symbolic operand expands through $at like sw/sb/sh,
+        so no load-delay nop is needed after the preceding load of the
+        stored register (ASPSX 2.30+).
+        """
+        lines = [
+            "lw\t$3,D_800F7A60+16($2)",
+            "swr\t$3,D_800F7A60+19($4)",
+        ]
+        expected_lines = [
+            ".set\tnoat",
+            "lui\t$at,%hi(D_800F7A60+16)",
+            "addu\t$at,$at,$2",
+            "lw\t$3,%lo(D_800F7A60+16)($at)",
+            ".set\tat",
+            "swr\t$3,D_800F7A60+19($4)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_swl_small_offset_nop(self):
+        """
+        swl with a small numeric offset does not use $at, so the load-delay
+        nop is still required.
+        """
+        lines = [
+            "lw\t$3,0($2)",
+            "swl\t$3,3($4)",
+        ]
+        expected_lines = [
+            "lw\t$3,0($2)",
+            "nop",
+            "swl\t$3,3($4)",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
