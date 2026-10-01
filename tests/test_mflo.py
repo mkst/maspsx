@@ -307,3 +307,31 @@ class TestMflo(unittest.TestCase):
 
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_jump(self):
+        lines = [
+            "	mflo	$7",
+            "	#nop",
+            "	j	$L2",
+            "$L6:",
+            "	divu	$7,$6,$4",
+        ]
+        expected_lines = [
+            "mflo\t$7",
+            "j\t$L2",
+            "nop",
+            "$L6:",
+            ".set\tnoat",
+            "divu\t$zero,$6,$4",
+            "bnez\t$4,.L_NOT_DIV_BY_ZERO_4",
+            "nop",
+            "break\t0x7",
+            ".L_NOT_DIV_BY_ZERO_4:",
+            "mflo\t$7",
+            ".set\tat",
+        ]
+        mp = MaspsxProcessor(lines, expand_div=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)

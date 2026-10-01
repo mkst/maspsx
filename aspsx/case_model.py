@@ -7,7 +7,6 @@ from pathlib import Path
 
 import yaml
 
-
 ROOT = Path(__file__).parent
 FIXTURE_DIR = ROOT / "fixtures"
 

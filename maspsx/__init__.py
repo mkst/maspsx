@@ -863,7 +863,7 @@ class MaspsxProcessor:
                                     ]
                                 )
                             else:
-                                if op in branch_mnemonics:
+                                if op in branch_mnemonics or op in jump_mnemonics:
                                     res.extend(
                                         [
                                             inst,
