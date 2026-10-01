@@ -9,7 +9,6 @@ import tempfile
 import time
 from typing import Optional
 
-
 ASPSX_RUNNER_LOOKUP = {
     "1.05": "dosemu2",
     "1.07": "dosemu2",

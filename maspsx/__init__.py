@@ -834,6 +834,11 @@ class MaspsxProcessor:
                                 "nop  # DEBUG: mflo/mfhi with mult/div/rem and li expands to 1 op"
                             )
 
+                    elif op == "j":
+                        res.extend(
+                            [inst, "nop  # DEBUG: mflo/mfhi with mult/div/rem and jump"]
+                        )
+
                     else:
 
                         if no_reorder:
