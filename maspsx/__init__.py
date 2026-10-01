@@ -863,7 +863,8 @@ class MaspsxProcessor:
                                     ]
                                 )
                             else:
-                                if op in branch_mnemonics:
+                                # NOTE: a j's delay slot also takes the nop, ahead of any following label (#148)
+                                if op in branch_mnemonics or op == "j":
                                     res.extend(
                                         [
                                             inst,

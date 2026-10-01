@@ -265,6 +265,57 @@ class TestMflo(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_mflo_mult_jump_label(self):
+        """
+        As with a branch, the nop fills the delay slot of a j, so it goes
+        before the label
+        """
+        lines = [
+            "	mflo	$20",
+            "	#nop",
+            "	j	$L78",
+            "$L83:",
+            "	mult	$16,$16",
+        ]
+        expected_lines = [
+            "mflo\t$20",
+            "j\t$L78",
+            "nop",
+            "$L83:",
+            "mult\t$16,$16",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_mflo_divu_jump_label(self):
+        """
+        A switch case ending in mflo followed by a case starting with divu:
+        the jump table points at $L1008, so it must label the divu, not the nop
+        BUG: https://github.com/mkst/maspsx/issues/148
+        """
+        lines = [
+            "	mult	$6,$4",
+            "	mflo	$7",
+            "	j	$L1004",
+            "$L1008:",
+            "	divu	$7,$6,$4",
+        ]
+        expected_lines = [
+            "mult\t$6,$4",
+            "mflo\t$7",
+            "j\t$L1004",
+            "nop",
+            "$L1008:",
+            "divu\t$zero,$6,$4",
+            "mflo\t$7",
+        ]
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_mflo_store_at_expansion(self):
         """
         A store to a symbolic address expands through $at (lui/addu/sh),
