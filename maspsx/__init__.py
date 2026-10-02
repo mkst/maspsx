@@ -463,6 +463,7 @@ class MaspsxProcessor:
         gp_allow_la=False,
         use_comm_section=False,
         use_comm_for_lcomm=False,
+        max_comm_alignment=16,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -484,6 +485,7 @@ class MaspsxProcessor:
 
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
+        self.max_comm_alignment = max_comm_alignment
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -631,8 +633,10 @@ class MaspsxProcessor:
                 if self.use_comm_section and (
                     symbol in self.comm_symbols or self.use_comm_for_lcomm
                 ):
-                    # implicit alignment for COMMON
-                    res.append(f"\t.comm {symbol},{size}")
+                    # GNU as's implicit alignment: the size rounded up to a power of two
+                    implicit_alignment = 1 << (size - 1).bit_length()
+                    alignment = min(implicit_alignment, self.max_comm_alignment)
+                    res.append(f"\t.comm {symbol},{size},{alignment}")
                     continue
 
                 if section == "sbss":
