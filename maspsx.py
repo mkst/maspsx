@@ -62,7 +62,7 @@ def main() -> None:
     parser.add_argument("--passthrough", action="store_true")
     parser.add_argument("--use-comm-section", action="store_true")
     parser.add_argument("--use-comm-for-lcomm", action="store_true")
-    parser.add_argument("--max-comm-alignment", type=int)
+    parser.add_argument("--max-comm-alignment", type=int, default=16)
     # decomp.me debugging
     parser.add_argument("--print-output", action="store_true")
     parser.add_argument("--print-input", action="store_true")

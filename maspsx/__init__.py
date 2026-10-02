@@ -463,7 +463,7 @@ class MaspsxProcessor:
         gp_allow_la=False,
         use_comm_section=False,
         use_comm_for_lcomm=False,
-        max_comm_alignment=None,
+        max_comm_alignment=16,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -633,12 +633,7 @@ class MaspsxProcessor:
                 if self.use_comm_section and (
                     symbol in self.comm_symbols or self.use_comm_for_lcomm
                 ):
-                    if self.max_comm_alignment is None:
-                        # implicit alignment for COMMON
-                        res.append(f"\t.comm {symbol},{size}")
-                        continue
-
-                    # GNU as defaults to the size rounded up to a power of two
+                    # GNU as's implicit alignment: the size rounded up to a power of two
                     implicit_alignment = 1 << (size - 1).bit_length()
                     alignment = min(implicit_alignment, self.max_comm_alignment)
                     res.append(f"\t.comm {symbol},{size},{alignment}")

@@ -48,7 +48,7 @@ This can be convenient with games using non-zero `-G` in situations where a vari
 **NOTE:** This also makes the symbols *global* (unlike regular `static` behaviour).
 
 ### `--max-comm-alignment`
-Cap the alignment of symbols emitted by `--use-comm-section`, e.g. `--max-comm-alignment 4`. Without it, GNU as aligns each common by its size (up to 16), whereas the original toolchain may have packed them tighter.
+Cap the alignment of symbols emitted by `--use-comm-section`, e.g. `--max-comm-alignment 4`. Defaults to 16, which matches GNU as.
 
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
