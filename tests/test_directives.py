@@ -41,3 +41,39 @@ class TestDirectives(unittest.TestCase):
         res = mp.process_line(line)
         self.assertEqual([line], res)
         self.assertEqual(mp.file_num, 2)
+
+    def test_comm_implicit_alignment(self):
+        lines = [
+            "\t.comm\tD_80000000,1",
+            "\t.comm\tD_80000004,8",
+        ]
+        mp = MaspsxProcessor(lines, use_comm_section=True)
+        res = mp.process_lines()
+
+        self.assertEqual(
+            [
+                ".section .bss",
+                "\t.comm D_80000000,1",
+                "\t.comm D_80000004,8",
+            ],
+            res,
+        )
+
+    def test_comm_max_alignment(self):
+        lines = [
+            "\t.comm\tD_80000000,1",
+            "\t.comm\tD_80000004,3",
+            "\t.comm\tD_80000008,8",
+        ]
+        mp = MaspsxProcessor(lines, use_comm_section=True, max_comm_alignment=4)
+        res = mp.process_lines()
+
+        self.assertEqual(
+            [
+                ".section .bss",
+                "\t.comm D_80000000,1,1",
+                "\t.comm D_80000004,3,4",
+                "\t.comm D_80000008,8,4",
+            ],
+            res,
+        )
