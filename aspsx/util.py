@@ -31,6 +31,9 @@ PSYQ_OBJ_PARSER = Path(__file__).parent / "deps" / "psyq-obj-parser"
 
 DATA_SECTIONS = (".rdata", ".data", ".sdata", ".sbss", ".bss")
 
+# Symbol offsets keyed by symbol name. `.comm` symbols have no offset.
+SymbolOffsets = dict[str, Optional[int]]
+
 STT_SECTION = 3
 STT_FILE = 4
 
@@ -61,8 +64,7 @@ class RunResult:
     error: Optional[str] = None
     duration: float = 0.0
     failure_kind: Optional[str] = None
-    # Symbol offsets, keyed by data section and then by symbol name.
-    sections: dict[str, dict[str, int]] = field(default_factory=dict)
+    sections: dict[str, SymbolOffsets] = field(default_factory=dict)
 
     @property
     def ok(self) -> bool:
@@ -172,7 +174,7 @@ def read_text_section(elf_data: bytes) -> bytes:
     )
 
 
-def read_symbol_offsets(elf_data: bytes) -> dict[str, dict[str, int]]:
+def read_symbol_offsets(elf_data: bytes) -> dict[str, SymbolOffsets]:
     """Return the offset of each symbol ASPSX placed in a data section."""
     from spimdisasm.elf32 import Elf32File
 
@@ -181,7 +183,7 @@ def read_symbol_offsets(elf_data: bytes) -> dict[str, dict[str, int]]:
         index: elf.shstrtab[header.name]
         for index, header in enumerate(elf.sectionHeaders.sections)
     }
-    sections: dict[str, dict[str, int]] = {}
+    sections: dict[str, SymbolOffsets] = {}
     for symbol in elf.symtab.symbols:
         name = elf.strtab[symbol.name]
         section = names.get(symbol.shndx)
@@ -192,10 +194,8 @@ def read_symbol_offsets(elf_data: bytes) -> dict[str, dict[str, int]]:
         # The linker places `.comm` symbols, so their offsets come from
         # psyq-obj-parser rather than ASPSX. They're the only data symbols
         # with a size.
-        # We can't validate `.comm` behavior, so skip these symbols.
-        if symbol.size:
-            continue
-        sections.setdefault(section, {})[name] = symbol.value
+        offset = None if symbol.size else symbol.value
+        sections.setdefault(section, {})[name] = offset
     return sections
 
 
@@ -442,19 +442,30 @@ def assembly_diff(expected: list[str], actual: list[str]) -> str:
     return "\n".join(lines)
 
 
-def symbol_diff(expected: dict[str, int], actual: dict[str, int]) -> str:
+def _symbol_differs(expected: SymbolOffsets, actual: SymbolOffsets, name: str) -> bool:
+    return name not in actual or expected[name] != actual[name]
+
+
+def _format_offset(offset: Optional[int]) -> str:
+    return "<comm>" if offset is None else f"0x{offset:X}"
+
+
+def symbol_diff(expected: SymbolOffsets, actual: SymbolOffsets) -> str:
     """Format the expected symbols whose offsets differ, in section order."""
     lines = [f"{'symbol':<24}{'expected':<12}actual"]
-    for name in sorted(expected, key=lambda name: (expected[name], name)):
-        if expected[name] != actual.get(name):
-            got = f"0x{actual[name]:X}" if name in actual else "<missing>"
-            lines.append(f"{name:<24}{f'0x{expected[name]:X}':<12}{got}")
+    order = sorted(
+        expected, key=lambda name: (expected[name] is None, expected[name] or 0, name)
+    )
+    for name in order:
+        if _symbol_differs(expected, actual, name):
+            got = _format_offset(actual[name]) if name in actual else "<missing>"
+            lines.append(f"{name:<24}{_format_offset(expected[name]):<12}{got}")
     return "\n".join(lines)
 
 
 def output_diff(
     expected_text: Optional[list[str]],
-    expected_sections: dict[str, dict[str, int]],
+    expected_sections: dict[str, SymbolOffsets],
     result: RunResult,
 ) -> str:
     """
@@ -468,6 +479,6 @@ def output_diff(
         reports.append(".text mismatch\n\n" + assembly_diff(expected_text, actual_text))
     for section, expected in expected_sections.items():
         actual = result.sections.get(section, {})
-        if any(expected[name] != actual.get(name) for name in expected):
+        if any(_symbol_differs(expected, actual, name) for name in expected):
             reports.append(f"{section} mismatch\n\n" + symbol_diff(expected, actual))
     return "\n\n".join(reports)

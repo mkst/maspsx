@@ -8,7 +8,7 @@ from typing import Optional
 
 import yaml
 
-from util import DATA_SECTIONS
+from util import DATA_SECTIONS, SymbolOffsets
 
 ROOT = Path(__file__).parent
 FIXTURE_DIR = ROOT / "fixtures"
@@ -22,8 +22,7 @@ class AssemblerCase:
     source: Path
     aspsx_version: str
     text: Optional[list[str]]
-    # Expected symbol offsets, keyed by data section and then by symbol name.
-    sections: dict[str, dict[str, int]] = field(default_factory=dict)
+    sections: dict[str, SymbolOffsets] = field(default_factory=dict)
     data_limit: str = ""
     extra_flags: str = ""
 
@@ -44,14 +43,16 @@ def _validate_expected(path: Path, aspsx_version, expected) -> None:
                 or not contents
                 or not all(
                     isinstance(name, str)
-                    and isinstance(offset, int)
-                    and not isinstance(offset, bool)
+                    and (
+                        offset is None
+                        or (isinstance(offset, int) and not isinstance(offset, bool))
+                    )
                     for name, offset in contents.items()
                 )
             ):
                 raise ValueError(
                     f"{prefix}: {section} must be a non-empty map of symbol names "
-                    "to offsets"
+                    "to offsets, or to null for `.comm` symbols"
                 )
         else:
             raise ValueError(f"{prefix}: unknown section {section!r}")

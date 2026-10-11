@@ -121,6 +121,14 @@ class TestOutputDiff(unittest.TestCase):
         self.assertRegex(report, r"\ntail\s+0x8\s+<missing>")
         self.assertNotRegex(report, r"\n[ac]\s")
 
+    def test_common_symbols_are_checked_by_section(self):
+        result = self.result({".sbss": {"l": 0x0}, ".bss": {"c": None}})
+        self.assertEqual("", util.output_diff(None, {".bss": {"c": None}}, result))
+        report = util.output_diff(None, {".sbss": {"c": None}}, result)
+        self.assertRegex(report, r"\nc\s+<comm>\s+<missing>")
+        report = util.output_diff(None, {".sbss": {"l": None}}, result)
+        self.assertRegex(report, r"\nl\s+<comm>\s+0x0")
+
 
 class TestFixtureModel(unittest.TestCase):
     def load(self, cases: str) -> dict:
@@ -137,8 +145,11 @@ class TestFixtureModel(unittest.TestCase):
             "    .sbss:\n"
             "      a: 0x0\n"
             "      tail: 0x4\n"
+            "      c: null\n"
         )
-        self.assertEqual({"a": 0, "tail": 4}, fixture["cases"]["2.67"][".sbss"])
+        self.assertEqual(
+            {"a": 0, "tail": 4, "c": None}, fixture["cases"]["2.67"][".sbss"]
+        )
 
     def test_rejects_unknown_section(self):
         with self.assertRaisesRegex(ValueError, "unknown section '.foo'"):
