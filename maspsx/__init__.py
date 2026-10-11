@@ -81,6 +81,16 @@ class LcommAlignment(Enum):
     # Aligned to the size rounded up to a power of two, at most 16
     POWER_OF_TWO = "power_of_two"
 
+    def layout(self, size: int) -> tuple[int, int]:
+        """Return the alignment and allocated size of a `.lcomm` symbol."""
+        if self == LcommAlignment.WORD:
+            return 4, (size + 3) & ~3
+
+        if self == LcommAlignment.POWER_OF_TWO and size > 1:
+            return min(1 << (size - 1).bit_length(), 16), size
+
+        return 1, size
+
 
 def strip_comments(line: str) -> str:
     if line.count("#") > 0:
@@ -473,6 +483,7 @@ class MaspsxProcessor:
         gp_allow_la=False,
         use_comm_section=False,
         use_comm_for_lcomm=False,
+        max_comm_alignment=16,
         lcomm_alignment=LcommAlignment.WORD,
         comm_uses_sdata_limit=True,
         use_gp_rel=True,
@@ -498,6 +509,7 @@ class MaspsxProcessor:
 
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
+        self.max_comm_alignment = max_comm_alignment
         self.lcomm_alignment = lcomm_alignment
         self.comm_uses_sdata_limit = comm_uses_sdata_limit
 
@@ -646,15 +658,16 @@ class MaspsxProcessor:
                 if i == 0:
                     res.append(f".section .{section}")
 
-                alignment, padded_size = self._lcomm_layout(size)
+                alignment, padded_size = self.lcomm_alignment.layout(size)
+                is_comm_symbol = symbol in self.comm_symbols or self.use_comm_for_lcomm
 
-                if self.use_comm_section and symbol in self.comm_symbols:
-                    # GNU as's implicit alignment: the size rounded up to a power of two
-                    alignment = min(1 << (size - 1).bit_length(), 16)
-                    res.append(f"\t.comm {symbol},{size},{alignment}")
-                    continue
+                if self.use_comm_section and is_comm_symbol:
+                    if symbol in self.comm_symbols:
+                        # For actual `comm` symbols, force GNU as's implicit alignment:
+                        # the size rounded up to a power of two.
+                        alignment = 1 << (size - 1).bit_length()
 
-                if self.use_comm_section and self.use_comm_for_lcomm:
+                    alignment = min(alignment, self.max_comm_alignment)
                     res.append(f"\t.comm {symbol},{size},{alignment}")
                     continue
 
@@ -674,16 +687,6 @@ class MaspsxProcessor:
                 )
 
         return res
-
-    def _lcomm_layout(self, size: int) -> tuple[int, int]:
-        """Return the alignment and allocated size of a `.lcomm` symbol."""
-        if self.lcomm_alignment == LcommAlignment.WORD:
-            return 4, (size + 3) & ~3
-
-        if self.lcomm_alignment == LcommAlignment.POWER_OF_TWO and size > 1:
-            return min(1 << (size - 1).bit_length(), 16), size
-
-        return 1, size
 
     def get_next_instruction(
         self, skip=0, ignore_nop=False, ignore_set=False, ignore_label=False

@@ -47,6 +47,9 @@ Also put `.lcomm`-declared symbols (in C, this means `static` variables without 
 This can be convenient with games using non-zero `-G` in situations where a variable needs to be marked `static` to get code generation to match, but you don't want to migrate `.sdata`/`.sbss` to that .c file yet.
 **NOTE:** This also makes the symbols *global* (unlike regular `static` behaviour).
 
+### `--max-comm-alignment`
+Cap the alignment of symbols emitted by `--use-comm-section`, e.g. `--max-comm-alignment 4`. Defaults to 16, which matches GNU as.
+
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
 Pass this as a single argument, e.g. `-G8`, rather than `-G 8`.

@@ -61,6 +61,25 @@ class TestDirectives(unittest.TestCase):
             res,
         )
 
+    def test_comm_max_alignment(self):
+        lines = [
+            "\t.comm\tD_80000000,1",
+            "\t.comm\tD_80000004,3",
+            "\t.comm\tD_80000008,8",
+        ]
+        mp = MaspsxProcessor(lines, use_comm_section=True, max_comm_alignment=4)
+        res = mp.process_lines()
+
+        self.assertEqual(
+            [
+                ".section .bss",
+                "\t.comm D_80000000,1,1",
+                "\t.comm D_80000004,3,4",
+                "\t.comm D_80000008,8,4",
+            ],
+            res,
+        )
+
     def test_lcomm_alignment_none(self):
         lines = [
             "\t.lcomm\tD_80000000,1",
@@ -169,6 +188,31 @@ class TestDirectives(unittest.TestCase):
                 ".section .bss",
                 "\t.comm D_80000000,1,4",
                 "\t.comm D_80000004,5,4",
+            ],
+            res,
+        )
+
+    def test_lcomm_max_alignment_with_comm_for_lcomm(self):
+        lines = [
+            "\t.lcomm\tD_80000000,1",
+            "\t.lcomm\tD_80000002,2",
+            "\t.lcomm\tD_80000004,9",
+        ]
+        mp = MaspsxProcessor(
+            lines,
+            use_comm_section=True,
+            use_comm_for_lcomm=True,
+            max_comm_alignment=2,
+            lcomm_alignment=LcommAlignment.POWER_OF_TWO,
+        )
+        res = mp.process_lines()
+
+        self.assertEqual(
+            [
+                ".section .bss",
+                "\t.comm D_80000000,1,1",
+                "\t.comm D_80000002,2,2",
+                "\t.comm D_80000004,9,2",
             ],
             res,
         )
