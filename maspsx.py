@@ -22,6 +22,7 @@ class AspsxVersionConfig:
     gp_allow_la: bool = False
     addiu_at: bool = False
     lcomm_alignment: LcommAlignment = LcommAlignment.WORD
+    comm_uses_sdata_limit: bool = True
 
 
 def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfig:
@@ -35,6 +36,8 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.lcomm_alignment = LcommAlignment.NONE
     if (1, 10) < aspsx_version < (2, 10):
         config.div_uses_tge = True
+    if aspsx_version < (2, 10):
+        config.comm_uses_sdata_limit = False
     if aspsx_version < (2, 30):
         config.nop_at_expansion = True
         config.nop_mflo_mfhi = False
@@ -157,6 +160,7 @@ def main() -> None:
             use_comm_section=args.use_comm_section,
             use_comm_for_lcomm=args.use_comm_for_lcomm,
             lcomm_alignment=version_config.lcomm_alignment,
+            comm_uses_sdata_limit=version_config.comm_uses_sdata_limit,
         )
 
     try:

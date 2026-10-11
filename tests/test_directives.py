@@ -172,3 +172,26 @@ class TestDirectives(unittest.TestCase):
             ],
             res,
         )
+
+    def test_comm_ignores_sdata_limit(self):
+        lines = [
+            "\t.comm\tD_80000000,4",
+            "\t.lcomm\tD_80000004,4",
+        ]
+        mp = MaspsxProcessor(lines, sdata_limit=8, comm_uses_sdata_limit=False)
+        res = mp.process_lines()
+
+        self.assertEqual(
+            [
+                ".section .sbss",
+                "\t.align 2",
+                "D_80000004:",
+                "\t.space 4",
+                ".section .bss",
+                "\t.align 2",
+                "\t.globl D_80000000",
+                "D_80000000:",
+                "\t.space 4",
+            ],
+            res,
+        )

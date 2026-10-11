@@ -29,6 +29,7 @@ class TestCli(unittest.TestCase):
                 nop_lw_lw=True,
                 addiu_at=True,
                 lcomm_alignment=lcomm_alignment.NONE,
+                comm_uses_sdata_limit=False,
             ),
             "2.05": self.maspsx_cli.AspsxVersionConfig(
                 div_uses_tge=True,
@@ -37,6 +38,7 @@ class TestCli(unittest.TestCase):
                 nop_lw_lw=True,
                 addiu_at=True,
                 lcomm_alignment=lcomm_alignment.NONE,
+                comm_uses_sdata_limit=False,
             ),
             "2.08": self.maspsx_cli.AspsxVersionConfig(
                 div_uses_tge=True,
@@ -44,6 +46,7 @@ class TestCli(unittest.TestCase):
                 nop_mflo_mfhi=False,
                 nop_lw_lw=True,
                 addiu_at=True,
+                comm_uses_sdata_limit=False,
             ),
             "2.21": self.maspsx_cli.AspsxVersionConfig(
                 nop_at_expansion=True,

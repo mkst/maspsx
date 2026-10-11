@@ -474,6 +474,7 @@ class MaspsxProcessor:
         use_comm_section=False,
         use_comm_for_lcomm=False,
         lcomm_alignment=LcommAlignment.WORD,
+        comm_uses_sdata_limit=True,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -496,6 +497,7 @@ class MaspsxProcessor:
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
         self.lcomm_alignment = lcomm_alignment
+        self.comm_uses_sdata_limit = comm_uses_sdata_limit
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -553,12 +555,14 @@ class MaspsxProcessor:
                 _, var = line.split()
                 symbol, size_str, *_ = var.split(",")
                 size = int(size_str)
-                if size <= self.sdata_limit:
+                is_comm = line.startswith(".comm")
+                uses_sdata_limit = self.comm_uses_sdata_limit or not is_comm
+                if uses_sdata_limit and size <= self.sdata_limit:
                     self.sbss_entries[symbol] = size
                 else:
                     self.bss_entries[symbol] = size
 
-                if line.startswith(".comm"):
+                if is_comm:
                     self.comm_symbols.add(symbol)
                 continue
 
