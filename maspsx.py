@@ -20,6 +20,7 @@ class AspsxVersionConfig:
     expand_li: bool = True
     gp_allow_offset: bool = False
     gp_allow_la: bool = False
+    use_gp_rel: bool = True
     addiu_at: bool = False
     lcomm_alignment: LcommAlignment = LcommAlignment.WORD
     comm_uses_sdata_limit: bool = True
@@ -38,6 +39,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.div_uses_tge = True
     if aspsx_version < (2, 10):
         config.comm_uses_sdata_limit = False
+        config.use_gp_rel = False
     if aspsx_version < (2, 30):
         config.nop_at_expansion = True
         config.nop_mflo_mfhi = False
@@ -135,6 +137,8 @@ def main() -> None:
 
         filtered_as_args.append(arg)
 
+    force_G0 = not args.dont_force_G0
+
     if args.passthrough:
         processor = PassthroughProcessor(in_lines)
 
@@ -143,6 +147,10 @@ def main() -> None:
 
         if args.dont_expand_li and version_config.expand_li:
             version_config.expand_li = False
+
+        # GNU as would otherwise use $gp itself
+        if not version_config.use_gp_rel:
+            force_G0 = True
 
         processor = MaspsxProcessor(
             in_lines,
@@ -157,6 +165,7 @@ def main() -> None:
             div_uses_tge=version_config.div_uses_tge,
             gp_allow_offset=version_config.gp_allow_offset,
             gp_allow_la=version_config.gp_allow_la,
+            use_gp_rel=version_config.use_gp_rel,
             use_comm_section=args.use_comm_section,
             use_comm_for_lcomm=args.use_comm_for_lcomm,
             lcomm_alignment=version_config.lcomm_alignment,
@@ -189,7 +198,7 @@ def main() -> None:
             *filtered_as_args,
             "-",  # read from stdin
         ]
-        if not args.dont_force_G0:
+        if force_G0:
             cmd.insert(-1, "-G0")
 
         with subprocess.Popen(

@@ -108,6 +108,34 @@ class TestGpRel(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines[:2])
 
+    def test_gp_rel_not_used_when_disabled(self):
+        lines = [
+            "	.sdata",
+            "	gValue:",
+            "	.word	1",
+            "	.lcomm	gCount,4",
+            "	.section .text",
+            "	lw	$4,gValue",
+            "	sw	$4,gCount",
+            "	la	$2,gCount",
+        ]
+        expected_lines = [
+            "lw\t$4,gValue",
+            "sw\t$4,gCount",
+            "la\t$2,gCount",
+        ]
+
+        mp = MaspsxProcessor(
+            lines,
+            sdata_limit=8,
+            gp_allow_la=True,
+            use_gp_rel=False,
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines[4:7])
+
     def test_gp_rel_load_with_offset_not_allowed_sdata(self):
         lines = [
             "	.sdata",
