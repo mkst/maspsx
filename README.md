@@ -57,18 +57,20 @@ Pass this as a single argument, e.g. `-G8`, rather than `-G 8`.
 
 ## Known Differences
 
-| Behavior / Version            | 1.05/1.07      | 2.05/2.08      | 2.21          | 2.30/2.34      | 2.56           | 2.67           | 2.77/2.79      | 2.81/2.86      |
-|:------------------------------|:--------------:|:--------------:|:-------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
-| div uses tge not break        | :white_circle: | :green_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| add nop before $at expansion  | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use addiu in $at expansion    | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| li 1 expands to ori 1         | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
-| use $at for sltu < 0          | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: |
-| supports `-0` argument        | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| mflo+mfhi / mult+div inst gap | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
-| support for %hi/%lo macros    | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: |
-| use $gp for symbol+offset     | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
-| use $gp for la                | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: |
+| Behavior / Version                      | 1.05/1.07      | 2.05/2.08      | 2.21          | 2.30/2.34      | 2.56           | 2.67           | 2.77/2.79      | 2.81/2.86      |
+|:----------------------------------------|:--------------:|:--------------:|:-------------:|:--------------:|:--------------:|:--------------:|:--------------:|:--------------:|
+| div uses tge not break                  | :white_circle: | :green_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| add nop before $at expansion            | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use addiu in $at expansion              | :green_circle: | :green_circle: |:green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| li 1 expands to ori 1                   | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: |
+| use $at for sltu < 0                    | :green_circle: | :green_circle: |:green_circle: | :green_circle: | :green_circle: | :white_circle: | :white_circle: | :white_circle: |
+| place small `.comm` symbols in `.sbss`  | :white_circle: | :white_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| use $gp for small-data access           | :white_circle: | :white_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| supports `-0` argument                  | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| mflo+mfhi / mult+div inst gap           | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| support for %hi/%lo macros              | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: |
+| use $gp for symbol+offset               | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
+| use $gp for la                          | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: |
 
 
 ## `INCLUDE_ASM` reordering workaround hack
