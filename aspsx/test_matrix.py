@@ -13,13 +13,17 @@ class TestAssemblerMatrix(unittest.TestCase):
 
 def _test_for(case):
     def test(self):
-        actual = util.run_aspsx(
+        result = util.run_aspsx_result(
             case.source,
             {"aspsx_version": case.aspsx_version},
             data_limit=case.data_limit,
             extra_flags=case.extra_flags,
         )
-        util.assert_assembly_equal(self, case.expected, actual)
+        if not result.ok:
+            raise util.AssemblerError(result)
+        mismatch = util.output_diff(case.text, case.sections, result)
+        if mismatch:
+            self.fail(mismatch)
 
     return test
 

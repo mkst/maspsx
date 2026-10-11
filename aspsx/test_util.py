@@ -1,8 +1,10 @@
 from pathlib import Path
 import subprocess
+import tempfile
 import unittest
 from unittest.mock import patch
 
+import case_model
 import util
 
 
@@ -79,3 +81,77 @@ class TestAssemblyDiff(unittest.TestCase):
         self.assertIn("0x8F820000", diff)
         self.assertIn("addu", diff)
         self.assertIn("lw", diff)
+
+
+class TestOutputDiff(unittest.TestCase):
+    def result(self, sections):
+        return util.RunResult(
+            Path("ASM/GP.S"),
+            "2.67",
+            "wine",
+            [],
+            instructions=["0x00000000"],
+            sections=sections,
+        )
+
+    def test_matching_output_has_no_report(self):
+        result = self.result({".sbss": {"a": 0x0, "tail": 0x4}})
+        self.assertEqual(
+            "",
+            util.output_diff(
+                ["0x00000000"], {".sbss": {"a": 0x0, "tail": 0x4}}, result
+            ),
+        )
+
+    def test_only_listed_sections_are_checked(self):
+        result = self.result({".sbss": {"a": 0x0}})
+        self.assertEqual("", util.output_diff(None, {}, result))
+
+    def test_only_listed_symbols_are_checked(self):
+        result = self.result({".sbss": {"pad": 0x0, "x": 0x4}})
+        self.assertEqual("", util.output_diff(None, {".sbss": {"x": 0x4}}, result))
+
+    def test_reports_moved_and_missing_symbols(self):
+        result = self.result({".sbss": {"a": 0x0, "b": 0x8, "c": 0xC}})
+        report = util.output_diff(
+            None, {".sbss": {"a": 0x0, "b": 0x4, "tail": 0x8}}, result
+        )
+        self.assertIn(".sbss mismatch", report)
+        self.assertRegex(report, r"\nb\s+0x4\s+0x8")
+        self.assertRegex(report, r"\ntail\s+0x8\s+<missing>")
+        self.assertNotRegex(report, r"\n[ac]\s")
+
+
+class TestFixtureModel(unittest.TestCase):
+    def load(self, cases: str) -> dict:
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / "case.yaml"
+            path.write_text("source: ASM/GP.S\ncases:\n" + cases)
+            return case_model._load_fixture(path)
+
+    def test_accepts_text_and_data_sections(self):
+        fixture = self.load(
+            '  "2.67":\n'
+            "    .text:\n"
+            '      - "0x00000000"\n'
+            "    .sbss:\n"
+            "      a: 0x0\n"
+            "      tail: 0x4\n"
+        )
+        self.assertEqual({"a": 0, "tail": 4}, fixture["cases"]["2.67"][".sbss"])
+
+    def test_rejects_unknown_section(self):
+        with self.assertRaisesRegex(ValueError, "unknown section '.foo'"):
+            self.load('  "2.67":\n    .foo:\n      a: 0x0\n')
+
+    def test_rejects_non_integer_offset(self):
+        with self.assertRaisesRegex(ValueError, "non-empty map of symbol names"):
+            self.load('  "2.67":\n    .sbss:\n      a: zero\n')
+
+    def test_rejects_empty_section(self):
+        with self.assertRaisesRegex(ValueError, "non-empty map of symbol names"):
+            self.load('  "2.67":\n    .sbss: {}\n')
+
+    def test_rejects_bare_word_list(self):
+        with self.assertRaisesRegex(ValueError, "non-empty map of sections"):
+            self.load('  "2.67":\n    - "0x00000000"\n')

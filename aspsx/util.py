@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import shlex
 import shutil
@@ -29,6 +29,11 @@ DEFAULT_TIMEOUT = 30.0
 
 PSYQ_OBJ_PARSER = Path(__file__).parent / "deps" / "psyq-obj-parser"
 
+DATA_SECTIONS = (".rdata", ".data", ".sdata", ".sbss", ".bss")
+
+STT_SECTION = 3
+STT_FILE = 4
+
 # The instruction bits that each ELF relocation type fills in.
 RELOCATION_MASKS = {
     2: 0xFFFFFFFF,  # R_MIPS_32
@@ -40,7 +45,7 @@ RELOCATION_MASKS = {
 
 
 class ObjectFormatError(ValueError):
-    """Raised when a PSYQ object cannot be converted or has no .text section."""
+    """Raised when a PSYQ object cannot be converted or read."""
 
 
 @dataclass
@@ -56,6 +61,8 @@ class RunResult:
     error: Optional[str] = None
     duration: float = 0.0
     failure_kind: Optional[str] = None
+    # Symbol offsets, keyed by data section and then by symbol name.
+    sections: dict[str, dict[str, int]] = field(default_factory=dict)
 
     @property
     def ok(self) -> bool:
@@ -157,12 +164,39 @@ def read_text_section(elf_data: bytes) -> bytes:
     elf = Elf32File(elf_data)
     text = elf.progbits.get(FileSectionType.Text)
     if text is None:
-        raise ObjectFormatError("object did not contain a .text section")
+        return b""
     rel = elf.rel.get(FileSectionType.Text)
     relocations = [(r.offset, r.rType) for r in rel.relocations] if rel else []
     return clear_relocated_fields(
         elf_data[text.offset : text.offset + text.size], relocations
     )
+
+
+def read_symbol_offsets(elf_data: bytes) -> dict[str, dict[str, int]]:
+    """Return the offset of each symbol ASPSX placed in a data section."""
+    from spimdisasm.elf32 import Elf32File
+
+    elf = Elf32File(elf_data)
+    names = {
+        index: elf.shstrtab[header.name]
+        for index, header in enumerate(elf.sectionHeaders.sections)
+    }
+    sections: dict[str, dict[str, int]] = {}
+    for symbol in elf.symtab.symbols:
+        name = elf.strtab[symbol.name]
+        section = names.get(symbol.shndx)
+        if not name or section not in DATA_SECTIONS:
+            continue
+        if symbol.info & 0xF in (STT_SECTION, STT_FILE):
+            continue
+        # The linker places `.comm` symbols, so their offsets come from
+        # psyq-obj-parser rather than ASPSX. They're the only data symbols
+        # with a size.
+        # We can't validate `.comm` behavior, so skip these symbols.
+        if symbol.size:
+            continue
+        sections.setdefault(section, {})[name] = symbol.value
+    return sections
 
 
 def _words_from_text(text_data: bytes) -> list[str]:
@@ -331,9 +365,9 @@ def run_aspsx_result(
         elf_file = workspace / "output.elf"
         try:
             convert_to_elf(object_file, elf_file, timeout)
-            result.instructions = _words_from_text(
-                read_text_section(elf_file.read_bytes())
-            )
+            elf_data = elf_file.read_bytes()
+            result.instructions = _words_from_text(read_text_section(elf_data))
+            result.sections = read_symbol_offsets(elf_data)
         except FileNotFoundError as exc:
             result.error = f"required host executable is unavailable: {exc.filename}"
             result.failure_kind = "missing_tool"
@@ -408,7 +442,32 @@ def assembly_diff(expected: list[str], actual: list[str]) -> str:
     return "\n".join(lines)
 
 
-def assert_assembly_equal(testcase, expected: list[str], actual: list[str]) -> None:
-    """Assert words while retaining a useful assembly-level mismatch report."""
-    if expected != actual:
-        testcase.fail("assembly mismatch\n\n" + assembly_diff(expected, actual))
+def symbol_diff(expected: dict[str, int], actual: dict[str, int]) -> str:
+    """Format the expected symbols whose offsets differ, in section order."""
+    lines = [f"{'symbol':<24}{'expected':<12}actual"]
+    for name in sorted(expected, key=lambda name: (expected[name], name)):
+        if expected[name] != actual.get(name):
+            got = f"0x{actual[name]:X}" if name in actual else "<missing>"
+            lines.append(f"{name:<24}{f'0x{expected[name]:X}':<12}{got}")
+    return "\n".join(lines)
+
+
+def output_diff(
+    expected_text: Optional[list[str]],
+    expected_sections: dict[str, dict[str, int]],
+    result: RunResult,
+) -> str:
+    """
+    Return a report for each expected section that differs, or "".
+
+    Only the sections and symbols listed in the fixture are checked.
+    """
+    reports = []
+    actual_text = result.instructions or []
+    if expected_text is not None and expected_text != actual_text:
+        reports.append(".text mismatch\n\n" + assembly_diff(expected_text, actual_text))
+    for section, expected in expected_sections.items():
+        actual = result.sections.get(section, {})
+        if any(expected[name] != actual.get(name) for name in expected):
+            reports.append(f"{section} mismatch\n\n" + symbol_diff(expected, actual))
+    return "\n\n".join(reports)

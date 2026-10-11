@@ -56,10 +56,13 @@ python3 -m unittest -v test_matrix.TestAssemblerMatrix.test_v0_at_2_08
 
 Fixture data lives in one YAML file per feature under `fixtures/`. Each file
 contains the source assembly path, optional assembler flags, and expected
-word arrays keyed directly by ASPSX version. Adding a case normally only requires editing
-the relevant YAML file. Identical expected sequences use YAML anchors and
-aliases; keep a literal sequence when a version differs in even one word.
-Expected words have inline comments generated from `spimdisasm disasmdis
+section contents keyed directly by ASPSX version.
+
+Adding a case normally only requires editing the relevant YAML file.
+Identical expected sequences use YAML anchors and aliases;
+keep a literal sequence when a version differs in even one word.
+
+Expected assembly code has inline comments generated from `spimdisasm disasmdis
 --pseudos`, so the encoded output and readable assembly can be reviewed
 together.
 

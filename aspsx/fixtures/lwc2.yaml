@@ -1,8 +1,9 @@
 source: ASM/LWC2.S
 cases:
   "1.05": &lwc2_1_05_expected
-    - "0xC8850004"  # lwc2        $5, 0x4($a0)
-    - "0x24A40008"  # addiu       $a0, $a1, 0x8
+    .text:
+      - "0xC8850004"  # lwc2        $5, 0x4($a0)
+      - "0x24A40008"  # addiu       $a0, $a1, 0x8
   "1.07": *lwc2_1_05_expected
   "2.05": *lwc2_1_05_expected
   "2.08": *lwc2_1_05_expected
