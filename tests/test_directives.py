@@ -111,9 +111,7 @@ class TestDirectives(unittest.TestCase):
             "\t.lcomm\tD_80000004,2",
             "\t.lcomm\tD_80000008,5",
         ]
-        mp = MaspsxProcessor(
-            lines, sdata_limit=8, lcomm_alignment=LcommAlignment.WORD
-        )
+        mp = MaspsxProcessor(lines, sdata_limit=8, lcomm_alignment=LcommAlignment.WORD)
         res = mp.process_lines()
 
         self.assertEqual(
