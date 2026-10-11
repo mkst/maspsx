@@ -20,6 +20,7 @@ class TestCli(unittest.TestCase):
         spec.loader.exec_module(cls.maspsx_cli)
 
     def test_config_for_aspsx_version(self):
+        lcomm_alignment = self.maspsx_cli.LcommAlignment
         expected_by_version = {
             None: self.maspsx_cli.AspsxVersionConfig(),
             "1.05": self.maspsx_cli.AspsxVersionConfig(
@@ -27,8 +28,17 @@ class TestCli(unittest.TestCase):
                 nop_mflo_mfhi=False,
                 nop_lw_lw=True,
                 addiu_at=True,
+                lcomm_alignment=lcomm_alignment.NONE,
             ),
             "2.05": self.maspsx_cli.AspsxVersionConfig(
+                div_uses_tge=True,
+                nop_at_expansion=True,
+                nop_mflo_mfhi=False,
+                nop_lw_lw=True,
+                addiu_at=True,
+                lcomm_alignment=lcomm_alignment.NONE,
+            ),
+            "2.08": self.maspsx_cli.AspsxVersionConfig(
                 div_uses_tge=True,
                 nop_at_expansion=True,
                 nop_mflo_mfhi=False,
@@ -48,17 +58,20 @@ class TestCli(unittest.TestCase):
             "2.67": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
                 sltu_at=False,
+                lcomm_alignment=lcomm_alignment.POWER_OF_TWO,
             ),
             "2.77": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
                 sltu_at=False,
                 gp_allow_offset=True,
+                lcomm_alignment=lcomm_alignment.POWER_OF_TWO,
             ),
             "2.81": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
                 sltu_at=False,
                 gp_allow_offset=True,
                 gp_allow_la=True,
+                lcomm_alignment=lcomm_alignment.POWER_OF_TWO,
             ),
         }
 

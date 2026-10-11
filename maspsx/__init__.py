@@ -1,6 +1,7 @@
 import struct
 import re
 
+from enum import Enum
 from typing import List
 
 branch_mnemonics = {
@@ -70,6 +71,15 @@ double_reg_loads = {
     "slti",
     "sltu",
 }
+
+
+class LcommAlignment(Enum):
+    # Packed right after the previous symbol
+    NONE = "none"
+    # Aligned to 4, size rounded up to a multiple of 4
+    WORD = "word"
+    # Aligned to the size rounded up to a power of two, at most 16
+    POWER_OF_TWO = "power_of_two"
 
 
 def strip_comments(line: str) -> str:
@@ -463,7 +473,7 @@ class MaspsxProcessor:
         gp_allow_la=False,
         use_comm_section=False,
         use_comm_for_lcomm=False,
-        max_comm_alignment=16,
+        lcomm_alignment=LcommAlignment.WORD,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -485,7 +495,7 @@ class MaspsxProcessor:
 
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
-        self.max_comm_alignment = max_comm_alignment
+        self.lcomm_alignment = lcomm_alignment
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -630,22 +640,20 @@ class MaspsxProcessor:
                 if i == 0:
                     res.append(f".section .{section}")
 
-                if self.use_comm_section and (
-                    symbol in self.comm_symbols or self.use_comm_for_lcomm
-                ):
+                alignment, padded_size = self._lcomm_layout(size)
+
+                if self.use_comm_section and symbol in self.comm_symbols:
                     # GNU as's implicit alignment: the size rounded up to a power of two
-                    implicit_alignment = 1 << (size - 1).bit_length()
-                    alignment = min(implicit_alignment, self.max_comm_alignment)
+                    alignment = min(1 << (size - 1).bit_length(), 16)
                     res.append(f"\t.comm {symbol},{size},{alignment}")
                     continue
 
-                if section == "sbss":
-                    if size >= 8:
-                        res.append("\t.align 3")
-                    elif size >= 4:
-                        res.append("\t.align 2")
-                    elif size >= 2:
-                        res.append("\t.align 1")
+                if self.use_comm_section and self.use_comm_for_lcomm:
+                    res.append(f"\t.comm {symbol},{size},{alignment}")
+                    continue
+
+                if alignment > 1:
+                    res.append(f"\t.align {alignment.bit_length() - 1}")
 
                 # only mark bss symbols as global
                 if section == "bss":
@@ -655,11 +663,21 @@ class MaspsxProcessor:
                 res.extend(
                     [
                         f"{symbol}:",
-                        f"\t.space {size}",
+                        f"\t.space {padded_size}",
                     ]
                 )
 
         return res
+
+    def _lcomm_layout(self, size: int) -> tuple[int, int]:
+        """Return the alignment and allocated size of a `.lcomm` symbol."""
+        if self.lcomm_alignment == LcommAlignment.WORD:
+            return 4, (size + 3) & ~3
+
+        if self.lcomm_alignment == LcommAlignment.POWER_OF_TWO and size > 1:
+            return min(1 << (size - 1).bit_length(), 16), size
+
+        return 1, size
 
     def get_next_instruction(
         self, skip=0, ignore_nop=False, ignore_set=False, ignore_label=False

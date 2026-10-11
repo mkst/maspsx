@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from typing import List
 from pathlib import Path
 
-from maspsx import MaspsxProcessor, PassthroughProcessor
+from maspsx import LcommAlignment, MaspsxProcessor, PassthroughProcessor
 
 
 @dataclass
@@ -21,6 +21,7 @@ class AspsxVersionConfig:
     gp_allow_offset: bool = False
     gp_allow_la: bool = False
     addiu_at: bool = False
+    lcomm_alignment: LcommAlignment = LcommAlignment.WORD
 
 
 def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfig:
@@ -30,6 +31,8 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         return config
 
     aspsx_version = tuple(int(x) for x in aspsx_version_arg.split("."))
+    if aspsx_version < (2, 8):
+        config.lcomm_alignment = LcommAlignment.NONE
     if (1, 10) < aspsx_version < (2, 10):
         config.div_uses_tge = True
     if aspsx_version < (2, 30):
@@ -41,6 +44,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.expand_li = False
     if aspsx_version >= (2, 60):
         config.sltu_at = False
+        config.lcomm_alignment = LcommAlignment.POWER_OF_TWO
     if aspsx_version >= (2, 70):
         config.gp_allow_offset = True
     if aspsx_version >= (2, 80):
@@ -62,7 +66,6 @@ def main() -> None:
     parser.add_argument("--passthrough", action="store_true")
     parser.add_argument("--use-comm-section", action="store_true")
     parser.add_argument("--use-comm-for-lcomm", action="store_true")
-    parser.add_argument("--max-comm-alignment", type=int, default=16)
     # decomp.me debugging
     parser.add_argument("--print-output", action="store_true")
     parser.add_argument("--print-input", action="store_true")
@@ -153,7 +156,7 @@ def main() -> None:
             gp_allow_la=version_config.gp_allow_la,
             use_comm_section=args.use_comm_section,
             use_comm_for_lcomm=args.use_comm_for_lcomm,
-            max_comm_alignment=args.max_comm_alignment,
+            lcomm_alignment=version_config.lcomm_alignment,
         )
 
     try:
