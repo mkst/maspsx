@@ -330,7 +330,7 @@ class TestNop(unittest.TestCase):
             "lh\t$2,2($2)",
             "sw\t$2,Map_water_height",
         ]
-        mp = MaspsxProcessor(lines, sdata_limit=4, use_gp_rel=False)
+        mp = MaspsxProcessor(lines, sdata_limit=4, gp_allow=False)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

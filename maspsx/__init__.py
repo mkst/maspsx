@@ -486,7 +486,7 @@ class MaspsxProcessor:
         max_comm_alignment=16,
         lcomm_alignment=LcommAlignment.WORD,
         comm_uses_sdata_limit=True,
-        use_gp_rel=True,
+        gp_allow=True,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -505,7 +505,7 @@ class MaspsxProcessor:
 
         self.gp_allow_offset = gp_allow_offset
         self.gp_allow_la = gp_allow_la
-        self.use_gp_rel = use_gp_rel
+        self.gp_allow = gp_allow
 
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
@@ -708,7 +708,7 @@ class MaspsxProcessor:
         return ""  # warn user?
 
     def _uses_gp(self, line: str) -> bool:
-        if self.sdata_limit == 0 or not self.use_gp_rel:
+        if self.sdata_limit == 0 or not self.gp_allow:
             return False
 
         line = strip_comments(line)
@@ -1031,7 +1031,7 @@ class MaspsxProcessor:
                     gp_rel = f"%gp_rel({symbol})($gp)"
                     gp_allowed = True
 
-                if self.use_gp_rel and gp_allowed and (
+                if self.gp_allow and gp_allowed and (
                     symbol in self.sdata_entries or symbol in self.sbss_entries
                 ):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
@@ -1122,7 +1122,7 @@ class MaspsxProcessor:
                 if op == "la" and not self.gp_allow_la:
                     gp_allowed = False
 
-                if self.use_gp_rel and gp_allowed and (
+                if self.gp_allow and gp_allowed and (
                     symbol in self.sdata_entries or symbol in self.sbss_entries
                 ):
                     res.append(f"{op}\t{r_dest},{gp_rel}")

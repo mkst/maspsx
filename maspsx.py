@@ -20,7 +20,7 @@ class AspsxVersionConfig:
     expand_li: bool = True
     gp_allow_offset: bool = False
     gp_allow_la: bool = False
-    use_gp_rel: bool = True
+    gp_allow: bool = True
     addiu_at: bool = False
     lcomm_alignment: LcommAlignment = LcommAlignment.WORD
     comm_uses_sdata_limit: bool = True
@@ -39,7 +39,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.div_uses_tge = True
     if aspsx_version < (2, 10):
         config.comm_uses_sdata_limit = False
-        config.use_gp_rel = False
+        config.gp_allow = False
     if aspsx_version < (2, 30):
         config.nop_at_expansion = True
         config.nop_mflo_mfhi = False
@@ -150,7 +150,7 @@ def main() -> None:
             version_config.expand_li = False
 
         # GNU as would otherwise use $gp itself
-        if not version_config.use_gp_rel:
+        if not version_config.gp_allow:
             force_G0 = True
 
         processor = MaspsxProcessor(
@@ -166,7 +166,7 @@ def main() -> None:
             div_uses_tge=version_config.div_uses_tge,
             gp_allow_offset=version_config.gp_allow_offset,
             gp_allow_la=version_config.gp_allow_la,
-            use_gp_rel=version_config.use_gp_rel,
+            gp_allow=version_config.gp_allow,
             use_comm_section=args.use_comm_section,
             use_comm_for_lcomm=args.use_comm_for_lcomm,
             max_comm_alignment=args.max_comm_alignment,

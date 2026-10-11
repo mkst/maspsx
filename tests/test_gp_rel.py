@@ -129,7 +129,7 @@ class TestGpRel(unittest.TestCase):
             lines,
             sdata_limit=8,
             gp_allow_la=True,
-            use_gp_rel=False,
+            gp_allow=False,
         )
         res = mp.process_lines()
 
