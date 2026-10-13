@@ -27,7 +27,7 @@ ASPSX_RUNNER_LOOKUP = {
 
 DEFAULT_TIMEOUT = 30.0
 
-PSYQ_OBJ_PARSER = Path(__file__).parent / "deps" / "psyq-obj-parser"
+PSYQ_OBJ_PARSER = Path(__file__).parent / "binaries" / "psyq-obj-parser"
 
 DATA_SECTIONS = (".rdata", ".data", ".sdata", ".sbss", ".bss")
 

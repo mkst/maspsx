@@ -25,6 +25,20 @@ tar xvzf aspsx-binaries.tar.gz -C binaries
 rm aspsx-binaries.tar.gz
 ```
 
+**Fetch `psyq-obj-parser`**
+
+`psyq-obj-parser` is a utility for parsing PsyQ objects (produced by ASPSX).
+It is maintained in the [`pcsx-redux`](https://github.com/grumpycoders/pcsx-redux) project
+and can be built from source if needed.
+
+Alternatively, a pre-built version of the binary can be found in the same
+location as the ASPSX binaries.
+
+```sh
+wget https://github.com/mkst/maspsx/releases/download/aspsx/psyq-obj-parser binaries/psyq-obj-parser
+chmod +x binaries/psyq-obj-parser
+```
+
 **Run the tests**
 
 ```sh
