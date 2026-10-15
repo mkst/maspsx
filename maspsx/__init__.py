@@ -1110,7 +1110,9 @@ class MaspsxProcessor:
 
             if is_addend and r_source is None:
                 # e.g. sw	$v0,D_800E52E0
-                if operand.count("+") == 1:
+                if not self.gp_allow:
+                    gp_allowed = False
+                elif operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
                     gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols
@@ -1122,11 +1124,7 @@ class MaspsxProcessor:
                 if op == "la" and not self.gp_allow_la:
                     gp_allowed = False
 
-                if (
-                    self.gp_allow
-                    and gp_allowed
-                    and (symbol in self.sdata_entries or symbol in self.sbss_entries)
-                ):
+                if gp_allowed and (symbol in self.sdata_entries or symbol in self.sbss_entries):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
