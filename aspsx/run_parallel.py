@@ -21,7 +21,7 @@ import util
 class CaseResult:
     case: AssemblerCase
     result: util.RunResult
-    mismatch: bool = False
+    mismatch: str = ""
 
     @property
     def passed(self) -> bool:
@@ -36,16 +36,15 @@ def run_case(case: AssemblerCase, timeout: float) -> CaseResult:
         case.extra_flags,
         timeout,
     )
-    expected = case.expected
-    return CaseResult(case, result, result.ok and result.instructions != expected)
+    if not result.ok:
+        return CaseResult(case, result)
+    return CaseResult(case, result, util.output_diff(case.text, case.sections, result))
 
 
 def render_failure(item: CaseResult) -> str:
     if not item.result.ok:
         return item.result.diagnostic()
-    return f"{item.case.name}: assembly mismatch\n\n" + util.assembly_diff(
-        item.case.expected, item.result.instructions or []
-    )
+    return f"{item.case.name}: {item.mismatch}"
 
 
 def main(argv: list[str] | None = None) -> int:

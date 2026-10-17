@@ -5,6 +5,8 @@ The idea of this directory is to leverage unit tests to catalog the various diff
 
 ## Running the tests
 
+Note that this test suite is designed for Linux x86_64 and does not support running on other platforms.
+
 **Install dosemu2 & wine**
 [dosemu2](https://github.com/dosemu2/dosemu2) is required to run the 16 bit ASPSX versions, `wine` is required to run the 32bit ASPSX versions.
 
@@ -21,6 +23,20 @@ mkdir -p binaries
 wget https://github.com/mkst/maspsx/releases/download/aspsx/aspsx-binaries.tar.gz
 tar xvzf aspsx-binaries.tar.gz -C binaries
 rm aspsx-binaries.tar.gz
+```
+
+**Fetch `psyq-obj-parser`**
+
+`psyq-obj-parser` is a utility for parsing PsyQ objects (produced by ASPSX).
+It is maintained in the [`pcsx-redux`](https://github.com/grumpycoders/pcsx-redux) project
+and can be built from source if needed.
+
+Alternatively, a pre-built version of the binary can be found in the same
+location as the ASPSX binaries.
+
+```sh
+wget https://github.com/mkst/maspsx/releases/download/aspsx/psyq-obj-parser binaries/psyq-obj-parser
+chmod +x binaries/psyq-obj-parser
 ```
 
 **Run the tests**
@@ -54,10 +70,13 @@ python3 -m unittest -v test_matrix.TestAssemblerMatrix.test_v0_at_2_08
 
 Fixture data lives in one YAML file per feature under `fixtures/`. Each file
 contains the source assembly path, optional assembler flags, and expected
-word arrays keyed directly by ASPSX version. Adding a case normally only requires editing
-the relevant YAML file. Identical expected sequences use YAML anchors and
-aliases; keep a literal sequence when a version differs in even one word.
-Expected words have inline comments generated from `spimdisasm disasmdis
+section contents keyed directly by ASPSX version.
+
+Adding a case normally only requires editing the relevant YAML file.
+Identical expected sequences use YAML anchors and aliases;
+keep a literal sequence when a version differs in even one word.
+
+Expected assembly code has inline comments generated from `spimdisasm disasmdis
 --pseudos`, so the encoded output and readable assembly can be reviewed
 together.
 

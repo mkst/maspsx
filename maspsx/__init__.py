@@ -1,6 +1,7 @@
 import struct
 import re
 
+from enum import Enum
 from typing import List
 
 branch_mnemonics = {
@@ -70,6 +71,25 @@ double_reg_loads = {
     "slti",
     "sltu",
 }
+
+
+class LcommAlignment(Enum):
+    # Packed right after the previous symbol
+    NONE = "none"
+    # Aligned to 4, size rounded up to a multiple of 4
+    WORD = "word"
+    # Aligned to the size rounded up to a power of two, at most 16
+    POWER_OF_TWO = "power_of_two"
+
+    def layout(self, size: int) -> tuple[int, int]:
+        """Return the alignment and allocated size of a `.lcomm` symbol."""
+        if self == LcommAlignment.WORD:
+            return 4, (size + 3) & ~3
+
+        if self == LcommAlignment.POWER_OF_TWO and size > 1:
+            return min(1 << (size - 1).bit_length(), 16), size
+
+        return 1, size
 
 
 def strip_comments(line: str) -> str:
@@ -464,6 +484,9 @@ class MaspsxProcessor:
         use_comm_section=False,
         use_comm_for_lcomm=False,
         max_comm_alignment=16,
+        lcomm_alignment=LcommAlignment.WORD,
+        comm_uses_sdata_limit=True,
+        gp_allow=True,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -482,10 +505,13 @@ class MaspsxProcessor:
 
         self.gp_allow_offset = gp_allow_offset
         self.gp_allow_la = gp_allow_la
+        self.gp_allow = gp_allow
 
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
         self.max_comm_alignment = max_comm_alignment
+        self.lcomm_alignment = lcomm_alignment
+        self.comm_uses_sdata_limit = comm_uses_sdata_limit
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -543,12 +569,14 @@ class MaspsxProcessor:
                 _, var = line.split()
                 symbol, size_str, *_ = var.split(",")
                 size = int(size_str)
-                if size <= self.sdata_limit:
+                is_comm = line.startswith(".comm")
+                uses_sdata_limit = self.comm_uses_sdata_limit or not is_comm
+                if uses_sdata_limit and size <= self.sdata_limit:
                     self.sbss_entries[symbol] = size
                 else:
                     self.bss_entries[symbol] = size
 
-                if line.startswith(".comm"):
+                if is_comm:
                     self.comm_symbols.add(symbol)
                 continue
 
@@ -630,22 +658,21 @@ class MaspsxProcessor:
                 if i == 0:
                     res.append(f".section .{section}")
 
-                if self.use_comm_section and (
-                    symbol in self.comm_symbols or self.use_comm_for_lcomm
-                ):
-                    # GNU as's implicit alignment: the size rounded up to a power of two
-                    implicit_alignment = 1 << (size - 1).bit_length()
-                    alignment = min(implicit_alignment, self.max_comm_alignment)
+                alignment, padded_size = self.lcomm_alignment.layout(size)
+                is_comm_symbol = symbol in self.comm_symbols or self.use_comm_for_lcomm
+
+                if self.use_comm_section and is_comm_symbol:
+                    if symbol in self.comm_symbols:
+                        # For actual `comm` symbols, force GNU as's implicit alignment:
+                        # the size rounded up to a power of two.
+                        alignment = 1 << (size - 1).bit_length()
+
+                    alignment = min(alignment, self.max_comm_alignment)
                     res.append(f"\t.comm {symbol},{size},{alignment}")
                     continue
 
-                if section == "sbss":
-                    if size >= 8:
-                        res.append("\t.align 3")
-                    elif size >= 4:
-                        res.append("\t.align 2")
-                    elif size >= 2:
-                        res.append("\t.align 1")
+                if alignment > 1:
+                    res.append(f"\t.align {alignment.bit_length() - 1}")
 
                 # only mark bss symbols as global
                 if section == "bss":
@@ -655,7 +682,7 @@ class MaspsxProcessor:
                 res.extend(
                     [
                         f"{symbol}:",
-                        f"\t.space {size}",
+                        f"\t.space {padded_size}",
                     ]
                 )
 
@@ -681,7 +708,7 @@ class MaspsxProcessor:
         return ""  # warn user?
 
     def _uses_gp(self, line: str) -> bool:
-        if self.sdata_limit == 0:
+        if self.sdata_limit == 0 or not self.gp_allow:
             return False
 
         line = strip_comments(line)
@@ -995,7 +1022,9 @@ class MaspsxProcessor:
 
             elif is_addend and r_source is None:
                 # e.g. lb	$s0,D_800E52E0
-                if operand.count("+") == 1:
+                if not self.gp_allow:
+                    gp_allowed = False
+                elif operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
                     gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols
@@ -1083,7 +1112,9 @@ class MaspsxProcessor:
 
             if is_addend and r_source is None:
                 # e.g. sw	$v0,D_800E52E0
-                if operand.count("+") == 1:
+                if not self.gp_allow:
+                    gp_allowed = False
+                elif operand.count("+") == 1:
                     symbol, offset = operand.split("+")
                     gp_rel = f"%gp_rel({symbol}+{offset})($gp)"
                     gp_allowed = self.gp_allow_offset or symbol not in self.comm_symbols

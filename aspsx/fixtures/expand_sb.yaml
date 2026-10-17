@@ -1,9 +1,10 @@
 source: ASM/EXPND_SB.S
 cases:
   "1.05": &expand_sb_1_05_expected
-    - "0x97A20010"  # lhu         $v0, 0x10($sp)
-    - "0x00000000"  # nop
-    - "0xA0022710"  # sb          $v0, 0x2710($zero)
+    .text:
+      - "0x97A20010"  # lhu         $v0, 0x10($sp)
+      - "0x00000000"  # nop
+      - "0xA0022710"  # sb          $v0, 0x2710($zero)
   "1.07": *expand_sb_1_05_expected
   "2.05": *expand_sb_1_05_expected
   "2.08": *expand_sb_1_05_expected
