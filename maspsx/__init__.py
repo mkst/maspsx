@@ -1033,7 +1033,9 @@ class MaspsxProcessor:
                     gp_rel = f"%gp_rel({symbol})($gp)"
                     gp_allowed = True
 
-                if gp_allowed and (symbol in self.sdata_entries or symbol in self.sbss_entries):
+                if gp_allowed and (
+                    symbol in self.sdata_entries or symbol in self.sbss_entries
+                ):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
@@ -1124,7 +1126,9 @@ class MaspsxProcessor:
                 if op == "la" and not self.gp_allow_la:
                     gp_allowed = False
 
-                if gp_allowed and (symbol in self.sdata_entries or symbol in self.sbss_entries):
+                if gp_allowed and (
+                    symbol in self.sdata_entries or symbol in self.sbss_entries
+                ):
                     res.append(f"{op}\t{r_dest},{gp_rel}")
                 else:
                     res.append(line)
