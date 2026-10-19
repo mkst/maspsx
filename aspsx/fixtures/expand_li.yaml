@@ -3,6 +3,10 @@ cases:
   "1.07": &expand_li_1_07_expected
     .text:
       - "0x34020000"  # ori         $v0, $zero, 0x0
+      - "0x34020001"  # ori         $v0, $zero, 0x1
+      - "0x34027FFF"  # ori         $v0, $zero, 0x7FFF
+      - "0x34028000"  # ori         $v0, $zero, 0x8000
+      - "0x3402FFFF"  # ori         $v0, $zero, 0xFFFF
       - "0x3C020001"  # lui         $v0, 0x1
       - "0x3C020001"  # lui         $v0, 0x1
       - "0x34420001"  # ori         $v0, $v0, 0x1
@@ -20,6 +24,10 @@ cases:
   "2.56": &expand_li_2_56_expected
     .text:
       - "0x24020000"  # addiu       $v0, $zero, 0x0
+      - "0x24020001"  # addiu       $v0, $zero, 0x1
+      - "0x24027FFF"  # addiu       $v0, $zero, 0x7FFF
+      - "0x34028000"  # ori         $v0, $zero, 0x8000
+      - "0x3402FFFF"  # ori         $v0, $zero, 0xFFFF
       - "0x3C020001"  # lui         $v0, 0x1
       - "0x3C020001"  # lui         $v0, 0x1
       - "0x34420001"  # ori         $v0, $v0, 0x1

@@ -18,7 +18,7 @@ class AspsxVersionConfig:
     nop_lw_lw: bool = False
     sltu_at: bool = True
     expand_li: bool = True
-    li_zero_uses_addiu: bool = False
+    li_small_uses_addiu: bool = False
     gp_allow_offset: bool = False
     gp_allow_la: bool = False
     gp_allow: bool = True
@@ -48,7 +48,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         config.nop_lw_lw = True
     if aspsx_version >= (2, 50):
         config.expand_li = False
-        config.li_zero_uses_addiu = True
+        config.li_small_uses_addiu = True
     if aspsx_version >= (2, 60):
         config.sltu_at = False
         config.lcomm_alignment = LcommAlignment.POWER_OF_TWO
@@ -160,7 +160,7 @@ def main() -> None:
             sdata_limit=sdata_limit,
             expand_div=args.expand_div,
             expand_li=version_config.expand_li,
-            li_zero_uses_addiu=version_config.li_zero_uses_addiu,
+            li_small_uses_addiu=version_config.li_small_uses_addiu,
             nop_at_expansion=version_config.nop_at_expansion,
             nop_mflo_mfhi=version_config.nop_mflo_mfhi,
             nop_lw_lw=version_config.nop_lw_lw,
