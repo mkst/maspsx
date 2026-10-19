@@ -27,7 +27,25 @@ class TestLi(unittest.TestCase):
         expected_lines = [
             "addiu\t$3,$zero,0",
         ]
-        mp = MaspsxProcessor(lines, expand_li=True, li_zero_uses_addiu=True)
+        mp = MaspsxProcessor(lines, expand_li=True, li_small_uses_addiu=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_li_positive_signed_16_uses_addiu(self):
+        lines = ["\tli\t$3,1", "\tli\t$4,32767"]
+        expected_lines = ["addiu\t$3,$zero,1", "addiu\t$4,$zero,32767"]
+        mp = MaspsxProcessor(lines, expand_li=True, li_small_uses_addiu=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_li_positive_16_above_signed_range_uses_ori(self):
+        lines = ["\tli\t$3,32768"]
+        expected_lines = ["ori\t$3,$zero,32768"]
+        mp = MaspsxProcessor(lines, expand_li=True, li_small_uses_addiu=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

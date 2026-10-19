@@ -257,7 +257,7 @@ def div_needs_expanding(line: str) -> bool:
     return r_dest not in ("$zero", "$0")
 
 
-def expand_load_immediate(line: str, li_zero_uses_addiu=False) -> List[str]:
+def expand_load_immediate(line: str, li_small_uses_addiu=False) -> List[str]:
     res = []
 
     match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
@@ -266,7 +266,10 @@ def expand_load_immediate(line: str, li_zero_uses_addiu=False) -> List[str]:
     r_dest = match.group(1)
     operand = int(match.group(2), 0)
 
-    if 0 < operand < 0x10000:
+    if 0 <= operand <= 0x7FFF:
+        inst = "addiu" if li_small_uses_addiu else "ori"
+        res.append(f"{inst}\t{r_dest},$zero,{operand}")
+    elif 0 < operand < 0x10000:
         res.append(f"ori\t{r_dest},$zero,{operand}")
     elif operand >= 0x10000:
         res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
@@ -276,14 +279,10 @@ def expand_load_immediate(line: str, li_zero_uses_addiu=False) -> List[str]:
         res.append(f"addiu\t{r_dest},$zero,{operand}")
     elif operand == -0x8000:
         res.append(f"addiu\t{r_dest},$zero,{operand} & 0xFFFF")
-    elif operand < -0x8000:
+    else:  # operand < -0x8000
         res.append(f"lui\t{r_dest},({operand} >> 16) & 0xFFFF")
         if operand & 0xFFFF:
             res.append(f"ori\t{r_dest},{r_dest},{operand} & 0xFFFF")
-    else:
-        # GNU as interprets the two-operand form as ori r_dest,r_dest,0.
-        inst = "addiu" if li_zero_uses_addiu else "ori"
-        res.append(f"{inst}\t{r_dest},$zero,0")
 
     return res
 
@@ -487,7 +486,7 @@ class MaspsxProcessor:
         lcomm_alignment=LcommAlignment.WORD,
         comm_uses_sdata_limit=True,
         gp_allow=True,
-        li_zero_uses_addiu=False,
+        li_small_uses_addiu=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -495,7 +494,7 @@ class MaspsxProcessor:
 
         self.expand_div = expand_div
         self.expand_li = expand_li
-        self.li_zero_uses_addiu = li_zero_uses_addiu
+        self.li_small_uses_addiu = li_small_uses_addiu
 
         self.nop_at_expansion = nop_at_expansion
         self.nop_mflo_mfhi = nop_mflo_mfhi
@@ -851,7 +850,10 @@ class MaspsxProcessor:
                         break
 
                     if op == "li":
-                        expanded = expand_load_immediate(inst, self.li_zero_uses_addiu)
+                        expanded = expand_load_immediate(
+                            inst,
+                            self.li_small_uses_addiu,
+                        )
 
                         if self.expand_li:
                             res += expanded
@@ -1184,7 +1186,10 @@ class MaspsxProcessor:
         elif op == "li":
             # TODO: handle non-soft floats?
             if self.expand_li:
-                res += expand_load_immediate(line, self.li_zero_uses_addiu)
+                res += expand_load_immediate(
+                    line,
+                    self.li_small_uses_addiu,
+                )
             else:
                 res.append(line)
 
