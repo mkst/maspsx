@@ -7,14 +7,8 @@ The idea of this directory is to leverage unit tests to catalog the various diff
 
 Note that this test suite is designed for Linux x86_64 and does not support running on other platforms.
 
-**Install dosemu2 & wine**
-[dosemu2](https://github.com/dosemu2/dosemu2) is required to run the 16 bit ASPSX versions, `wine` is required to run the 32bit ASPSX versions.
-
-```
-sudo add-apt-repository ppa:dosemu2/ppa
-sudo apt update
-sudo apt-get install dosemu2 wine
-```
+**Install Daze & Wibo**
+[Daze](https://github.com/mkst/daze) runs the 16-bit ASPSX versions, and [Wibo](https://github.com/decompals/wibo) runs the 32-bit versions. Install them from the [Daze releases](https://github.com/mkst/daze/releases/latest) and [Wibo releases](https://github.com/decompals/wibo/releases), and make sure `daze` and `wibo` are available on your `PATH`.
 
 **Fetch ASPSX binaries**
 

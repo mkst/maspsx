@@ -10,19 +10,19 @@ import time
 from typing import Optional
 
 ASPSX_RUNNER_LOOKUP = {
-    "1.05": "dosemu2",
-    "1.07": "dosemu2",
-    "2.05": "dosemu2",
-    "2.08": "dosemu2",
-    "2.21": "dosemu2",
-    "2.30": "dosemu2",
-    "2.34": "dosemu2",
-    "2.56": "wine",
-    "2.67": "wine",
-    "2.77": "wine",
-    "2.79": "wine",
-    "2.81": "wine",
-    "2.86": "wine",
+    "1.05": "daze",
+    "1.07": "daze",
+    "2.05": "daze",
+    "2.08": "daze",
+    "2.21": "daze",
+    "2.30": "daze",
+    "2.34": "daze",
+    "2.56": "wibo",
+    "2.67": "wibo",
+    "2.77": "wibo",
+    "2.79": "wibo",
+    "2.81": "wibo",
+    "2.86": "wibo",
 }
 
 DEFAULT_TIMEOUT = 30.0
@@ -220,13 +220,10 @@ def _build_command(
     extra_flags: str,
 ) -> list[str]:
     flags = [*shlex.split(data_limit), *shlex.split(extra_flags)]
-    if runner == "wine":
-        return ["wine", str(aspsx_path), *flags, "-o", object_name, source_name]
-    if runner == "dosemu2":
-        guest_command = shlex.join(
-            ["ASPSX.EXE", *flags, "-o", object_name, source_name]
-        )
-        return ["dosemu", "-dumb", "-K", str(workspace), "-E", guest_command]
+    if runner == "wibo":
+        return ["wibo", str(aspsx_path), *flags, "-o", object_name, source_name]
+    if runner == "daze":
+        return ["daze", "ASPSX.EXE", *flags, "-o", object_name, source_name]
     raise ValueError(f"unsupported ASPSX runner {runner!r}")
 
 
@@ -258,7 +255,7 @@ def run_aspsx_result(
         staged_source = workspace / source_asm.name
         try:
             shutil.copy2(source_asm, staged_source)
-            if runner == "dosemu2":
+            if runner == "daze":
                 shutil.copy2(aspsx_path, workspace / "ASPSX.EXE")
         except OSError as exc:
             return RunResult(
