@@ -7,6 +7,34 @@ from .util import strip_comments
 
 
 class TestLi(unittest.TestCase):
+    def test_expand_li_zero_uses_zero_register(self):
+        lines = [
+            "\tli\t$3,0",
+        ]
+        expected_lines = [
+            "ori\t$3,$zero,0",
+        ]
+        mp = MaspsxProcessor(lines, expand_li=True)
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
+    def test_expand_li_zero_can_use_addiu(self):
+        lines = [
+            "\tli\t$3,0",
+        ]
+        expected_lines = [
+            "addiu\t$3,$zero,0",
+        ]
+        mp = MaspsxProcessor(
+            lines, expand_li=True, li_zero_uses_addiu=True
+        )
+        res = mp.process_lines()
+
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_no_expand_li(self):
         """
         Ensure we don't expand li if option is not enabled

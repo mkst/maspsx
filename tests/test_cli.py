@@ -60,22 +60,31 @@ class TestCli(unittest.TestCase):
                 addiu_at=True,
             ),
             "2.30": self.maspsx_cli.AspsxVersionConfig(),
+            "2.34": self.maspsx_cli.AspsxVersionConfig(),
+            "2.50": self.maspsx_cli.AspsxVersionConfig(
+                expand_li=False,
+                li_zero_uses_addiu=True,
+            ),
             "2.56": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
+                li_zero_uses_addiu=True,
             ),
             "2.67": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
+                li_zero_uses_addiu=True,
                 sltu_at=False,
                 lcomm_alignment=lcomm_alignment.POWER_OF_TWO,
             ),
             "2.77": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
+                li_zero_uses_addiu=True,
                 sltu_at=False,
                 gp_allow_offset=True,
                 lcomm_alignment=lcomm_alignment.POWER_OF_TWO,
             ),
             "2.81": self.maspsx_cli.AspsxVersionConfig(
                 expand_li=False,
+                li_zero_uses_addiu=True,
                 sltu_at=False,
                 gp_allow_offset=True,
                 gp_allow_la=True,

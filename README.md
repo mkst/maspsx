@@ -68,6 +68,7 @@ Pass this as a single argument, e.g. `-G8`, rather than `-G 8`.
 | use $gp for small-data access           | :white_circle: | :white_circle: |:green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
 | supports `-0` argument                  | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
 | mflo+mfhi / mult+div inst gap           | :white_circle: | :white_circle: |:white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
+| li 0 expands to addiu 0                 | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: | :green_circle: |
 | support for %hi/%lo macros              | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: | :green_circle: |
 | use $gp for symbol+offset               | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: | :green_circle: |
 | use $gp for la                          | :white_circle: | :white_circle: |:white_circle: | :white_circle: | :white_circle: | :white_circle: | :white_circle: | :green_circle: |
