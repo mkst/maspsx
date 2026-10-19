@@ -851,9 +851,7 @@ class MaspsxProcessor:
                         break
 
                     if op == "li":
-                        expanded = expand_load_immediate(
-                            inst, self.li_zero_uses_addiu
-                        )
+                        expanded = expand_load_immediate(inst, self.li_zero_uses_addiu)
 
                         if self.expand_li:
                             res += expanded

@@ -27,9 +27,7 @@ class TestLi(unittest.TestCase):
         expected_lines = [
             "addiu\t$3,$zero,0",
         ]
-        mp = MaspsxProcessor(
-            lines, expand_li=True, li_zero_uses_addiu=True
-        )
+        mp = MaspsxProcessor(lines, expand_li=True, li_zero_uses_addiu=True)
         res = mp.process_lines()
 
         clean_lines = strip_comments(res)

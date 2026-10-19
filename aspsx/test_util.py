@@ -19,9 +19,7 @@ class TestRunnerCommand(unittest.TestCase):
             "",
             "",
         )
-        self.assertEqual(
-            ["daze", "ASPSX.EXE", "-o", "output.obj", "input.s"], command
-        )
+        self.assertEqual(["daze", "ASPSX.EXE", "-o", "output.obj", "input.s"], command)
 
     def test_32_bit_versions_use_wibo(self):
         command = util._build_command(
@@ -37,6 +35,7 @@ class TestRunnerCommand(unittest.TestCase):
             ["wibo", "/tools/ASPSX.EXE", "-o", "output.obj", "input.s"],
             command,
         )
+
 
 class TestRelocatedFields(unittest.TestCase):
     def test_clears_relocated_bits(self):
