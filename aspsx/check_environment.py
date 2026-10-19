@@ -29,9 +29,8 @@ def check() -> list[tuple[bool, str]]:
 
     runners = sorted(set(ASPSX_RUNNER_LOOKUP.values()))
     for runner in runners:
-        executable = "dosemu" if runner == "dosemu2" else runner
-        found = shutil.which(executable)
-        results.append((found is not None, f"host runner {executable}"))
+        found = shutil.which(runner)
+        results.append((found is not None, f"host runner {runner}"))
 
     parser_ok = PSYQ_OBJ_PARSER.is_file() and os.access(PSYQ_OBJ_PARSER, os.X_OK)
     results.append(

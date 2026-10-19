@@ -8,6 +8,36 @@ import case_model
 import util
 
 
+class TestRunnerCommand(unittest.TestCase):
+    def test_16_bit_versions_use_daze(self):
+        command = util._build_command(
+            "daze",
+            Path("ASPSX.EXE"),
+            Path("/tmp/workspace"),
+            "input.s",
+            "output.obj",
+            "",
+            "",
+        )
+        self.assertEqual(
+            ["daze", "ASPSX.EXE", "-o", "output.obj", "input.s"], command
+        )
+
+    def test_32_bit_versions_use_wibo(self):
+        command = util._build_command(
+            "wibo",
+            Path("/tools/ASPSX.EXE"),
+            Path("/tmp/workspace"),
+            "input.s",
+            "output.obj",
+            "",
+            "",
+        )
+        self.assertEqual(
+            ["wibo", "/tools/ASPSX.EXE", "-o", "output.obj", "input.s"],
+            command,
+        )
+
 class TestRelocatedFields(unittest.TestCase):
     def test_clears_relocated_bits(self):
         text = bytes.fromhex(
@@ -39,8 +69,8 @@ class TestRunner(unittest.TestCase):
         result = util.RunResult(
             Path("ASM/GP.S"),
             "2.67",
-            "wine",
-            ["wine", "ASPSX.EXE"],
+            "wibo",
+            ["wibo", "ASPSX.EXE"],
             returncode=1,
             error="assembler process exited unsuccessfully",
             failure_kind="process_error",
@@ -51,7 +81,7 @@ class TestRunner(unittest.TestCase):
     @patch(
         "util.subprocess.run",
         side_effect=subprocess.TimeoutExpired(
-            ["wine", "ASPSX.EXE"], 1, output=b"partial", stderr=b"timeout"
+            ["wibo", "ASPSX.EXE"], 1, output=b"partial", stderr=b"timeout"
         ),
     )
     def test_timeout_remains_a_timeout_result(self, _run):
@@ -88,7 +118,7 @@ class TestOutputDiff(unittest.TestCase):
         return util.RunResult(
             Path("ASM/GP.S"),
             "2.67",
-            "wine",
+            "wibo",
             [],
             instructions=["0x00000000"],
             sections=sections,
