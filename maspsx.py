@@ -1,11 +1,10 @@
 import argparse
+import os
 import shutil
 import subprocess
 import sys
 
 from dataclasses import dataclass
-from typing import List
-from pathlib import Path
 
 from maspsx import LcommAlignment, MaspsxProcessor, PassthroughProcessor
 
@@ -125,7 +124,7 @@ def main() -> None:
     ]
 
     sdata_limit = 0
-    filtered_as_args: List[str] = []
+    filtered_as_args: list[str] = []
     for arg in as_args:
         # Can we stop gcc from passing us this flag?
         if arg == "-KPIC":
@@ -193,8 +192,7 @@ def main() -> None:
         sys.stderr.write(out_text)
 
     if args.run_assembler:
-        gnu_as_path = Path(args.gnu_as_path)
-        if not gnu_as_path.is_file() and not shutil.which(args.gnu_as_path):
+        if not os.path.isfile(args.gnu_as_path) and not shutil.which(args.gnu_as_path):
             sys.stderr.write(f"MASPSX: {args.gnu_as_path} not found")
             sys.exit(1)
 

@@ -2,7 +2,6 @@ import struct
 import re
 
 from enum import Enum
-from typing import List
 
 branch_mnemonics = {
     "beq",
@@ -257,7 +256,7 @@ def div_needs_expanding(line: str) -> bool:
     return r_dest not in ("$zero", "$0")
 
 
-def expand_load_immediate(line: str, li_small_uses_addiu=False) -> List[str]:
+def expand_load_immediate(line: str, li_small_uses_addiu=False) -> list[str]:
     res = []
 
     match = re.match(r"li\s+(\$[0-9A-z]+),\s?(-?[x0-9a-fA-F]+)", line)
@@ -440,10 +439,10 @@ def is_coff_directive(line: str):
 
 class PassthroughProcessor:
 
-    def __init__(self, lines: List[str]):
+    def __init__(self, lines: list[str]):
         self.lines = [x.strip() for x in lines]
 
-    def process_lines(self) -> List[str]:
+    def process_lines(self) -> list[str]:
         res = []
 
         for line in self.lines:
@@ -468,7 +467,7 @@ class MaspsxProcessor:
 
     def __init__(
         self,
-        lines: List[str],
+        lines: list[str],
         sdata_limit=0,
         expand_div=False,
         expand_li=False,
@@ -645,7 +644,7 @@ class MaspsxProcessor:
                     in_include_asm_hack = False
                 continue
 
-            if is_instruction(line) and self.skip_instructions > 0:
+            if self.skip_instructions > 0 and is_instruction(line):
                 self.skip_instructions -= 1
                 res += [f"# {line}  # DEBUG: skipped"]
             else:
@@ -740,8 +739,8 @@ class MaspsxProcessor:
 
     def _handle_nop_before_next_instruction(
         self, next_instruction: str, r_dest: str
-    ) -> List[str]:
-        res: List[str] = []
+    ) -> list[str]:
+        res: list[str] = []
 
         if line_loads_from_reg(next_instruction, r_dest, loads_to_reg=self.nop_lw_lw):
             nop_required = False
@@ -779,9 +778,9 @@ class MaspsxProcessor:
 
         return res
 
-    def _handle_mflo_mfhi(self, r_source=None) -> List[str]:
+    def _handle_mflo_mfhi(self, r_source=None) -> list[str]:
         # we cannot use a div/mult within 2 instructions of mflo/mfhi
-        res: List[str] = []
+        res: list[str] = []
 
         if not self.nop_mflo_mfhi:
             return res
