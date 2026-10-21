@@ -265,6 +265,30 @@ class TestMflo(unittest.TestCase):
         clean_lines = strip_comments(res)
         self.assertEqual(expected_lines, clean_lines)
 
+    def test_mflo_li_mult_branch_label(self):
+        """Keep the branch label on the mflo/mult hazard nop. (Issue #159)"""
+        lines = [
+            "\tmflo\t$15",
+            "\tli\t$2,80",
+            "$L451:",
+            "\tmult\t$4,$2",
+            "\tbne\t$6,$7,$L451",
+        ]
+        expected_lines = [
+            "mflo\t$15",
+            "li\t$2,80",
+            "$L451:",
+            "nop",
+            "mult\t$4,$2",
+            "bne\t$6,$7,$L451",
+            "nop",
+        ]
+
+        mp = MaspsxProcessor(lines)
+        res = mp.process_lines()
+        clean_lines = strip_comments(res)
+        self.assertEqual(expected_lines, clean_lines)
+
     def test_mflo_store_at_expansion(self):
         """
         A store to a symbolic address expands through $at (lui/addu/sh),

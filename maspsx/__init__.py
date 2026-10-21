@@ -859,6 +859,11 @@ class MaspsxProcessor:
                         else:
                             res.append(inst)
 
+                        maybe_label = self.get_next_instruction(skip=skip)
+                        if is_label(maybe_label):
+                            res.append(maybe_label)
+                            skip += 1
+
                         if len(expanded) == 2:
                             res.append(
                                 "#nop  # DEBUG: mflo/mfhi with mult/div/rem and li expands to 2 ops"
