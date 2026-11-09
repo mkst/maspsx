@@ -482,6 +482,7 @@ class MaspsxProcessor:
         use_comm_section=False,
         use_comm_for_lcomm=False,
         max_comm_alignment=16,
+        max_lcomm_alignment=None,
         lcomm_alignment=LcommAlignment.WORD,
         comm_uses_sdata_limit=True,
         gp_allow=True,
@@ -510,6 +511,7 @@ class MaspsxProcessor:
         self.use_comm_section = use_comm_section
         self.use_comm_for_lcomm = use_comm_for_lcomm
         self.max_comm_alignment = max_comm_alignment
+        self.max_lcomm_alignment = max_lcomm_alignment
         self.lcomm_alignment = lcomm_alignment
         self.comm_uses_sdata_limit = comm_uses_sdata_limit
 
@@ -659,6 +661,8 @@ class MaspsxProcessor:
                     res.append(f".section .{section}")
 
                 alignment, padded_size = self.lcomm_alignment.layout(size)
+                if self.max_lcomm_alignment is not None:
+                    alignment = min(alignment, self.max_lcomm_alignment)
                 is_comm_symbol = symbol in self.comm_symbols or self.use_comm_for_lcomm
 
                 if self.use_comm_section and is_comm_symbol:
