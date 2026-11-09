@@ -50,6 +50,9 @@ This can be convenient with games using non-zero `-G` in situations where a vari
 ### `--max-comm-alignment`
 Cap the alignment of symbols emitted by `--use-comm-section`, e.g. `--max-comm-alignment 4`. Defaults to 16, which matches GNU as.
 
+### `--local-lcomm`
+Prevents `.lcomm` symbols in `.bss` from being redeclared as `.globl`.
+
 ### `-G`
 **EXPERIMENTAL** If your project uses `$gp`, maspsx needs to be explicitly passed a non-zero value for `-G`.
 Pass this as a single argument, e.g. `-G8`, rather than `-G 8`.
