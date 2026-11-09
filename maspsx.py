@@ -73,6 +73,7 @@ def main() -> None:
     parser.add_argument("--use-comm-section", action="store_true")
     parser.add_argument("--use-comm-for-lcomm", action="store_true")
     parser.add_argument("--max-comm-alignment", type=int, default=16)
+    parser.add_argument("--max-lcomm-alignment", type=int)
     # decomp.me debugging
     parser.add_argument("--print-output", action="store_true")
     parser.add_argument("--print-input", action="store_true")
@@ -172,6 +173,7 @@ def main() -> None:
             use_comm_section=args.use_comm_section,
             use_comm_for_lcomm=args.use_comm_for_lcomm,
             max_comm_alignment=args.max_comm_alignment,
+            max_lcomm_alignment=args.max_lcomm_alignment,
             lcomm_alignment=version_config.lcomm_alignment,
             comm_uses_sdata_limit=version_config.comm_uses_sdata_limit,
         )
