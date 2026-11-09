@@ -486,6 +486,7 @@ class MaspsxProcessor:
         comm_uses_sdata_limit=True,
         gp_allow=True,
         li_small_uses_addiu=False,
+        local_lcomm=False,
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -512,6 +513,7 @@ class MaspsxProcessor:
         self.max_comm_alignment = max_comm_alignment
         self.lcomm_alignment = lcomm_alignment
         self.comm_uses_sdata_limit = comm_uses_sdata_limit
+        self.local_lcomm = local_lcomm
 
         self.bss_entries: dict[str, int] = {}
         self.sbss_entries: dict[str, int] = {}
@@ -675,7 +677,9 @@ class MaspsxProcessor:
                     res.append(f"\t.align {alignment.bit_length() - 1}")
 
                 # only mark bss symbols as global
-                if section == "bss":
+                if section == "bss" and not (
+                    self.local_lcomm and symbol not in self.comm_symbols
+                ):
                     res.append(
                         f"\t.globl {symbol}",
                     )
