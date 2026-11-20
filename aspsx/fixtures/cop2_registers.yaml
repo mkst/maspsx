@@ -1,0 +1,532 @@
+# See ../COP2_BEHAVIOR.md. Two explicit nops separate source blocks.
+source: ASM/COP2_REGISTERS.S
+cases:
+  "1.05": &cop2_registers_1_05_expected
+    .text:
+      # [01] boundary/0/mfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48002800"  # mfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] boundary/0/mfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48050000"  # mfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] boundary/2/mfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48022800"  # mfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] boundary/2/mfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48051000"  # mfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] boundary/31/mfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x481F2800"  # mfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] boundary/31/mfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x4805F800"  # mfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] boundary/0/cfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48402800"  # cfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] boundary/0/cfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48450000"  # cfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] boundary/2/cfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48422800"  # cfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] boundary/2/cfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48451000"  # cfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] boundary/31/cfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x485F2800"  # cfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] boundary/31/cfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x4845F800"  # cfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] boundary/0/mtc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48802800"  # mtc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] boundary/0/mtc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48850000"  # mtc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] boundary/2/mtc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48822800"  # mtc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] boundary/2/mtc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48851000"  # mtc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] boundary/31/mtc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x489F2800"  # mtc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] boundary/31/mtc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x4885F800"  # mtc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] boundary/0/ctc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C02800"  # ctc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] boundary/0/ctc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C50000"  # ctc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] boundary/2/ctc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C22800"  # ctc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] boundary/2/ctc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C51000"  # ctc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] boundary/31/ctc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48DF2800"  # ctc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] boundary/31/ctc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C5F800"  # ctc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "1.07": *cop2_registers_1_05_expected
+  "2.05": *cop2_registers_1_05_expected
+  "2.08": *cop2_registers_1_05_expected
+  "2.21": &cop2_registers_2_21_expected
+    .text:
+      # [01] boundary/0/mfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48002800"  # mfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] boundary/0/mfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48050000"  # mfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] boundary/2/mfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48022800"  # mfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] boundary/2/mfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48051000"  # mfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] boundary/31/mfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x481F2800"  # mfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] boundary/31/mfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4805F800"  # mfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] boundary/0/cfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48402800"  # cfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] boundary/0/cfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48450000"  # cfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] boundary/2/cfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48422800"  # cfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] boundary/2/cfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48451000"  # cfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] boundary/31/cfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x485F2800"  # cfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] boundary/31/cfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4845F800"  # cfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] boundary/0/mtc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48802800"  # mtc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] boundary/0/mtc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48850000"  # mtc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] boundary/2/mtc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48822800"  # mtc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] boundary/2/mtc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48851000"  # mtc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] boundary/31/mtc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x489F2800"  # mtc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] boundary/31/mtc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4885F800"  # mtc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] boundary/0/ctc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C02800"  # ctc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] boundary/0/ctc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C50000"  # ctc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] boundary/2/ctc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C22800"  # ctc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] boundary/2/ctc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48C51000"  # ctc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] boundary/31/ctc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48DF2800"  # ctc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] boundary/31/ctc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x48C5F800"  # ctc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.30": &cop2_registers_2_30_expected
+    .text:
+      # [01] boundary/0/mfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48002800"  # mfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] boundary/0/mfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48050000"  # mfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] boundary/2/mfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48022800"  # mfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] boundary/2/mfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48051000"  # mfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] boundary/31/mfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x481F2800"  # mfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] boundary/31/mfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4805F800"  # mfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] boundary/0/cfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48402800"  # cfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] boundary/0/cfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48450000"  # cfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] boundary/2/cfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48422800"  # cfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] boundary/2/cfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48451000"  # cfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] boundary/31/cfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x485F2800"  # cfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] boundary/31/cfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4845F800"  # cfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] boundary/0/mtc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48802800"  # mtc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] boundary/0/mtc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48850000"  # mtc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] boundary/2/mtc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48822800"  # mtc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] boundary/2/mtc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48851000"  # mtc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] boundary/31/mtc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x489F2800"  # mtc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] boundary/31/mtc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4885F800"  # mtc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] boundary/0/ctc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C02800"  # ctc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] boundary/0/ctc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C50000"  # ctc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] boundary/2/ctc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48C22800"  # ctc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] boundary/2/ctc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C51000"  # ctc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] boundary/31/ctc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x48DF2800"  # ctc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] boundary/31/ctc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C5F800"  # ctc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.34": *cop2_registers_2_30_expected
+  "2.56": &cop2_registers_2_56_expected
+    .text:
+      # [01] boundary/0/mfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48002800"  # mfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] boundary/0/mfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48050000"  # mfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] boundary/2/mfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48022800"  # mfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] boundary/2/mfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48051000"  # mfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] boundary/31/mfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x481F2800"  # mfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] boundary/31/mfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4805F800"  # mfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] boundary/0/cfc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48402800"  # cfc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] boundary/0/cfc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48450000"  # cfc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] boundary/2/cfc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48422800"  # cfc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] boundary/2/cfc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48451000"  # cfc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] boundary/31/cfc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x485F2800"  # cfc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] boundary/31/cfc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4845F800"  # cfc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] boundary/0/mtc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48802800"  # mtc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] boundary/0/mtc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48850000"  # mtc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] boundary/2/mtc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48822800"  # mtc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] boundary/2/mtc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48851000"  # mtc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] boundary/31/mtc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x489F2800"  # mtc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] boundary/31/mtc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x4885F800"  # mtc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] boundary/0/ctc2/0,5
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C02800"  # ctc2        $zero, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] boundary/0/ctc2/5,0
+      - "0x8E400000"  # lw          $zero, 0x0($s2)
+      - "0x48C50000"  # ctc2        $a1, $0
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] boundary/2/ctc2/2,5
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C22800"  # ctc2        $v0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] boundary/2/ctc2/5,2
+      - "0x8E420000"  # lw          $v0, 0x0($s2)
+      - "0x48C51000"  # ctc2        $a1, $2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] boundary/31/ctc2/31,5
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48DF2800"  # ctc2        $ra, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] boundary/31/ctc2/5,31
+      - "0x8E5F0000"  # lw          $ra, 0x0($s2)
+      - "0x48C5F800"  # ctc2        $a1, $31
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.67": *cop2_registers_2_56_expected
+  "2.77": *cop2_registers_2_56_expected
+  "2.79": *cop2_registers_2_56_expected
+  "2.81": *cop2_registers_2_56_expected
+  "2.86": *cop2_registers_2_56_expected

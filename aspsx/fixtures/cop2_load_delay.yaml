@@ -1,0 +1,2432 @@
+# See ../COP2_BEHAVIOR.md. Two explicit nops separate source blocks.
+source: ASM/COP2_LOAD_DELAY.S
+cases:
+  "1.05": &cop2_load_delay_1_05_expected
+    .text:
+      # [01] load/plain/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/plain/mfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] load/plain/mfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] load/plain/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/plain/mfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/plain/mfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] load/plain/mfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] load/plain/mfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/plain/mfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/plain/mfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] load/plain/mfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] load/plain/mfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/plain/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/plain/cfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] load/plain/cfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] load/plain/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/plain/cfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/plain/cfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] load/plain/cfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] load/plain/cfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/plain/cfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/plain/cfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] load/plain/cfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] load/plain/cfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/plain/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/plain/mtc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] load/plain/mtc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] load/plain/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/plain/mtc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/plain/mtc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] load/plain/mtc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] load/plain/mtc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/plain/mtc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/plain/mtc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] load/plain/mtc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] load/plain/mtc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/plain/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/plain/ctc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] load/plain/ctc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] load/plain/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/plain/ctc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/plain/ctc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] load/plain/ctc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] load/plain/ctc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/plain/ctc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/plain/ctc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] load/plain/ctc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] load/plain/ctc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] loads/lb/mfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] loads/lb/mfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] loads/lbu/mfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] loads/lbu/mfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] loads/lh/mfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] loads/lh/mfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] loads/lhu/mfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] loads/lhu/mfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] loads/lw/mfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] loads/lw/mfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] loads/lwl/mfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] loads/lwl/mfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] loads/lwr/mfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] loads/lwr/mfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] loads/lb/cfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] loads/lb/cfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] loads/lbu/cfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] loads/lbu/cfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] loads/lh/cfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] loads/lh/cfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] loads/lhu/cfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] loads/lhu/cfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] loads/lw/cfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] loads/lw/cfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [73] loads/lwl/cfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [74] loads/lwl/cfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [75] loads/lwr/cfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [76] loads/lwr/cfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [77] loads/lb/mtc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [78] loads/lb/mtc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [79] loads/lbu/mtc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [80] loads/lbu/mtc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [81] loads/lh/mtc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [82] loads/lh/mtc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [83] loads/lhu/mtc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [84] loads/lhu/mtc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [85] loads/lw/mtc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [86] loads/lw/mtc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [87] loads/lwl/mtc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [88] loads/lwl/mtc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [89] loads/lwr/mtc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [90] loads/lwr/mtc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [91] loads/lb/ctc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [92] loads/lb/ctc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [93] loads/lbu/ctc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [94] loads/lbu/ctc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [95] loads/lh/ctc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [96] loads/lh/ctc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [97] loads/lhu/ctc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [98] loads/lhu/ctc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [99] loads/lw/ctc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [100] loads/lw/ctc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [101] loads/lwl/ctc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [102] loads/lwl/ctc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [103] loads/lwr/ctc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [104] loads/lwr/ctc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "1.07": *cop2_load_delay_1_05_expected
+  "2.05": *cop2_load_delay_1_05_expected
+  "2.08": *cop2_load_delay_1_05_expected
+  "2.21": &cop2_load_delay_2_21_expected
+    .text:
+      # [01] load/plain/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/plain/mfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] load/plain/mfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] load/plain/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/plain/mfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/plain/mfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] load/plain/mfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] load/plain/mfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/plain/mfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/plain/mfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] load/plain/mfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] load/plain/mfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/plain/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/plain/cfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] load/plain/cfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] load/plain/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/plain/cfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/plain/cfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] load/plain/cfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] load/plain/cfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/plain/cfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/plain/cfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] load/plain/cfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] load/plain/cfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/plain/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/plain/mtc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] load/plain/mtc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] load/plain/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/plain/mtc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/plain/mtc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] load/plain/mtc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] load/plain/mtc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/plain/mtc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/plain/mtc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] load/plain/mtc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] load/plain/mtc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/plain/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/plain/ctc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] load/plain/ctc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] load/plain/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/plain/ctc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/plain/ctc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] load/plain/ctc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] load/plain/ctc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/plain/ctc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/plain/ctc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] load/plain/ctc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] load/plain/ctc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] loads/lb/mfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] loads/lb/mfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] loads/lbu/mfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] loads/lbu/mfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] loads/lh/mfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] loads/lh/mfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] loads/lhu/mfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] loads/lhu/mfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] loads/lw/mfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] loads/lw/mfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] loads/lwl/mfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] loads/lwl/mfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] loads/lwr/mfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] loads/lwr/mfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] loads/lb/cfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] loads/lb/cfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] loads/lbu/cfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] loads/lbu/cfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] loads/lh/cfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] loads/lh/cfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] loads/lhu/cfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] loads/lhu/cfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] loads/lw/cfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] loads/lw/cfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [73] loads/lwl/cfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [74] loads/lwl/cfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [75] loads/lwr/cfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [76] loads/lwr/cfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [77] loads/lb/mtc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [78] loads/lb/mtc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [79] loads/lbu/mtc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [80] loads/lbu/mtc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [81] loads/lh/mtc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [82] loads/lh/mtc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [83] loads/lhu/mtc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [84] loads/lhu/mtc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [85] loads/lw/mtc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [86] loads/lw/mtc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [87] loads/lwl/mtc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [88] loads/lwl/mtc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [89] loads/lwr/mtc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [90] loads/lwr/mtc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [91] loads/lb/ctc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [92] loads/lb/ctc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [93] loads/lbu/ctc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [94] loads/lbu/ctc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [95] loads/lh/ctc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [96] loads/lh/ctc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [97] loads/lhu/ctc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [98] loads/lhu/ctc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [99] loads/lw/ctc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [100] loads/lw/ctc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [101] loads/lwl/ctc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [102] loads/lwl/ctc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [103] loads/lwr/ctc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [104] loads/lwr/ctc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.30": &cop2_load_delay_2_30_expected
+    .text:
+      # [01] load/plain/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/plain/mfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] load/plain/mfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] load/plain/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/plain/mfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/plain/mfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] load/plain/mfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] load/plain/mfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/plain/mfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/plain/mfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] load/plain/mfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] load/plain/mfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/plain/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/plain/cfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] load/plain/cfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] load/plain/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/plain/cfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/plain/cfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] load/plain/cfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] load/plain/cfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/plain/cfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/plain/cfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] load/plain/cfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] load/plain/cfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/plain/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/plain/mtc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] load/plain/mtc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] load/plain/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/plain/mtc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/plain/mtc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] load/plain/mtc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] load/plain/mtc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/plain/mtc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/plain/mtc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] load/plain/mtc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] load/plain/mtc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/plain/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/plain/ctc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] load/plain/ctc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] load/plain/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/plain/ctc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/plain/ctc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] load/plain/ctc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] load/plain/ctc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/plain/ctc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/plain/ctc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] load/plain/ctc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] load/plain/ctc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] loads/lb/mfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] loads/lb/mfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] loads/lbu/mfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] loads/lbu/mfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] loads/lh/mfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] loads/lh/mfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] loads/lhu/mfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] loads/lhu/mfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] loads/lw/mfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] loads/lw/mfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] loads/lwl/mfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] loads/lwl/mfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] loads/lwr/mfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] loads/lwr/mfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] loads/lb/cfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] loads/lb/cfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] loads/lbu/cfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] loads/lbu/cfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] loads/lh/cfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] loads/lh/cfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] loads/lhu/cfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] loads/lhu/cfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] loads/lw/cfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] loads/lw/cfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [73] loads/lwl/cfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [74] loads/lwl/cfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [75] loads/lwr/cfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [76] loads/lwr/cfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [77] loads/lb/mtc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [78] loads/lb/mtc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [79] loads/lbu/mtc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [80] loads/lbu/mtc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [81] loads/lh/mtc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [82] loads/lh/mtc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [83] loads/lhu/mtc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [84] loads/lhu/mtc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [85] loads/lw/mtc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [86] loads/lw/mtc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [87] loads/lwl/mtc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [88] loads/lwl/mtc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [89] loads/lwr/mtc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [90] loads/lwr/mtc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [91] loads/lb/ctc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [92] loads/lb/ctc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [93] loads/lbu/ctc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [94] loads/lbu/ctc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [95] loads/lh/ctc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [96] loads/lh/ctc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [97] loads/lhu/ctc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [98] loads/lhu/ctc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [99] loads/lw/ctc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [100] loads/lw/ctc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [101] loads/lwl/ctc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [102] loads/lwl/ctc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [103] loads/lwr/ctc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [104] loads/lwr/ctc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.34": *cop2_load_delay_2_30_expected
+  "2.56": &cop2_load_delay_2_56_expected
+    .text:
+      # [01] load/plain/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/plain/mfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] load/plain/mfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] load/plain/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/plain/mfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/plain/mfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] load/plain/mfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] load/plain/mfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/plain/mfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48084000"  # mfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/plain/mfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] load/plain/mfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] load/plain/mfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48042800"  # mfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/plain/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/plain/cfc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] load/plain/cfc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] load/plain/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/plain/cfc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/plain/cfc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] load/plain/cfc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] load/plain/cfc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/plain/cfc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48484000"  # cfc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/plain/cfc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] load/plain/cfc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] load/plain/cfc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48442800"  # cfc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/plain/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/plain/mtc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] load/plain/mtc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] load/plain/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/plain/mtc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/plain/mtc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] load/plain/mtc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] load/plain/mtc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/plain/mtc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48884000"  # mtc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/plain/mtc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] load/plain/mtc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] load/plain/mtc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48842800"  # mtc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/plain/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/plain/ctc2/4,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] load/plain/ctc2/4,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] load/plain/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/plain/ctc2/8,4/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/plain/ctc2/8,4/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] load/plain/ctc2/8,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] load/plain/ctc2/8,8/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/plain/ctc2/8,8/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C84000"  # ctc2        $t0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/plain/ctc2/4,5/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] load/plain/ctc2/4,5/gap1
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] load/plain/ctc2/4,5/gap2
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x48C42800"  # ctc2        $a0, $5
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] loads/lb/mfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] loads/lb/mfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] loads/lbu/mfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] loads/lbu/mfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] loads/lh/mfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] loads/lh/mfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] loads/lhu/mfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] loads/lhu/mfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] loads/lw/mfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] loads/lw/mfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] loads/lwl/mfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] loads/lwl/mfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] loads/lwr/mfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] loads/lwr/mfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] loads/lb/cfc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] loads/lb/cfc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] loads/lbu/cfc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] loads/lbu/cfc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] loads/lh/cfc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] loads/lh/cfc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] loads/lhu/cfc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] loads/lhu/cfc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] loads/lw/cfc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] loads/lw/cfc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [73] loads/lwl/cfc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [74] loads/lwl/cfc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [75] loads/lwr/cfc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [76] loads/lwr/cfc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [77] loads/lb/mtc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [78] loads/lb/mtc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [79] loads/lbu/mtc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [80] loads/lbu/mtc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [81] loads/lh/mtc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [82] loads/lh/mtc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [83] loads/lhu/mtc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [84] loads/lhu/mtc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [85] loads/lw/mtc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [86] loads/lw/mtc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [87] loads/lwl/mtc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [88] loads/lwl/mtc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [89] loads/lwr/mtc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [90] loads/lwr/mtc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [91] loads/lb/ctc2/4,8
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [92] loads/lb/ctc2/8,4
+      - "0x82480000"  # lb          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [93] loads/lbu/ctc2/4,8
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [94] loads/lbu/ctc2/8,4
+      - "0x92480000"  # lbu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [95] loads/lh/ctc2/4,8
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [96] loads/lh/ctc2/8,4
+      - "0x86480000"  # lh          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [97] loads/lhu/ctc2/4,8
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [98] loads/lhu/ctc2/8,4
+      - "0x96480000"  # lhu         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [99] loads/lw/ctc2/4,8
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [100] loads/lw/ctc2/8,4
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [101] loads/lwl/ctc2/4,8
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [102] loads/lwl/ctc2/8,4
+      - "0x8A480000"  # lwl         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [103] loads/lwr/ctc2/4,8
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [104] loads/lwr/ctc2/8,4
+      - "0x9A480000"  # lwr         $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.67": *cop2_load_delay_2_56_expected
+  "2.77": *cop2_load_delay_2_56_expected
+  "2.79": *cop2_load_delay_2_56_expected
+  "2.81": *cop2_load_delay_2_56_expected
+  "2.86": *cop2_load_delay_2_56_expected

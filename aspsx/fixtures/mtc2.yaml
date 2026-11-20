@@ -1,0 +1,34 @@
+source: ASM/MTC2.S
+cases:
+  "1.05": &mtc2_1_05_expected
+    .text:
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x8C480000"  # lw          $t0, 0x0($v0)
+      - "0x00000000"  # nop
+      - "0x4888F800"  # mtc2        $t0, $31
+  "1.07": *mtc2_1_05_expected
+  "2.05": *mtc2_1_05_expected
+  "2.08": *mtc2_1_05_expected
+  "2.21": &mtc2_2_21_expected
+    .text:
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x8C480000"  # lw          $t0, 0x0($v0)
+      - "0x00000000"  # nop
+      - "0x4888F800"  # mtc2        $t0, $31
+  "2.30": *mtc2_2_21_expected
+  "2.34": *mtc2_2_21_expected
+  "2.56": *mtc2_2_21_expected
+  "2.67": *mtc2_2_21_expected
+  "2.77": *mtc2_2_21_expected
+  "2.79": *mtc2_2_21_expected
+  "2.81": *mtc2_2_21_expected
+  "2.86": *mtc2_2_21_expected

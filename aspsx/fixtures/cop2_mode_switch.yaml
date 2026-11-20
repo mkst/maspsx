@@ -1,0 +1,272 @@
+source: ASM/COP2_MODE_SWITCH.S
+cases:
+  "1.05": &cop2_mode_switch_1_05
+    .text:
+      # [01] reorder -> noreorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] reorder -> noreorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] reorder -> noreorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] reorder -> noreorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] reorder -> noreorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] reorder -> noreorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] reorder -> noreorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] reorder -> noreorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] noreorder -> reorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] noreorder -> reorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] noreorder -> reorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] noreorder -> reorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] noreorder -> reorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] noreorder -> reorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] noreorder -> reorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] noreorder -> reorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "1.07": *cop2_mode_switch_1_05
+  "2.05": *cop2_mode_switch_1_05
+  "2.08": *cop2_mode_switch_1_05
+  "2.21": *cop2_mode_switch_1_05
+  "2.30": &cop2_mode_switch_2_30
+    .text:
+      # [01] reorder -> noreorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] reorder -> noreorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] reorder -> noreorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] reorder -> noreorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] reorder -> noreorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] reorder -> noreorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] reorder -> noreorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] reorder -> noreorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] noreorder -> reorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] noreorder -> reorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] noreorder -> reorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] noreorder -> reorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] noreorder -> reorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] noreorder -> reorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] noreorder -> reorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] noreorder -> reorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.34": *cop2_mode_switch_2_30
+  "2.56": &cop2_mode_switch_2_56
+    .text:
+      # [01] reorder -> noreorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] reorder -> noreorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] reorder -> noreorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] reorder -> noreorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] reorder -> noreorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] reorder -> noreorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] reorder -> noreorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] reorder -> noreorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] noreorder -> reorder: load -> mfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] noreorder -> reorder: mfc2 -> GPR read
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] noreorder -> reorder: load -> cfc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] noreorder -> reorder: cfc2 -> GPR read
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] noreorder -> reorder: load -> mtc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] noreorder -> reorder: mtc2 -> GPR read
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] noreorder -> reorder: load -> ctc2
+      - "0x8E480000"  # lw          $t0, 0x0($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] noreorder -> reorder: ctc2 -> GPR read
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.67": *cop2_mode_switch_2_56
+  "2.77": *cop2_mode_switch_2_56
+  "2.79": *cop2_mode_switch_2_56
+  "2.81": *cop2_mode_switch_2_56
+  "2.86": *cop2_mode_switch_2_56

@@ -1,0 +1,1374 @@
+# See ../COP2_BEHAVIOR.md. Two explicit nops separate source blocks.
+source: ASM/COP2_MODES.S
+cases:
+  "1.05": &cop2_modes_1_05_expected
+    .text:
+      # [01] load/app_transfer/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/app_transfer/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] after/app_transfer/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] after/app_transfer/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/app_transfer/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/app_transfer/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] after/app_transfer/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] after/app_transfer/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/app_transfer/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/app_transfer/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] after/app_transfer/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] after/app_transfer/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/app_transfer/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/app_transfer/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] after/app_transfer/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] after/app_transfer/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/app_all/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/app_all/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] after/app_all/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] after/app_all/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/app_all/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/app_all/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] after/app_all/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] after/app_all/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/app_all/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/app_all/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] after/app_all/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] after/app_all/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/app_all/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/app_all/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] after/app_all/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] after/app_all/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/semicolon/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/semicolon/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] after/semicolon/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] after/semicolon/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/semicolon/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/semicolon/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] after/semicolon/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] after/semicolon/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/semicolon/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/semicolon/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] after/semicolon/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] after/semicolon/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/semicolon/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/semicolon/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] after/semicolon/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] after/semicolon/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] load/noreorder/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] load/noreorder/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] after/noreorder/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] after/noreorder/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] load/noreorder/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] load/noreorder/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] after/noreorder/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] after/noreorder/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] load/noreorder/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] load/noreorder/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] after/noreorder/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] after/noreorder/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] load/noreorder/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] load/noreorder/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] after/noreorder/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] after/noreorder/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "1.07": *cop2_modes_1_05_expected
+  "2.05": *cop2_modes_1_05_expected
+  "2.08": *cop2_modes_1_05_expected
+  "2.21": &cop2_modes_2_21_expected
+    .text:
+      # [01] load/app_transfer/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/app_transfer/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] after/app_transfer/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] after/app_transfer/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/app_transfer/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/app_transfer/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] after/app_transfer/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] after/app_transfer/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/app_transfer/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/app_transfer/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] after/app_transfer/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] after/app_transfer/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/app_transfer/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/app_transfer/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] after/app_transfer/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] after/app_transfer/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/app_all/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/app_all/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] after/app_all/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] after/app_all/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/app_all/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/app_all/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] after/app_all/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] after/app_all/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/app_all/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/app_all/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] after/app_all/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] after/app_all/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/app_all/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/app_all/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] after/app_all/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] after/app_all/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/semicolon/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/semicolon/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] after/semicolon/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] after/semicolon/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/semicolon/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/semicolon/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] after/semicolon/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] after/semicolon/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/semicolon/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/semicolon/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] after/semicolon/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] after/semicolon/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/semicolon/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/semicolon/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] after/semicolon/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] after/semicolon/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] load/noreorder/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] load/noreorder/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] after/noreorder/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] after/noreorder/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] load/noreorder/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] load/noreorder/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] after/noreorder/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] after/noreorder/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] load/noreorder/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] load/noreorder/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] after/noreorder/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] after/noreorder/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] load/noreorder/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] load/noreorder/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] after/noreorder/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] after/noreorder/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.30": &cop2_modes_2_30_expected
+    .text:
+      # [01] load/app_transfer/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/app_transfer/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] after/app_transfer/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] after/app_transfer/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/app_transfer/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/app_transfer/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] after/app_transfer/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] after/app_transfer/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/app_transfer/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/app_transfer/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] after/app_transfer/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] after/app_transfer/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/app_transfer/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/app_transfer/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] after/app_transfer/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] after/app_transfer/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/app_all/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/app_all/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] after/app_all/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] after/app_all/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/app_all/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/app_all/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] after/app_all/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] after/app_all/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/app_all/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/app_all/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] after/app_all/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] after/app_all/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/app_all/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/app_all/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] after/app_all/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] after/app_all/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/semicolon/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/semicolon/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] after/semicolon/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] after/semicolon/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/semicolon/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/semicolon/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] after/semicolon/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] after/semicolon/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/semicolon/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/semicolon/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] after/semicolon/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] after/semicolon/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/semicolon/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/semicolon/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] after/semicolon/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] after/semicolon/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] load/noreorder/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] load/noreorder/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] after/noreorder/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] after/noreorder/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] load/noreorder/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] load/noreorder/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] after/noreorder/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] after/noreorder/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] load/noreorder/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] load/noreorder/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] after/noreorder/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] after/noreorder/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] load/noreorder/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] load/noreorder/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] after/noreorder/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] after/noreorder/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.34": *cop2_modes_2_30_expected
+  "2.56": &cop2_modes_2_56_expected
+    .text:
+      # [01] load/app_transfer/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] load/app_transfer/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] after/app_transfer/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] after/app_transfer/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] load/app_transfer/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] load/app_transfer/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] after/app_transfer/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] after/app_transfer/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] load/app_transfer/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] load/app_transfer/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] after/app_transfer/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] after/app_transfer/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] load/app_transfer/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] load/app_transfer/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] after/app_transfer/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] after/app_transfer/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] load/app_all/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] load/app_all/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] after/app_all/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] after/app_all/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] load/app_all/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] load/app_all/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] after/app_all/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] after/app_all/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] load/app_all/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] load/app_all/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] after/app_all/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] after/app_all/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] load/app_all/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] load/app_all/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] after/app_all/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] after/app_all/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] load/semicolon/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] load/semicolon/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] after/semicolon/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] after/semicolon/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] load/semicolon/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] load/semicolon/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] after/semicolon/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] after/semicolon/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] load/semicolon/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] load/semicolon/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] after/semicolon/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] after/semicolon/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] load/semicolon/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] load/semicolon/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x00000000"  # nop
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] after/semicolon/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] after/semicolon/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] load/noreorder/mfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48044000"  # mfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] load/noreorder/mfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] after/noreorder/mfc2/addu $9,$8,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] after/noreorder/mfc2/addu $8,$9,$10
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] load/noreorder/cfc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48444000"  # cfc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] load/noreorder/cfc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] after/noreorder/cfc2/addu $9,$8,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] after/noreorder/cfc2/addu $8,$9,$10
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] load/noreorder/mtc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48844000"  # mtc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] load/noreorder/mtc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] after/noreorder/mtc2/addu $9,$8,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] after/noreorder/mtc2/addu $8,$9,$10
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] load/noreorder/ctc2/4,8/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C44000"  # ctc2        $a0, $8
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] load/noreorder/ctc2/8,4/gap0
+      - "0x96480172"  # lhu         $t0, 0x172($s2)
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] after/noreorder/ctc2/addu $9,$8,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x010A4821"  # addu        $t1, $t0, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] after/noreorder/ctc2/addu $8,$9,$10
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x012A4021"  # addu        $t0, $t1, $t2
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.67": *cop2_modes_2_56_expected
+  "2.77": *cop2_modes_2_56_expected
+  "2.79": *cop2_modes_2_56_expected
+  "2.81": *cop2_modes_2_56_expected
+  "2.86": *cop2_modes_2_56_expected

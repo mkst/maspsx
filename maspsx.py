@@ -11,6 +11,7 @@ from maspsx import LcommAlignment, MaspsxProcessor, PassthroughProcessor
 
 @dataclass
 class AspsxVersionConfig:
+    cop2_version: tuple[int, int] = (2, 86)
     div_uses_tge: bool = False
     nop_at_expansion: bool = False
     nop_mflo_mfhi: bool = True
@@ -33,6 +34,7 @@ def config_for_aspsx_version(aspsx_version_arg: str | None) -> AspsxVersionConfi
         return config
 
     aspsx_version = tuple(int(x) for x in aspsx_version_arg.split("."))
+    config.cop2_version = aspsx_version
     if aspsx_version < (2, 8):
         config.lcomm_alignment = LcommAlignment.NONE
     if (1, 10) < aspsx_version < (2, 10):
@@ -156,6 +158,7 @@ def main() -> None:
 
         processor = MaspsxProcessor(
             in_lines,
+            cop2_version=version_config.cop2_version,
             sdata_limit=sdata_limit,
             expand_div=args.expand_div,
             expand_li=version_config.expand_li,

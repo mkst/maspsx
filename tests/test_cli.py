@@ -94,6 +94,8 @@ class TestCli(unittest.TestCase):
 
         for version, expected in expected_by_version.items():
             with self.subTest(version=version):
+                if version is not None:
+                    expected.cop2_version = tuple(int(x) for x in version.split("."))
                 self.assertEqual(
                     expected,
                     self.maspsx_cli.config_for_aspsx_version(version),

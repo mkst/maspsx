@@ -1,0 +1,1413 @@
+# See ../COP2_BEHAVIOR.md. Two explicit nops separate source blocks.
+source: ASM/COP2_GTE_DELAY.S
+cases:
+  "1.05": &cop2_gte_delay_1_05_expected
+    .text:
+      # [01] gte/plain/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] gte/plain/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] gte/plain/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] gte/plain/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] gte/plain/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] gte/plain/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] gte/plain/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] gte/plain/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] gte/plain/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] gte/plain/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] gte/plain/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] gte/plain/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] gte/plain/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] gte/plain/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] gte/plain/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] gte/plain/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] gte/plain/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] gte/plain/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] gte/plain/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] gte/plain/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] gte/plain/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] gte/plain/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] gte/plain/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] gte/plain/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] gte/plain/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] gte/plain/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] gte/plain/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] gte/plain/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] gte/noreorder/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] gte/noreorder/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] gte/noreorder/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] gte/noreorder/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] gte/noreorder/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] gte/noreorder/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] gte/noreorder/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] gte/noreorder/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] gte/noreorder/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] gte/noreorder/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] gte/noreorder/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] gte/noreorder/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] gte/noreorder/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] gte/noreorder/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] gte/noreorder/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] gte/noreorder/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] gte/noreorder/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] gte/noreorder/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] gte/noreorder/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] gte/noreorder/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] gte/noreorder/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] gte/noreorder/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] gte/noreorder/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] gte/noreorder/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] gte/noreorder/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] gte/noreorder/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] gte/noreorder/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] gte/noreorder/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] gte/semicolon/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] gte/semicolon/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] gte/semicolon/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] gte/semicolon/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] copnext/plain/mfc2/cop2 0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] copnext/plain/mfc2/mfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] copnext/plain/mfc2/cfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] copnext/plain/cfc2/cop2 0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] copnext/plain/cfc2/mfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] copnext/plain/cfc2/cfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] copnext/plain/mtc2/cop2 0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] copnext/plain/mtc2/mfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] copnext/plain/mtc2/cfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] copnext/plain/ctc2/cop2 0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] copnext/plain/ctc2/mfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] copnext/plain/ctc2/cfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "1.07": *cop2_gte_delay_1_05_expected
+  "2.05": *cop2_gte_delay_1_05_expected
+  "2.08": *cop2_gte_delay_1_05_expected
+  "2.21": *cop2_gte_delay_1_05_expected
+  "2.30": &cop2_gte_delay_2_30_expected
+    .text:
+      # [01] gte/plain/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] gte/plain/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] gte/plain/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] gte/plain/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] gte/plain/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] gte/plain/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] gte/plain/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] gte/plain/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] gte/plain/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] gte/plain/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] gte/plain/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] gte/plain/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] gte/plain/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] gte/plain/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] gte/plain/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] gte/plain/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] gte/plain/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] gte/plain/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] gte/plain/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] gte/plain/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] gte/plain/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] gte/plain/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] gte/plain/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] gte/plain/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] gte/plain/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] gte/plain/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] gte/plain/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] gte/plain/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] gte/noreorder/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] gte/noreorder/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] gte/noreorder/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] gte/noreorder/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] gte/noreorder/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] gte/noreorder/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] gte/noreorder/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] gte/noreorder/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] gte/noreorder/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] gte/noreorder/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] gte/noreorder/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] gte/noreorder/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] gte/noreorder/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] gte/noreorder/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] gte/noreorder/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] gte/noreorder/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] gte/noreorder/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] gte/noreorder/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] gte/noreorder/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] gte/noreorder/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] gte/noreorder/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] gte/noreorder/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] gte/noreorder/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] gte/noreorder/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] gte/noreorder/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] gte/noreorder/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] gte/noreorder/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] gte/noreorder/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] gte/semicolon/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] gte/semicolon/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] gte/semicolon/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] gte/semicolon/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] copnext/plain/mfc2/cop2 0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] copnext/plain/mfc2/mfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] copnext/plain/mfc2/cfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] copnext/plain/cfc2/cop2 0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] copnext/plain/cfc2/mfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] copnext/plain/cfc2/cfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] copnext/plain/mtc2/cop2 0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] copnext/plain/mtc2/mfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] copnext/plain/mtc2/cfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] copnext/plain/ctc2/cop2 0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] copnext/plain/ctc2/mfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] copnext/plain/ctc2/cfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.34": *cop2_gte_delay_2_30_expected
+  "2.56": &cop2_gte_delay_2_56_expected
+    .text:
+      # [01] gte/plain/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [02] gte/plain/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [03] gte/plain/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [04] gte/plain/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [05] gte/plain/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [06] gte/plain/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [07] gte/plain/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [08] gte/plain/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [09] gte/plain/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [10] gte/plain/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [11] gte/plain/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [12] gte/plain/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [13] gte/plain/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [14] gte/plain/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [15] gte/plain/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [16] gte/plain/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [17] gte/plain/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [18] gte/plain/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [19] gte/plain/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [20] gte/plain/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [21] gte/plain/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [22] gte/plain/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [23] gte/plain/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [24] gte/plain/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [25] gte/plain/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [26] gte/plain/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [27] gte/plain/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [28] gte/plain/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [29] gte/noreorder/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [30] gte/noreorder/mfc2/nop/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [31] gte/noreorder/mfc2/addu $10,$11,$12/gap1
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [32] gte/noreorder/mfc2/nop/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [33] gte/noreorder/mfc2/addu $10,$11,$12/gap2
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [34] gte/noreorder/mfc2/nop/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [35] gte/noreorder/mfc2/addu $10,$11,$12/gap3
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [36] gte/noreorder/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [37] gte/noreorder/cfc2/nop/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [38] gte/noreorder/cfc2/addu $10,$11,$12/gap1
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [39] gte/noreorder/cfc2/nop/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [40] gte/noreorder/cfc2/addu $10,$11,$12/gap2
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [41] gte/noreorder/cfc2/nop/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [42] gte/noreorder/cfc2/addu $10,$11,$12/gap3
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [43] gte/noreorder/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [44] gte/noreorder/mtc2/nop/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [45] gte/noreorder/mtc2/addu $10,$11,$12/gap1
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [46] gte/noreorder/mtc2/nop/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [47] gte/noreorder/mtc2/addu $10,$11,$12/gap2
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [48] gte/noreorder/mtc2/nop/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [49] gte/noreorder/mtc2/addu $10,$11,$12/gap3
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [50] gte/noreorder/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [51] gte/noreorder/ctc2/nop/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [52] gte/noreorder/ctc2/addu $10,$11,$12/gap1
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [53] gte/noreorder/ctc2/nop/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [54] gte/noreorder/ctc2/addu $10,$11,$12/gap2
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [55] gte/noreorder/ctc2/nop/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [56] gte/noreorder/ctc2/addu $10,$11,$12/gap3
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x016C5021"  # addu        $t2, $t3, $t4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [57] gte/semicolon/mfc2/addu $10,$11,$12/gap0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [58] gte/semicolon/cfc2/addu $10,$11,$12/gap0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [59] gte/semicolon/mtc2/addu $10,$11,$12/gap0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [60] gte/semicolon/ctc2/addu $10,$11,$12/gap0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A180001"  # .word       0x4A180001                   # INVALID     $s0, $t8, 0x1 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [61] copnext/plain/mfc2/cop2 0
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [62] copnext/plain/mfc2/mfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [63] copnext/plain/mfc2/cfc2 $8,$4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [64] copnext/plain/cfc2/cop2 0
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [65] copnext/plain/cfc2/mfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [66] copnext/plain/cfc2/cfc2 $8,$4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [67] copnext/plain/mtc2/cop2 0
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [68] copnext/plain/mtc2/mfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [69] copnext/plain/mtc2/cfc2 $8,$4
+      - "0x48882000"  # mtc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [70] copnext/plain/ctc2/cop2 0
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x00000000"  # nop
+      - "0x00000000"  # nop
+      - "0x4A000000"  # .word       0x4A000000                   # INVALID     $s0, $zero, 0x0 # 00000000 <InstrIdType: CPU_COP2>
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [71] copnext/plain/ctc2/mfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48082000"  # mfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+      # [72] copnext/plain/ctc2/cfc2 $8,$4
+      - "0x48C82000"  # ctc2        $t0, $4
+      - "0x48482000"  # cfc2        $t0, $4
+      - "0x00000000"  # nop (explicit separator)
+      - "0x00000000"  # nop (explicit separator)
+  "2.67": *cop2_gte_delay_2_56_expected
+  "2.77": *cop2_gte_delay_2_56_expected
+  "2.79": *cop2_gte_delay_2_56_expected
+  "2.81": *cop2_gte_delay_2_56_expected
+  "2.86": *cop2_gte_delay_2_56_expected

@@ -15,6 +15,7 @@ jump_mnemonics = {
     "j",
     "jal",
 }
+cop2_transfers = ("mfc2", "cfc2", "mtc2", "ctc2")
 aligned_load_mnemonics = {
     "lb",
     "lbu",
@@ -486,6 +487,7 @@ class MaspsxProcessor:
         comm_uses_sdata_limit=True,
         gp_allow=True,
         li_small_uses_addiu=False,
+        cop2_version=(2, 86),
     ):
         self.lines = [x.strip() for x in lines]
 
@@ -494,6 +496,7 @@ class MaspsxProcessor:
         self.expand_div = expand_div
         self.expand_li = expand_li
         self.li_small_uses_addiu = li_small_uses_addiu
+        self.cop2_version = cop2_version
 
         self.nop_at_expansion = nop_at_expansion
         self.nop_mflo_mfhi = nop_mflo_mfhi
@@ -618,6 +621,8 @@ class MaspsxProcessor:
 
     def process_lines(self):
         self.is_reorder = True
+        self._cop2_previous = ("", "", False)
+        self._cop2_slots = 0
         self.skip_instructions = 0
         self.file_num = 1
 
@@ -648,7 +653,7 @@ class MaspsxProcessor:
                 self.skip_instructions -= 1
                 res += [f"# {line}  # DEBUG: skipped"]
             else:
-                res += self.process_line(line)
+                res += self._handle_cop2(self.process_line(line))
 
         for section, entries in [
             ("sbss", self.sbss_entries),
@@ -686,6 +691,99 @@ class MaspsxProcessor:
                     ]
                 )
 
+        return res
+
+    def _cop2_uses_reg(self, line: str, reg: str) -> bool:
+        """ASPSX's operand tests, including comparisons across register banks."""
+        op, *rest = line.split(None, 1)
+        operands = rest[0].split(",") if rest else []
+        operands = [operand.strip() for operand in operands]
+        version = self.cop2_version
+        if op in cop2_transfers:
+            if version < (2, 21):
+                return reg in operands
+            if version < (2, 30) or op == "mtc2":
+                return reg == operands[0]
+            if op == "ctc2":
+                return reg == operands[1 if version < (2, 56) else 0]
+            return False
+        if op in ("lwc2", "swc2"):
+            if reg == operands[0] and (
+                version < (2, 21) or (op == "swc2" and (2, 30) <= version < (2, 56))
+            ):
+                return True
+            return bool(re.search(rf"\(\s*{re.escape(reg)}\s*\)$", line))
+        if version < (2, 30):
+            # Older read delays also protect a GPR that is only overwritten.
+            return reg in re.findall(r"\$[A-Za-z0-9]+", " ".join(rest))
+        return line_loads_from_reg(line, reg)
+
+    def _handle_cop2(self, lines: List[str]) -> List[str]:
+        """Schedule only COP2 hazards, counting instructions after expansion.
+
+        Source reorder mode comes from process_line, not generated .set lines.
+        Keep each emitted line intact unless a nop is needed inside it.
+        """
+        res = []
+        for raw in lines:
+            parts = []
+            changed = False
+            for line in strip_comments(raw).split(";"):
+                line = line.strip()
+                if not line or line.startswith(".") or line.endswith(":"):
+                    if line.startswith((".section", ".text", ".data", ".rdata")):
+                        self._cop2_previous = ("", "", False)
+                        self._cop2_slots = 0
+                    parts.append(line)
+                    continue
+                op, *rest = line.split(None, 1)
+                previous_op, reg, reorder = self._cop2_previous
+                transfer = op in cop2_transfers
+                delayed = (
+                    (previous_op in load_mnemonics and reorder and transfer)
+                    or (previous_op == "mfc2" and reorder)
+                    or (previous_op == "cfc2" and self.cop2_version >= (2, 30))
+                )
+                nops = int(
+                    delayed
+                    and reg not in ("$0", "$zero")
+                    and self._cop2_uses_reg(line, reg)
+                )
+                if op == "cop2" and self.cop2_version >= (2, 56):
+                    nops = max(nops, self._cop2_slots)
+                parts.extend(["nop"] * nops)
+                parts.append(line)
+                changed |= nops > 0
+                width = 1
+                if self._cop2_slots:
+                    # Some pseudos are deliberately left for GNU as. Count
+                    # their words too; the pending delay is at most two slots.
+                    if op in ("li", "la") and is_number(rest[0].split(",")[1].strip()):
+                        value = int(rest[0].split(",")[1], 0) & 0xFFFFFFFF
+                        # A 16-bit immediate or a lone lui needs only one word.
+                        width = (
+                            1
+                            if value < 0x10000
+                            or value >= 0xFFFF8000
+                            or value & 0xFFFF == 0
+                            else 2
+                        )
+                    elif (
+                        op in load_mnemonics | store_mnemonics and "%gp_rel" not in line
+                    ):
+                        _, _, operand, addend, expands = parse_load_or_store(rest[0])
+                        width += int(
+                            expands
+                            and (addend or not -32768 <= int(operand, 0) < 32768)
+                        )
+                self._cop2_slots = (
+                    2
+                    if op in ("mtc2", "ctc2")
+                    else max(0, self._cop2_slots - width - nops)
+                )
+                reg = rest[0].split(",")[0].strip() if rest else ""
+                self._cop2_previous = (op, reg, self.is_reorder)
+            res.extend(parts if changed else [raw])
         return res
 
     def get_next_instruction(
@@ -741,6 +839,19 @@ class MaspsxProcessor:
         self, next_instruction: str, r_dest: str
     ) -> list[str]:
         res: list[str] = []
+
+        # COP2 load delays are decided from emitted instructions, so expanded
+        # loads, inline macros and source reorder mode all use the same rules.
+        source = self.lines[self.line_index]
+        next_op = next_instruction.split()[0] if next_instruction else ""
+        if source.split()[0] in load_mnemonics and (
+            next_op in cop2_transfers
+            or (
+                ";" in source
+                and expand_macro(source)[-1][0] in (*cop2_transfers, "cop2")
+            )
+        ):
+            return res
 
         if line_loads_from_reg(next_instruction, r_dest, loads_to_reg=self.nop_lw_lw):
             nop_required = False

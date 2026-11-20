@@ -105,11 +105,18 @@ class TestRunner(unittest.TestCase):
 
 class TestAssemblyDiff(unittest.TestCase):
     def test_includes_raw_words_and_disassembly(self):
-        diff = util.assembly_diff(["0x00220821"], ["0x8F820000"])
-        self.assertIn("0x00220821", diff)
-        self.assertIn("0x8F820000", diff)
-        self.assertIn("addu", diff)
-        self.assertIn("lw", diff)
+        from spimdisasm.common import GlobalConfig, InputEndian
+
+        for endian in (InputEndian.BIG, InputEndian.LITTLE):
+            with self.subTest(endian=endian), patch.object(
+                GlobalConfig, "ENDIAN", endian
+            ):
+                diff = util.assembly_diff(["0x00220821"], ["0x8F820000"])
+                self.assertIn("0x00220821", diff)
+                self.assertIn("0x8F820000", diff)
+                self.assertIn("addu", diff)
+                self.assertIn("lw", diff)
+                self.assertEqual(endian, GlobalConfig.ENDIAN)
 
 
 class TestOutputDiff(unittest.TestCase):

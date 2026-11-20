@@ -399,10 +399,8 @@ def disassemble(words: list[str]) -> list[str]:
         from spimdisasm.disasmdis import DisasmdisInternals
 
         decoder = DisasmdisInternals.rabbitizer.Instruction
-        parse_word = DisasmdisInternals.getWordFromStr
     except (ImportError, AttributeError):
         decoder = None
-        parse_word = None
     try:
         if decoder is None:
             import rabbitizer
@@ -413,7 +411,8 @@ def disassemble(words: list[str]) -> list[str]:
     lines = []
     for offset, word in enumerate(words):
         try:
-            value = parse_word(word[2:]) if parse_word else int(word, 16)
+            # These are numeric words, not bytes in the configured endianness.
+            value = int(word, 16)
             instruction = decoder(value).disassemble()
         except Exception as exc:
             instruction = f"<decode error: {exc}>"

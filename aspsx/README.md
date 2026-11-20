@@ -2,6 +2,9 @@
 
 The idea of this directory is to leverage unit tests to catalog the various differences between ASPSX versions.
 
+See [COP2 transfer nop behavior](COP2_BEHAVIOR.md) for the `mfc2`, `cfc2`,
+`mtc2`, and `ctc2` version matrix and its characterization fixtures.
+
 
 ## Running the tests
 
