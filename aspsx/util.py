@@ -394,24 +394,13 @@ def run_aspsx(
 def disassemble(words: list[str]) -> list[str]:
     """Return one stable human-readable instruction line per machine word."""
     try:
-        # Use spimdisasm's configured Rabbitizer bridge when available. This
-        # keeps the harness aligned with the disassembler used by the project.
-        from spimdisasm.disasmdis import DisasmdisInternals
-
-        decoder = DisasmdisInternals.rabbitizer.Instruction
-    except (ImportError, AttributeError):
-        decoder = None
-    try:
-        if decoder is None:
-            import rabbitizer
-
-            decoder = rabbitizer.Instruction
+        import rabbitizer
     except ImportError:
         return [f"{word}  <Rabbitizer unavailable>" for word in words]
     lines = []
     for offset, word in enumerate(words):
         try:
-            instruction = decoder(int(word, 16)).disassemble()
+            instruction = rabbitizer.Instruction(int(word, 16)).disassemble()
         except Exception as exc:
             instruction = f"<decode error: {exc}>"
         lines.append(f"0x{offset * 4:04X}: {word}  {instruction}")
