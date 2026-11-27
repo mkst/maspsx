@@ -1221,6 +1221,12 @@ class MaspsxProcessor:
 
             move_from = "mfhi" if op == "rem" else "mflo"
             if self.expand_div:
+                # tge is MIPS II, so GNU as refuses it for the R3000
+                overflow = (
+                    ".word\t0x00001770  # tge $zero,$zero,93"
+                    if self.div_uses_tge
+                    else "break\t0x6"
+                )
                 res.extend(
                     [
                         "# EXPAND_DIV START",
@@ -1235,7 +1241,7 @@ class MaspsxProcessor:
                         "lui\t$at,0x8000",
                         f"bne\t{r_source},$at,.L_DIV_BY_POSITIVE_SIGN_{self.line_index}",
                         "nop",
-                        "tge\t$zero,$zero,93" if self.div_uses_tge else "break\t0x6",
+                        overflow,
                         f".L_DIV_BY_POSITIVE_SIGN_{self.line_index}:",
                         f"{move_from}\t{r_dest}",
                         ".set\tat",
